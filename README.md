@@ -5,22 +5,21 @@
 
 ## 准备工作
 
-- <a href="https://www.bytedesk.com/admin#/register" target="_blank">注册账号</a>
-- <a href="https://www.bytedesk.com/admin#/login" target="_blank">登录后台</a>
-- 分配应用：登录后台->接入设置->移动应用->添加应用
+- [注册账号](https://www.bytedesk.com/admin#/register)
+- [登录后台](https://www.bytedesk.com/admin#/login)
+- 分配应用：登录后台->所有设置->应用管理->APP
 
 ## 集成SDK
 
-萝卜丝·云客服在经典版<a href="http://www.weikefu.net" target="_blank">微客服</a>基础上面做了重构，将原先一个SDK一分为二为两个sdk：
+萝卜丝·云客服在经典版[微客服](http://www.weikefu.net)基础上面做了重构，将原先一个SDK一分为二为两个sdk：
 
-  - 核心库：com.bytedesk:core: [![Download](https://api.bintray.com/packages/jackning/maven/core/images/download.svg)](https://bintray.com/jackning/maven/core/_latestVersion), [详情](https://bintray.com/jackning/maven/core)
-  - 界面库，完全开源(Demo中的bytedesk-ui模块)，方便开发者自定义界面：com.bytedesk:ui: [![Download](https://api.bintray.com/packages/jackning/maven/ui/images/download.svg)](https://bintray.com/jackning/maven/ui/_latestVersion), [详情](https://bintray.com/jackning/maven/ui)
-
+- 核心库：com.bytedesk:core: [![Download](https://api.bintray.com/packages/jackning/maven/core/images/download.svg)](https://bintray.com/jackning/maven/core/_latestVersion), [详情](https://bintray.com/jackning/maven/core)
+- 界面库，完全开源(Demo中的bytedesk-ui模块)，方便开发者自定义界面：com.bytedesk:ui: [![Download](https://api.bintray.com/packages/jackning/maven/ui/images/download.svg)](https://bintray.com/jackning/maven/ui/_latestVersion), [详情](https://bintray.com/jackning/maven/ui)
 
 开发环境：
 
-  - Android Studio 3.1
-  - Gradle 4.6
+- Android Studio 3.1
+- Gradle 4.6
 
 > 第一步：在项目build.gradle的 allprojects -> repositories 添加
 
@@ -46,7 +45,6 @@ allprojects {
 
 > 第二步：在module的build.gradle dependencies 里面添加依赖库，两种方法二选其一：
 
-
 > 方法一：基于默认UI
 
 ```java
@@ -55,7 +53,6 @@ implementation 'com.bytedesk:core:1.0.1' // 注意：1.0.1为编写文档时的�
 // 加载默认UI库
 implementation 'com.bytedesk:ui:1.0.0' // 注意：1.0.1为编写文档时的版本，集成到项目时请使用最新版
 ```
-
 
 > 方法二：自定义对话界面UI
 
@@ -70,8 +67,8 @@ implementation project(':bytedesk-ui')
 
 基于两点考虑：
 
-  - 方便开发者快速集成
-  - 方便开发者对接App自有用户系统
+- 方便开发者快速集成
+- 方便开发者对接App自有用户系统
 
 我们开放了两种登录接口, 二选其一
 
@@ -110,7 +107,6 @@ WXCoreApi.visitorLogin(getApplicationContext(), appkey, subdomain, new LoginCall
 ```
 
 > 接口二：自定义用户名登录
-
 > 首先调用注册接口：
 
 ```java
@@ -148,9 +144,9 @@ WXCoreApi.visitorLogin(getApplicationContext(),"username", appkey, subdomain, ne
 
 总共有三个相关接口：
 
- - 获取用户信息接口：获取用户昵称，以及key/value信息对
- - 设置用户昵称接口：设置用户昵称，可在客服端显示
- - 设置用户任意信息接口：自定义key/value设置用户信息，可在客服端显示查看
+- 获取用户信息接口：获取用户昵称，以及key/value信息对
+- 设置用户昵称接口：设置用户昵称，可在客服端显示
+- 设置用户任意信息接口：自定义key/value设置用户信息，可在客服端显示查看
 
 > 获取用户信息
 
@@ -232,14 +228,12 @@ WXCoreApi.visitorSetUserinfo(getContext(), "自定义key", "自定义value", new
 });
 ```
 
-
 ## 在线状态接口
 
 提供两个接口：
 
-  - 查询某个客服账号的在线状态
-  - 查询某个工作组id的在线状态
-
+- 查询某个客服账号的在线状态
+- 查询某个工作组id的在线状态
 
 > 获取某个客服账号的在线状态：online代表在线，offline代表离线
 
@@ -285,9 +279,7 @@ WXCoreApi.visitorGetWorkgroupStatus(getContext(), mDefaultWorkgroupId, new BaseC
 });
 ```
 
-
 ## 历史会话接口
-
 
 支持获取用户的所有历史会话
 
@@ -311,4 +303,3 @@ WXCoreApi.visitorGetThreads(getContext(), new BaseCallback() {
     }
 });
 ```
-
