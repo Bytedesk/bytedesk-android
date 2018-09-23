@@ -13,8 +13,8 @@
 
 萝卜丝·云客服在经典版<a href="http://www.weikefu.net" target="_blank">微客服</a>基础上面做了重构，将原先一个SDK一分为二为两个sdk：
 
-  - 核心库：com.bytedesk:core: [![Download](https://api.bintray.com/packages/jackning/maven/core/images/download.svg)](https://bintray.com/jackning/maven/core/_latestVersion)
-  - 界面库，完全开源(Demo中的bytedesk-ui模块)，方便开发者自定义界面：com.bytedesk:ui: [![Download](https://api.bintray.com/packages/jackning/maven/ui/images/download.svg)](https://bintray.com/jackning/maven/ui/_latestVersion)
+  - 核心库：com.bytedesk:core: [![Download](https://api.bintray.com/packages/jackning/maven/core/images/download.svg)](https://bintray.com/jackning/maven/core/_latestVersion), [详情](https://bintray.com/jackning/maven/core)
+  - 界面库，完全开源(Demo中的bytedesk-ui模块)，方便开发者自定义界面：com.bytedesk:ui: [![Download](https://api.bintray.com/packages/jackning/maven/ui/images/download.svg)](https://bintray.com/jackning/maven/ui/_latestVersion), [详情](https://bintray.com/jackning/maven/ui)
 
 
 开发环境：
@@ -51,9 +51,9 @@ allprojects {
 
 ```java
 // 加载核心库
-implementation 'com.bytedesk:core:1.0.1' // 注意：1.0.1为编写文档时的版本，集成到项目时请使用最新版，
+implementation 'com.bytedesk:core:1.0.1' // 注意：1.0.1为编写文档时的版本，集成到项目时请使用最新版
 // 加载默认UI库
-implementation 'com.bytedesk:ui:1.0.0'
+implementation 'com.bytedesk:ui:1.0.0' // 注意：1.0.1为编写文档时的版本，集成到项目时请使用最新版
 ```
 
 
