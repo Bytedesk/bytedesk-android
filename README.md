@@ -52,7 +52,7 @@ allprojects {
 // 加载核心库
 implementation 'com.bytedesk:core:1.0.1' // 注意：1.0.1为编写文档时的版本，集成到项目时请使用最新版
 // 加载默认UI库
-implementation 'com.bytedesk:ui:1.0.0' // 注意：1.0.1为编写文档时的版本，集成到项目时请使用最新版
+implementation 'com.bytedesk:ui:1.0.0' // 注意：1.0.0为编写文档时的版本，集成到项目时请使用最新版
 ```
 
 > 方法二：自定义对话界面UI
@@ -185,7 +185,7 @@ BDCoreApi.visitorSetUserinfo(getContext(), "自定义key", "自定义value", new
 - 查询某个工作组id的在线状态
 - 查询某个客服uId的在线状态（获取uId: 登录后台->所有设置->客服账号->客服：唯一ID(uId)）
 
-> 获取某个工作组的在线状态：online代表在线，offline代表离线
+> 获取某个工作组的在线状态：1代表在线，注意需要替换真实参数
 
 ```java
 BDCoreApi.visitorGetWorkgroupStatus(getContext(), mDefaultWorkgroupId, new BaseCallback() {
@@ -239,7 +239,7 @@ BDCoreApi.visitorGetThreads(getContext(), new BaseCallback() {
     public void onSuccess(JSONObject object) {
         // 获取成功
     }
-    
+
     @Override
     public void onError(JSONObject object) {
         // 获取失败
