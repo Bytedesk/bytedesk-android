@@ -1,3 +1,30 @@
 <resources>
-    <string name="app_name">ByteDeskDemo</string>
+    <string name="app_name">BytedeskDemo</string>
+
+    <!-- 接口说明界面 -->
+
+
+    <!-- 登录接口界面 -->
+
+
+    <!-- 开始新会话界面 -->
+
+
+    <!-- 设置用户信息界面 -->
+
+
+    <!-- 查询/设置用户信息界面 -->
+
+
+    <!-- 会话历史接口界面 -->
+
+
+    <!-- 关于界面 -->
+    <string name="about_title">关于</string>
+    <string name="about_url">http://wuxieyun.com</string>
+    <string name="about_item_homepage">访问官网: www.bytedesk.com</string>
+    <string name="about_item_github">GitHub</string>
+    <string name="about_copyright">© %1$s bytedesk.com All rights reserved.</string>
+
+
 </resources>

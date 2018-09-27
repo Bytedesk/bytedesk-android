@@ -1,28 +1,82 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
     defaultConfig {
-        applicationId "com.bytedesk.bytedeskdemo"
-        minSdkVersion 15
-        targetSdkVersion 28
+        applicationId "com.bytedesk.demo"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "5.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        // Error:(28, 17) 警告: Schema export directory is not provided to the annotation processor
+        // so we cannot export the schema. You can either provide `room.schemaLocation` annotation
+        // processor argument OR set exportSchema to false.
+//        javaCompileOptions {
+//            annotationProcessorOptions {
+//                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+//            }
+//        }
     }
     buildTypes {
+//        debug {
+//            buildConfigField("String", "BASE_URL", "\"http://www.kefudashi.com/implementation/v1\"")
+//        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            buildConfigField("String", "BASE_URL", "\"http://www.kefudashi.com/implementation/v2\"")
         }
     }
+
+    // 避免 lint 检测出错时停止构建
+    lintOptions {
+        abortOnError false
+    }
+    // 防止出现rxjava重复报错： Duplicated file rxjava.properties
+//    packagingOptions {
+//        exclude 'META-INF/rxjava.properties'
+//    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:28.+'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    // 加载核心库
+    implementation 'com.bytedesk:core:1.0.1'
+    // 加载默认UI库
+    implementation 'com.bytedesk:ui:1.0.0'
+
+    // http://jakewharton.github.io/butterknife/
+    implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    // Android sqlite 调试库
+    // https://github.com/facebook/stetho
+    implementation 'com.facebook.stetho:stetho:1.5.0'
+    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
+    implementation 'com.facebook.stetho:stetho-js-rhino:1.5.0'
+
+    // http://qmuiteam.com/android/page/start.html
+    // https://bintray.com/chanthuang/qmuirepo
+    implementation 'com.qmuiteam:qmui:1.1.7'
+    implementation 'com.qmuiteam:arch:0.1.4'
+
+    //    https://github.com/orhanobut/logger
+    implementation 'com.orhanobut:logger:2.2.0'
+
+    // 图片加载：https://github.com/bumptech/glide
+    implementation 'com.github.bumptech.glide:glide:4.6.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+
+    //
+    implementation 'com.android.support:support-v4:' + rootProject.supportLibVersion
+    implementation 'com.android.support:appcompat-v7:' + rootProject.supportLibVersion
+    implementation 'com.android.support:design:' + rootProject.supportLibVersion
+    implementation 'com.android.support:recyclerview-v7:' + rootProject.supportLibVersion
+
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
