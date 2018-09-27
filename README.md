@@ -66,30 +66,22 @@ implementation project(':bytedesk-ui')
 
 ## 登录接口
 
-基于两点考虑：
+- 获取appkey：登录后台->所有设置->应用管理->APP->appkey列
+- 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
 
-- 方便开发者快速集成
-- 方便开发者对接App自有用户系统
-
-我们开放了两种登录接口, 二选其一
-
-`获取Appkey和Subdomain：登录后台->接入设置->移动应用`
-
-> 接口一：默认用户名登录，系统自动生成一串数字作为用户名
+> 登录接口，默认用户名登录，系统自动生成一串数字作为用户名，其中appkey和企业号需要替换为真实值
 
 ```java
-// 需要填写真实的：登录后台->接入设置->移动应用 页面获取
-final String appkey = "appkey";
-final String subdomain = "user1";
+// 需要填写真实的
+final String appkey = "201809171553111";
+final String subdomain = "vip";
 // 登录接口
-WXCoreApi.visitorLogin(getApplicationContext(), appkey, subdomain, new LoginCallback() {
-
+BDCoreApi.visitorLogin(getApplicationContext(), appKey, subDomain, new LoginCallback() {
     @Override
     public void onSuccess(JSONObject object) {
-        // 登录成功
+        //
         try {
             Logger.d("login success message: " + object.get("message") + " status_code:" + object.get("status_code"));
-            // PassportToken passportToken = (PassportToken) object.get("data");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -97,9 +89,10 @@ WXCoreApi.visitorLogin(getApplicationContext(), appkey, subdomain, new LoginCall
 
     @Override
     public void onError(JSONObject object) {
-        // 登录失败
         try {
-            Logger.d("login faile message: " + object.get("message")+ " status_code:" + object.get("status_code")+ " data:" + object.get("data"));
+            Logger.d("login failed message: " + object.get("message")
+                    + " status_code:" + object.get("status_code")
+                    + " data:" + object.get("data"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -107,41 +100,16 @@ WXCoreApi.visitorLogin(getApplicationContext(), appkey, subdomain, new LoginCall
 });
 ```
 
-> 接口二：自定义用户名登录
-> 首先调用注册接口：
+## 开始会话
+
+- 获取uId: 登录后台->所有设置->客服账号->超级管理员用户的：唯一ID(uId)
+- 获取wId: 登录后台->所有设置->工作组->超级管理员用户的：唯一ID(wId)
 
 ```java
-WXCoreApi.visitorRegister("username", "nickname", appkey, subdomain, new BaseCallback() {
-    @Override
-    public void onSuccess(JSONObject object) {
-        // 注册成功
-        // 在此调用自定义用户名登录接口
-    }
-
-    @Override
-    public void onError(JSONObject object) {
-       // 注册失败
-    }
-});
+BDUiApi.visitorStartChatActivity(getContext(), uId, wId, '默认标题');
 ```
 
-> 其次调用登录接口：
-
-```java
-WXCoreApi.visitorLogin(getApplicationContext(),"username", appkey, subdomain, new LoginCallback() {
-    @Override
-    public void onSuccess(JSONObject object) {
-        // 登录成功
-    }
-
-    @Override
-    public void onError(JSONObject object) {
-        // 登录失败
-    }
-});
-```
-
-## 用户信息接口
+## 用户信息接口 (可选)
 
 总共有三个相关接口：
 
@@ -149,27 +117,16 @@ WXCoreApi.visitorLogin(getApplicationContext(),"username", appkey, subdomain, ne
 - 设置用户昵称接口：设置用户昵称，可在客服端显示
 - 设置用户任意信息接口：自定义key/value设置用户信息，可在客服端显示查看
 
-> 获取用户信息
+> 获取用户信息 (可选)
 
 ```java
-WXCoreApi.visitorGetUserinfo(getContext(), new BaseCallback() {
+BDCoreApi.visitorGetUserInfo(getContext(), new BaseCallback() {
 
     @Override
     public void onSuccess(JSONObject object) {
         try {
             Logger.d("get userinfo success message: " + object.get("message")+ " status_code:" + object.get("status_code")+ " data:" + object.get("data"));
             //
-            Userinfo userinfo = (Userinfo) object.get("data");
-            // 获取昵称
-            // userinfo.getNickname();
-            // 获取其他用户key:value
-            for (int i = 0; i < userinfo.getTags().size(); i++) {
-                Logger.i("key:" + userinfo.getTags().get(i).getKey() + " value:" + userinfo.getTags().get(i).getValue());
-                if (userinfo.getTags().get(i).getKey().equals(mTagkey)) {
-                    // 获取并设置tag
-                    // mTagValue = userinfo.getTags().get(i).getValue();
-                }
-            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -181,7 +138,6 @@ WXCoreApi.visitorGetUserinfo(getContext(), new BaseCallback() {
             Logger.d("get userinfo failed message: " + object.get("message")
                     + " status_code:" + object.get("status_code")
                     + " data:" + object.get("data"));
-            // WXUIUtils.showTipDialog(getContext(), "获取个人资料失败");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -189,20 +145,14 @@ WXCoreApi.visitorGetUserinfo(getContext(), new BaseCallback() {
 });
 ```
 
-> 设置用户昵称接口
+> 设置用户昵称接口 (可选)
 
 ```java
 // 调用接口设置昵称
-WXCoreApi.visitorSetNickname(getContext(), "nickname", new BaseCallback() {
+BDCoreApi.visitorSetNickname(getContext(), "nickname", new BaseCallback() {
     @Override
     public void onSuccess(JSONObject object) {
         // 设置昵称成功
-        //解析 object
-        // try {
-        //     String nickname = object.getJSONObject("data").getString("nickname");
-        // } catch (JSONException e) {
-        //     e.printStackTrace();
-        // }
     }
 
     @Override
@@ -212,11 +162,10 @@ WXCoreApi.visitorSetNickname(getContext(), "nickname", new BaseCallback() {
 });
 ```
 
-
-> 设置用户任意信息接口 
+> 设置用户任意信息接口 (可选)
 
 ```java
-WXCoreApi.visitorSetUserinfo(getContext(), "自定义key", "自定义value", new BaseCallback() {
+BDCoreApi.visitorSetUserinfo(getContext(), "自定义key", "自定义value", new BaseCallback() {
     @Override
     public void onSuccess(JSONObject object) {
         // 设置标签成功
@@ -229,39 +178,17 @@ WXCoreApi.visitorSetUserinfo(getContext(), "自定义key", "自定义value", new
 });
 ```
 
-## 在线状态接口
+## 在线状态接口 (可选)
 
 提供两个接口：
 
-- 查询某个客服账号的在线状态
 - 查询某个工作组id的在线状态
-
-> 获取某个客服账号的在线状态：online代表在线，offline代表离线
-
-```java
-WXCoreApi.visitorGetAgentStatus(getContext(), mDefaultAgentname, new BaseCallback() {
-    @Override
-    public void onSuccess(JSONObject object) {
-        // 获取成功 
-        try {
-            // String agent = object.getJSONObject("data").getString("agent");
-            // String status = object.getJSONObject("data").getString("status");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onError(JSONObject object) {
-        // 获取失败
-    }
-});
-```
+- 查询某个客服uId的在线状态（获取uId: 登录后台->所有设置->客服账号->客服：唯一ID(uId)）
 
 > 获取某个工作组的在线状态：online代表在线，offline代表离线
 
 ```java
-WXCoreApi.visitorGetWorkgroupStatus(getContext(), mDefaultWorkgroupId, new BaseCallback() {
+BDCoreApi.visitorGetWorkgroupStatus(getContext(), mDefaultWorkgroupId, new BaseCallback() {
     @Override
     public void onSuccess(JSONObject object) {
         //  获取成功
@@ -280,24 +207,39 @@ WXCoreApi.visitorGetWorkgroupStatus(getContext(), mDefaultWorkgroupId, new BaseC
 });
 ```
 
-## 历史会话接口
-
-支持获取用户的所有历史会话
+> 获取某个客服uId的在线状态：注意需要替换真实参数
 
 ```java
-WXCoreApi.visitorGetThreads(getContext(), new BaseCallback() {
+BDCoreApi.visitorGetAgentStatus(getContext(), mDefaultAgentname, new BaseCallback() {
     @Override
     public void onSuccess(JSONObject object) {
         // 获取成功
         try {
-            // VisitorGetThreadsResult visitorGetThreadsResult = (VisitorGetThreadsResult) object.get("data");
-            // Logger.d(visitorGetThreadsResult.getMessage());
-            // visitorGetThreadsResult.getThreadList();
+            // String agent = object.getJSONObject("data").getString("agent");
+            // String status = object.getJSONObject("data").getString("status");
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    @Override
+    public void onError(JSONObject object) {
+        // 获取失败
+    }
+});
+```
+
+## 历史会话接口 (可选)
+
+> 支持获取用户的所有历史会话
+
+```java
+BDCoreApi.visitorGetThreads(getContext(), new BaseCallback() {
+    @Override
+    public void onSuccess(JSONObject object) {
+        // 获取成功
+    }
+    
     @Override
     public void onError(JSONObject object) {
         // 获取失败
