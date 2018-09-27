@@ -64,6 +64,30 @@ implementation 'com.bytedesk:core:1.0.1'
 implementation project(':bytedesk-ui')
 ```
 
+## AndroidManifest.xml
+
+> 添加权限
+
+```java
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+> 其他
+
+```java
+<!--萝卜丝bytedesk.com代码 开始-->
+<activity
+    android:name="com.bytedesk.ui.activity.ChatActivity"
+    android:screenOrientation="portrait"/>
+
+<service android:name="com.bytedesk.paho.android.service.MqttService"/>
+<!--./萝卜丝bytedesk.com代码 结束-->
+```
+
 ## 登录接口
 
 - 获取appkey：登录后台->所有设置->应用管理->APP->appkey列

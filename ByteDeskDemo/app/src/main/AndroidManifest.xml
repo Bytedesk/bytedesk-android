@@ -36,12 +36,14 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
 
+
+        <!--萝卜丝bytedesk.com代码 开始-->
         <activity
             android:name="com.bytedesk.ui.activity.ChatActivity"
             android:screenOrientation="portrait"/>
 
-        <!-- Mqtt Service -->
         <service android:name="com.bytedesk.paho.android.service.MqttService"/>
+        <!--./萝卜丝bytedesk.com代码 结束-->
 
     </application>
 
