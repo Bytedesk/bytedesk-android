@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/kfds_message_item_timestamp_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/kfds_message_item_timestamp_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/kfds_timestamp_margin_top"
+            android:text="timestamp"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/kfds_message_item_content_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp">
+
+
+        <com.qmuiteam.qmui.widget.QMUIRadiusImageView
+            android:id="@+id/kfds_message_item_header"
+            android:clickable="true"
+            android:layout_width="@dimen/kfds_avatar_default_width_height"
+            android:layout_height="@dimen/kfds_avatar_default_width_height"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"/>
+
+        <TextView
+            android:id="@+id/kfds_message_item_content"
+            style="@style/kfds_chat_content_date_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toLeftOf="@+id/kfds_message_item_header"
+            android:autoLink="phone|email"
+            android:textColorLink="#0082CB"
+            android:background="@drawable/wx_message_item_background_self"
+            />
+
+    </RelativeLayout>
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
