@@ -42,6 +42,10 @@
             android:name="com.bytedesk.ui.activity.ChatActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name="com.bytedesk.ui.activity.BrowserActivity"
+            android:screenOrientation="portrait"/>
+
         <service android:name="com.bytedesk.paho.android.service.MqttService"/>
         <!--./萝卜丝bytedesk.com代码 结束-->
 

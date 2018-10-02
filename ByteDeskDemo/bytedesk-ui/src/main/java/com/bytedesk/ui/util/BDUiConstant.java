@@ -10,6 +10,7 @@ public class BDUiConstant {
     public static final String EXTRA_UID = "uId";
     public static final String EXTRA_WID = "wId";
     public static final String EXTRA_TITLE = "title";
+    public static final String EXTRA_URL = "url";
 
     //
     public static final int PERMISSION_REQUEST_CAMERA = 0;

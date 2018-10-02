@@ -270,3 +270,13 @@ BDCoreApi.visitorGetThreads(getContext(), new BaseCallback() {
     }
 });
 ```
+
+## 更新日志
+
+> 2018-10-02
+
+- 增加APP内嵌入wap演示
+
+> 2018-09-23
+
+- 新平台上线

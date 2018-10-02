@@ -13,11 +13,10 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/kfds_message_item_timestamp_textview"
+            android:id="@+id/bytedesk_message_item_timestamp_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/kfds_timestamp_margin_top"
-            android:textSize="10dp"
             android:text="timestamp"/>
 
     </LinearLayout>
@@ -30,7 +29,7 @@
 
         <!-- 显示圆形头像 -->
         <com.qmuiteam.qmui.widget.QMUIRadiusImageView
-            android:id="@+id/kfds_message_item_header"
+            android:id="@+id/bytedesk_message_item_header"
             android:clickable="true"
             android:layout_width="@dimen/kfds_avatar_default_width_height"
             android:layout_height="@dimen/kfds_avatar_default_width_height"
@@ -40,13 +39,13 @@
             android:id="@+id/kfds_message_item_content_agent_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/kfds_message_item_header"
+            android:layout_toRightOf="@+id/bytedesk_message_item_header"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="50dp"
             >
 
             <TextView
-                android:id="@+id/kfds_message_item_nickname"
+                android:id="@+id/kfds_message_item_agentnickname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -54,13 +53,15 @@
                 android:text="客服小薇"
                 />
 
-            <ImageView
-                android:id="@+id/appkefu_message_item_image"
+            <TextView
+                android:id="@+id/bytedesk_message_item_content"
                 style="@style/kfds_chat_content_date_style"
-                android:layout_width="200sp"
-                android:layout_height="200sp"
-                android:layout_below="@+id/kfds_message_item_nickname"
-                android:background="@drawable/wx_message_item_background" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/kfds_message_item_agentnickname"
+                android:autoLink="phone|email"
+                android:background="@drawable/wx_message_item_background"
+                android:textColorLink="#0082CB" />
 
         </RelativeLayout>
 

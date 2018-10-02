@@ -62,7 +62,7 @@
         </com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout>
 
 
-        <include layout="@layout/wx_fragment_chat_input" />
+        <include layout="@layout/bytedesk_fragment_chat_input" />
 
     </LinearLayout>
 

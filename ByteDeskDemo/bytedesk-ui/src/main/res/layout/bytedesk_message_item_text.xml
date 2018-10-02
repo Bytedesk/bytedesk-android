@@ -13,10 +13,11 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/kfds_message_item_timestamp_textview"
+            android:id="@+id/bytedesk_message_item_timestamp_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/kfds_timestamp_margin_top"
+            android:textSize="10dp"
             android:text="timestamp"/>
 
     </LinearLayout>
@@ -29,7 +30,7 @@
 
         <!-- 显示圆形头像 -->
         <com.qmuiteam.qmui.widget.QMUIRadiusImageView
-            android:id="@+id/kfds_message_item_header"
+            android:id="@+id/bytedesk_message_item_header"
             android:clickable="true"
             android:layout_width="@dimen/kfds_avatar_default_width_height"
             android:layout_height="@dimen/kfds_avatar_default_width_height"
@@ -39,29 +40,30 @@
             android:id="@+id/kfds_message_item_content_agent_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/kfds_message_item_header"
+            android:layout_toRightOf="@+id/bytedesk_message_item_header"
             android:layout_marginLeft="2dp"
-            android:layout_marginRight="50dp"
-            >
+            android:layout_marginRight="50dp">
 
             <TextView
-                android:id="@+id/kfds_message_item_agentnickname"
+                android:id="@+id/bytedesk_message_item_nickname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="10dp"
-                android:text="客服小薇"
-                />
+                android:textSize="10dp"
+                android:text="客服小薇" />
 
-            <TextView
-                android:id="@+id/kfds_message_item_content"
+            <com.qmuiteam.qmui.widget.textview.QMUILinkTextView
+                android:id="@+id/bytedesk_message_item_content"
                 style="@style/kfds_chat_content_date_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/kfds_message_item_agentnickname"
+                android:layout_below="@+id/bytedesk_message_item_nickname"
                 android:autoLink="phone|email"
                 android:background="@drawable/wx_message_item_background"
-                android:textColorLink="#0082CB" />
+                android:textColorLink="#0082CB"
+                android:textAlignment="center"/>
+            <!--app:qmui_linkTextColor="@color/wx_color_blue"-->
 
         </RelativeLayout>
 

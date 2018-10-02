@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -71,7 +70,6 @@ import java.util.List;
 public class ChatActivity extends AppCompatActivity
         implements ChatItemClickListener, View.OnClickListener {
 
-
     private QMUITopBar mTopBar;
     private QMUIPullRefreshLayout mPullRefreshLayout;
     private RecyclerView mRecyclerView;
@@ -99,7 +97,7 @@ public class ChatActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.wx_activity_chat);
+        setContentView(R.layout.bytedesk_activity_chat);
         //
         if (null != getIntent()) {
             uId = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);

@@ -58,31 +58,31 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
         switch (viewType) {
             case MessageEntity.TYPE_TEXT_ID:
-                layout = R.layout.wx_message_item_text;
+                layout = R.layout.bytedesk_message_item_text;
                 break;
             case MessageEntity.TYPE_TEXT_SELF_ID:
-                layout = R.layout.wx_message_item_text_self;
+                layout = R.layout.bytedesk_message_item_text_self;
                 break;
             case MessageEntity.TYPE_IMAGE_ID:
-                layout = R.layout.wx_message_item_image;
+                layout = R.layout.bytedesk_message_item_image;
                 break;
             case MessageEntity.TYPE_IMAGE_SELF_ID:
-                layout = R.layout.wx_message_item_image_self;
+                layout = R.layout.bytedesk_message_item_image_self;
                 break;
             case MessageEntity.TYPE_VOICE_ID:
-                layout = R.layout.wx_message_item_voice;
+                layout = R.layout.bytedesk_message_item_voice;
                 break;
             case MessageEntity.TYPE_VOICE_SELF_ID:
-                layout = R.layout.wx_message_item_voice_self;
+                layout = R.layout.bytedesk_message_item_voice_self;
                 break;
             case MessageEntity.TYPE_NOTIFICATION_ID:
-                layout = R.layout.wx_message_item_notification;
+                layout = R.layout.bytedesk_message_item_notification;
                 break;
             case MessageEntity.TYPE_QUEUE_NOTIFICATION_ID:
-                layout = R.layout.wx_message_item_notification;
+                layout = R.layout.bytedesk_message_item_notification;
                 break;
             default:
-                layout = R.layout.wx_message_item_text;
+                layout = R.layout.bytedesk_message_item_text;
         }
 
         View view = LayoutInflater.from(mContext).inflate(layout, parent, false);
@@ -129,45 +129,45 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             super(itemView);
             //
             messageViewType = msgeViewType;
-            timestampTextView = itemView.findViewById(R.id.kfds_message_item_timestamp_textview);
+            timestampTextView = itemView.findViewById(R.id.bytedesk_message_item_timestamp_textview);
 
             // 文字消息
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
                     || messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
                     || messageViewType == MessageEntity.TYPE_EVENT_ID
                     || messageViewType == MessageEntity.TYPE_EVENT_SELF_ID) {
-                avatarImageView = itemView.findViewById(R.id.kfds_message_item_header);
-                avatarImageView.setBorderColor(ContextCompat.getColor(mContext, R.color.wx_config_color_gray_6));
+                avatarImageView = itemView.findViewById(R.id.bytedesk_message_item_header);
+                avatarImageView.setBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_6));
                 avatarImageView.setBorderWidth(QMUIDisplayHelper.dp2px(mContext, 1));
-                avatarImageView.setSelectedMaskColor(ContextCompat.getColor(mContext, R.color.wx_config_color_gray_8));
-                avatarImageView.setSelectedBorderColor(ContextCompat.getColor(mContext, R.color.wx_config_color_gray_4));
+                avatarImageView.setSelectedMaskColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_8));
+                avatarImageView.setSelectedBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_4));
                 avatarImageView.setTouchSelectModeEnabled(true);
                 avatarImageView.setCircle(true);
-                contentTextView = itemView.findViewById(R.id.kfds_message_item_content);
+                contentTextView = itemView.findViewById(R.id.bytedesk_message_item_content);
             }
             // 图片消息
             else if (messageViewType == MessageEntity.TYPE_IMAGE_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID) {
-                avatarImageView = itemView.findViewById(R.id.kfds_message_item_header);
-                avatarImageView.setBorderColor(ContextCompat.getColor(mContext, R.color.wx_config_color_gray_6));
+                avatarImageView = itemView.findViewById(R.id.bytedesk_message_item_header);
+                avatarImageView.setBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_6));
                 avatarImageView.setBorderWidth(QMUIDisplayHelper.dp2px(mContext, 1));
-                avatarImageView.setSelectedMaskColor(ContextCompat.getColor(mContext, R.color.wx_config_color_gray_8));
-                avatarImageView.setSelectedBorderColor(ContextCompat.getColor(mContext, R.color.wx_config_color_gray_4));
+                avatarImageView.setSelectedMaskColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_8));
+                avatarImageView.setSelectedBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_4));
                 avatarImageView.setTouchSelectModeEnabled(true);
                 avatarImageView.setCircle(true);
-                imageImageView = itemView.findViewById(R.id.kfds_message_item_image);
+                imageImageView = itemView.findViewById(R.id.bytedesk_message_item_image);
             }
             // 通知消息
             else if (messageViewType == MessageEntity.TYPE_NOTIFICATION_ID
                     || messageViewType == MessageEntity.TYPE_QUEUE_NOTIFICATION_ID) {
-                notificationTextView = itemView.findViewById(R.id.kfds_message_item_notification_textview);
+                notificationTextView = itemView.findViewById(R.id.bytedesk_message_item_notification_textview);
             }
 
             // 收到的消息
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_ID
                     || messageViewType == MessageEntity.TYPE_VOICE_ID) {
-                nicknameTextView = itemView.findViewById(R.id.kfds_message_item_nickname);
+                nicknameTextView = itemView.findViewById(R.id.bytedesk_message_item_nickname);
             }
         }
 

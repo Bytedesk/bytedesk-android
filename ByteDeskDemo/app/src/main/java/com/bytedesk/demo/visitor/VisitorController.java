@@ -1,22 +1,17 @@
 package com.bytedesk.demo.visitor;
 
-import android.app.Activity;
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.bytedesk.demo.common.AboutFragment;
 import com.bytedesk.demo.visitor.tutorial.ChatFragment;
-import com.bytedesk.demo.visitor.tutorial.IntroFragment;
-import com.bytedesk.demo.visitor.tutorial.LoginFragment;
 import com.bytedesk.demo.visitor.tutorial.StatusFragment;
 import com.bytedesk.demo.visitor.tutorial.ProfileFragment;
 import com.bytedesk.demo.visitor.tutorial.ThreadFragment;
-import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.bytedesk.ui.api.BDUiApi;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseController;
-import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
@@ -74,6 +69,8 @@ public class VisitorController extends BaseController {
 
         QMUICommonListItemView sessionHistoryItem = mGroupListView.createItemView("会话历史记录接口");
 
+        QMUICommonListItemView wapChatItem = mGroupListView.createItemView("网页会话演示");
+
         QMUIGroupListView.newSection(getContext())
 //                .addItemView(introItem, new OnClickListener() {
 //                    @Override
@@ -115,6 +112,14 @@ public class VisitorController extends BaseController {
                     public void onClick(View view) {
                         ThreadFragment threadFragment = new ThreadFragment();
                         startFragment(threadFragment);
+                    }
+                })
+                .addItemView(wapChatItem, new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
+                        String url = "https://vip.bytedesk.com/visitor/chat?auid=201808221551193&wid=201807171659201&type=workGroup";
+                        BDUiApi.visitorStartChatWap(getContext(), url);
                     }
                 })
                 .addTo(mGroupListView);

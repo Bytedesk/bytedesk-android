@@ -15,7 +15,7 @@ public class BigImageViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.wx_activity_bigimageview);
+        setContentView(R.layout.bytedesk_activity_bigimageview);
 
         mImageUrl = getIntent().getStringExtra("image_url");
 

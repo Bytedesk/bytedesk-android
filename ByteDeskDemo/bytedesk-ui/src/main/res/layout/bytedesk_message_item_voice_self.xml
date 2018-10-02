@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
@@ -13,11 +12,10 @@
         android:gravity="center_horizontal">
 
         <TextView
-            android:id="@+id/kfds_message_item_timestamp_textview"
+            android:id="@+id/bytedesk_message_item_timestamp_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/kfds_timestamp_margin_top"
-            android:textSize="10dp"
             android:text="timestamp"/>
 
     </LinearLayout>
@@ -28,29 +26,27 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp">
 
+
         <com.qmuiteam.qmui.widget.QMUIRadiusImageView
-            android:id="@+id/kfds_message_item_header"
+            android:id="@+id/bytedesk_message_item_header"
             android:clickable="true"
             android:layout_width="@dimen/kfds_avatar_default_width_height"
             android:layout_height="@dimen/kfds_avatar_default_width_height"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"/>
 
-        <com.qmuiteam.qmui.widget.textview.QMUILinkTextView
-            android:id="@+id/kfds_message_item_content"
+        <TextView
+            android:id="@+id/bytedesk_message_item_content"
             style="@style/kfds_chat_content_date_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="5dp"
-            android:layout_toLeftOf="@+id/kfds_message_item_header"
+            android:layout_toLeftOf="@+id/bytedesk_message_item_header"
             android:autoLink="phone|email"
-            android:background="@drawable/wx_message_item_background_self"
             android:textColorLink="#0082CB"
-            android:textAlignment="center" />
-
-        <!--app:qmui_linkTextColor="@color/wx_color_blue"-->
-
+            android:background="@drawable/wx_message_item_background_self"
+            />
 
     </RelativeLayout>
 
