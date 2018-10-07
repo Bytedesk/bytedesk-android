@@ -118,7 +118,7 @@ public class VisitorController extends BaseController {
                     @Override
                     public void onClick(View view) {
                         // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
-                        String url = "https://vip.bytedesk.com/visitor/chat?auid=201808221551193&wid=201807171659201&type=workGroup";
+                        String url = "https://vip.bytedesk.com/visitor/chat?uid=201808221551193&wid=201807171659201&type=workGroup";
                         BDUiApi.visitorStartChatWap(getContext(), url);
                     }
                 })
