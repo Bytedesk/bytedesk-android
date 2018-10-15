@@ -8,7 +8,7 @@
     <color name="colorWhite">#ffffff</color>
 
     <!-- common -->
-    <color name="app_color_blue">#00A8E1</color>
+    <color name="app_color_blue">#007bff</color>
     <color name="app_color_blue_disabled">#8000A8E1</color>
     <color name="app_color_blue_pressed">#c000A8E1</color>
 
