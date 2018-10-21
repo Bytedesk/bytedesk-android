@@ -36,14 +36,15 @@ android {
     lintOptions {
         abortOnError false
     }
+
     // 防止出现rxjava重复报错： Duplicated file rxjava.properties
 //    packagingOptions {
 //        exclude 'META-INF/rxjava.properties'
 //    }
 
-    dataBinding {
-        enabled = true
-    }
+//    dataBinding {
+//        enabled = true
+//    }
 
 }
 
