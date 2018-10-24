@@ -273,6 +273,10 @@ BDCoreApi.visitorGetThreads(getContext(), new BaseCallback() {
 
 ## 更新日志
 
+> 2018-10-24
+
+- 优化消息体
+
 > 2018-10-06
 
 - 更新wap参数

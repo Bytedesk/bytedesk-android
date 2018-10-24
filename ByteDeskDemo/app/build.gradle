@@ -50,10 +50,11 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    // 加载核心库
-    implementation 'com.bytedesk:core:1.0.2'
     // 加载默认UI库
-    implementation 'com.bytedesk:ui:1.0.1'
+    implementation 'com.bytedesk:ui:1.0.2'
+    // 加载核心库
+    implementation 'com.bytedesk:core:1.0.3'
+
 
     // http://jakewharton.github.io/butterknife/
     implementation 'com.jakewharton:butterknife:8.8.1'

@@ -172,7 +172,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
 
         public void setContent(final MessageEntity msgEntity) {
-//            Logger.d(msgEntity.getAvatar());
+//            Logger.d("createdAt:", msgEntity.getCreatedAt());
 
             timestampTextView.setText(BDUiUtils.friendlyTime(msgEntity.getCreatedAt(), mContext));
 

@@ -88,7 +88,7 @@ public class BDUiUtils {
     }
 
 
-    private final static ThreadLocal<SimpleDateFormat> dateFormater = new ThreadLocal<SimpleDateFormat>() {
+    private final static ThreadLocal<SimpleDateFormat> datetimeFormater = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected SimpleDateFormat initialValue() {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -108,7 +108,7 @@ public class BDUiUtils {
      */
     public static Date toDate(String sdate) {
         try {
-            return dateFormater.get().parse(sdate);
+            return datetimeFormater.get().parse(sdate);
         } catch (ParseException e) {
             return null;
         }

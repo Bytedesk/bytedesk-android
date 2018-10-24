@@ -648,7 +648,7 @@ public class ChatActivity extends AppCompatActivity
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent messageEvent) {
-        Logger.d("message received: " + messageEvent.getMessage());
+//        Logger.d("message received: " + messageEvent.getMessage());
 
         try {
             JSONObject jsonObject = new JSONObject(messageEvent.getMessage());
