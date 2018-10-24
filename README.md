@@ -50,16 +50,16 @@ allprojects {
 
 ```java
 // 加载核心库
-implementation 'com.bytedesk:core:1.0.1' // 注意：1.0.1为编写文档时的版本，集成到项目时请使用最新版
+implementation 'com.bytedesk:core:1.0.3' // 注意：1.0.3为编写文档时的版本，集成到项目时请使用最新版
 // 加载默认UI库
-implementation 'com.bytedesk:ui:1.0.0' // 注意：1.0.0为编写文档时的版本，集成到项目时请使用最新版
+implementation 'com.bytedesk:ui:1.0.3' // 注意：1.0.2为编写文档时的版本，集成到项目时请使用最新版
 ```
 
 > 方法二：自定义对话界面UI
 
 ```java
 // 加载核心库
-implementation 'com.bytedesk:core:1.0.1'
+implementation 'com.bytedesk:core:1.0.3'
 // 首先将工程中的bytedesk-ui module加入自己项目
 implementation project(':bytedesk-ui')
 ```
