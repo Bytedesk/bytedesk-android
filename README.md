@@ -52,7 +52,7 @@ allprojects {
 // 加载核心库
 implementation 'com.bytedesk:core:1.0.3' // 注意：1.0.3为编写文档时的版本，集成到项目时请使用最新版
 // 加载默认UI库
-implementation 'com.bytedesk:ui:1.0.3' // 注意：1.0.2为编写文档时的版本，集成到项目时请使用最新版
+implementation 'com.bytedesk:ui:1.0.2' // 注意：1.0.2为编写文档时的版本，集成到项目时请使用最新版
 ```
 
 > 方法二：自定义对话界面UI
