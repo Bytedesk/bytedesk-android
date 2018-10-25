@@ -91,6 +91,7 @@ public class ChatActivity extends AppCompatActivity
     private String tId;
     private String mTitle;
     private int mPage = 0;
+    private int mSize = 20;
 
     private BDPreferenceManager mPreferenceManager;
 
@@ -574,7 +575,7 @@ public class ChatActivity extends AppCompatActivity
      */
     private void getMessages() {
 
-        BDCoreApi.getMessageWithUser(getBaseContext(), mPage, new BaseCallback() {
+        BDCoreApi.getMessageWithUser(getBaseContext(), mPage, mSize, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
