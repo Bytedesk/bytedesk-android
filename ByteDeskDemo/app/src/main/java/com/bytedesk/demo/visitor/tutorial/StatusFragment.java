@@ -7,12 +7,11 @@ import android.view.View;
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.demo.R;
-import com.orhanobut.logger.Logger;
+import com.bytedesk.demo.common.BaseFragment;
 import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
-import com.bytedesk.demo.common.BaseFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +26,7 @@ public class StatusFragment extends BaseFragment {
     @BindView(R.id.groupListView) QMUIGroupListView mGroupListView;
 
     private String mDefaultWorkGroupWid = "201807171659201";
-    private String mDefaultAgentName = "270580156@qq.com";
+    private String mDefaultAgentUid = "201808221551193";
 
     @Override
     protected View onCreateView() {
@@ -54,8 +53,7 @@ public class StatusFragment extends BaseFragment {
 
     private void initGroupListView() {
 
-        final QMUICommonListItemView workGroupStatusItem = mGroupListView.createItemView("工作组：" + mDefaultWorkGroupWid);
-//        workgroupStatusItem.setDetailText("status");
+        final QMUICommonListItemView workGroupStatusItem = mGroupListView.createItemView("工作组Wid：" + mDefaultWorkGroupWid);
 
         QMUIGroupListView.newSection(getContext())
                 .setTitle("工作组在线状态接口")
@@ -68,7 +66,7 @@ public class StatusFragment extends BaseFragment {
                 })
                 .addTo(mGroupListView);
 
-        final QMUICommonListItemView agentStatusItem = mGroupListView.createItemView("客服账号：" + mDefaultAgentName);
+        final QMUICommonListItemView agentStatusItem = mGroupListView.createItemView("客服账号Uid：" + mDefaultAgentUid);
 //        agentStatusItem.setDetailText("status");
 
         QMUIGroupListView.newSection(getContext())
@@ -90,9 +88,7 @@ public class StatusFragment extends BaseFragment {
 
                 try {
                     String status = object.getJSONObject("data").getString("status");
-                    Logger.d("status:", status);
-
-//                    workgroupStatusItem.setDetailText(status);
+                    workGroupStatusItem.setDetailText(status);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -106,16 +102,13 @@ public class StatusFragment extends BaseFragment {
         });
 
         // 获取某个客服账号的在线状态：online代表在线，offline代表离线
-        BDCoreApi.visitorGetAgentStatus(getContext(), mDefaultAgentName, new BaseCallback() {
+        BDCoreApi.visitorGetAgentStatus(getContext(), mDefaultAgentUid, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
 
                 try {
                     String status = object.getJSONObject("data").getString("status");
-                    Logger.d("status:", status);
-
-//                    agentStatusItem.setDetailText(status);
-
+                    agentStatusItem.setDetailText(status);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -128,9 +121,6 @@ public class StatusFragment extends BaseFragment {
         });
 
     }
-
-
-
 
     @Override
     public QMUIFragment.TransitionConfig onFetchTransitionConfig() {

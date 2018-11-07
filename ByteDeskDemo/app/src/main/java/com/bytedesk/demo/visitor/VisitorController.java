@@ -1,6 +1,7 @@
 package com.bytedesk.demo.visitor;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -63,7 +64,7 @@ public class VisitorController extends BaseController {
 
         QMUICommonListItemView chatItem = mGroupListView.createItemView("开始新会话接口");
 
-        QMUICommonListItemView userinfoItem = mGroupListView.createItemView("设置用户信息接口");
+        QMUICommonListItemView userInfoItem = mGroupListView.createItemView("设置用户信息接口");
 
         QMUICommonListItemView statusItem = mGroupListView.createItemView("查询在线状态接口");
 
@@ -93,7 +94,7 @@ public class VisitorController extends BaseController {
                         startFragment(chatFragment);
                     }
                 })
-                .addItemView(userinfoItem, new OnClickListener() {
+                .addItemView(userInfoItem, new OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ProfileFragment profileFragment = new ProfileFragment();

@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
-import com.bytedesk.core.http.model.Userinfo;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.ui.util.BDUiUtils;
@@ -180,6 +179,10 @@ public class ProfileFragment extends BaseFragment {
                     Logger.d("get userinfo success message: " + object.get("message")
                             + " status_code:" + object.get("status_code")
                             + " data:" + object.get("data"));
+
+                    String nickname = object.getJSONObject("data").getString("nickname");
+                    nicknameItem.setDetailText(nickname);
+
                     //
 //                    Userinfo userinfo = (Userinfo) object.get("data");
 //                    // 设置昵称

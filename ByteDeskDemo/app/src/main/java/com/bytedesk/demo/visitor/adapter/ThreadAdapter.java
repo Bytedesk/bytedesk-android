@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bytedesk.core.http.model.Thread;
+import com.bytedesk.core.room.entity.ThreadEntity;
 import com.bytedesk.demo.R;
 
 import java.util.List;
@@ -18,14 +18,14 @@ import java.util.List;
 public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder> {
 
 
-    private List<Thread> mThreadList;
+    private List<ThreadEntity> mThreadList;
     private Context mContext;
 
     public ThreadAdapter(Context context) {
         mContext = context;
     }
 
-    public void setThreadList(List<Thread> threadList) {
+    public void setThreadList(List<ThreadEntity> threadList) {
         mThreadList = threadList;
         notifyDataSetChanged();
     }
@@ -38,7 +38,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Thread thread = mThreadList.get(position);
+        ThreadEntity thread = mThreadList.get(position);
         holder.setThread(thread);
     }
 
@@ -59,7 +59,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
         private TextView mTimestampTextView;
         private ImageView mAvatarImageView;
 
-        private Thread mThread;
+        private ThreadEntity mThread;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -71,7 +71,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
 
         }
 
-        public void setThread(Thread thread) {
+        public void setThread(ThreadEntity thread) {
             mThread = thread;
 
             mNicknameTextView.setText(mThread.getNickname());

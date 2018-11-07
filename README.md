@@ -50,16 +50,16 @@ allprojects {
 
 ```java
 // 加载核心库
-implementation 'com.bytedesk:core:1.0.4'
+implementation 'com.bytedesk:core:1.0.5'
 // 加载默认UI库
-implementation 'com.bytedesk:ui:1.0.3'
+implementation 'com.bytedesk:ui:1.0.5'
 ```
 
 > 方法二：自定义对话界面UI
 
 ```java
 // 加载核心库
-implementation 'com.bytedesk:core:1.0.4'
+implementation 'com.bytedesk:core:1.0.5'
 // 首先将工程中的bytedesk-ui module加入自己项目
 implementation project(':bytedesk-ui')
 ```
@@ -177,7 +177,7 @@ BDCoreApi.visitorGetUserInfo(getContext(), new BaseCallback() {
     @Override
     public void onSuccess(JSONObject object) {
         try {
-            Logger.d("get userinfo success message: " + object.get("message")+ " status_code:" + object.get("status_code")+ " data:" + object.get("data"));
+            String nickname = object.getJSONObject("data").getString("nickname");
             //
         } catch (JSONException e) {
             e.printStackTrace();
@@ -245,8 +245,7 @@ BDCoreApi.visitorGetWorkgroupStatus(getContext(), mDefaultWorkgroupId, new BaseC
     public void onSuccess(JSONObject object) {
         //  获取成功
         try {
-            // String workgroup_id = object.getJSONObject("data").getString("workgroup_id");
-            // String status = object.getJSONObject("data").getString("status");
+            String status = object.getJSONObject("data").getString("status");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -267,8 +266,7 @@ BDCoreApi.visitorGetAgentStatus(getContext(), mDefaultAgentname, new BaseCallbac
     public void onSuccess(JSONObject object) {
         // 获取成功
         try {
-            // String agent = object.getJSONObject("data").getString("agent");
-            // String status = object.getJSONObject("data").getString("status");
+            String status = object.getJSONObject("data").getString("status");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -300,6 +298,10 @@ BDCoreApi.visitorGetThreads(getContext(), new BaseCallback() {
 ```
 
 ## 更新日志
+
+> 2018-11-07
+
+- 优化在线状态接口
 
 > 2018-10-24
 

@@ -10,17 +10,20 @@ import android.view.View;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
-import com.bytedesk.core.http.model.http.VisitorGetThreadsResult;
+import com.bytedesk.core.room.entity.ThreadEntity;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.demo.common.ListViewDecoration;
 import com.bytedesk.demo.visitor.adapter.ThreadAdapter;
-import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,7 +70,6 @@ public class ThreadFragment extends BaseFragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
                 getThreads();
             }
         });
@@ -96,9 +98,33 @@ public class ThreadFragment extends BaseFragment {
             @Override
             public void onSuccess(JSONObject object) {
 
+                List<ThreadEntity> threadEntityList = new LinkedList<>();
+
+                try {
+
+                    JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        //
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                        ThreadEntity threadEntity = new ThreadEntity();
+                        threadEntity.setId(jsonObject.getLong("id"));
+                        threadEntity.setTid(jsonObject.getString("tid"));
+                        threadEntity.setUnreadCount(jsonObject.getInt("unreadCount"));
+                        threadEntity.setToken(jsonObject.getString("token"));
+                        threadEntity.setContent(jsonObject.getString("content"));
+                        threadEntity.setNickname(jsonObject.getJSONObject("visitor").getString("nickname"));
+                        threadEntity.setTimestamp(jsonObject.getString("timestamp"));
+                        threadEntity.setAvatar(jsonObject.getJSONObject("visitor").getString("avatar"));
+                        threadEntityList.add(threadEntity);
+                    }
+                    mThreadAdapter.setThreadList(threadEntityList);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 page++;
-
-
                 mSwipeRefreshLayout.setRefreshing(false);
             }
 
