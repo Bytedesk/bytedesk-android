@@ -88,6 +88,34 @@ implementation project(':bytedesk-ui')
 <!--./萝卜丝bytedesk.com代码 结束-->
 ```
 
+## res/values/styles.xml
+
+> 添加样式
+
+```java
+<style name="AppTheme" parent="QMUI.Compat.NoActionBar">
+    <!-- 配置Android提供的theme -->
+    <item name="android:textAppearanceListItemSmall">@style/QDTextAppearanceListItemSmall</item>
+    <item name="android:textAppearanceListItem">@style/QDtextAppearanceListItem</item>
+    <item name="android:listPreferredItemHeight">?attr/qmui_list_item_height_higher</item>
+    <item name="android:listPreferredItemHeightSmall">?attr/qmui_list_item_height</item>
+
+    <!-- 配置qmui提供的theme -->
+    <item name="qmui_config_color_blue">@color/app_color_blue</item>
+    <item name="qmui_round_btn_bg_color">@color/s_btn_blue_bg</item>
+    <item name="qmui_round_btn_border_color">@color/s_btn_blue_border</item>
+    <item name="qmui_round_btn_text_color">@color/s_btn_blue_text</item>
+    <item name="qmui_content_spacing_horizontal">20dp</item>
+    <item name="qmui_content_padding_horizontal">@dimen/qmui_content_spacing_horizontal</item>
+
+    <item name="QMUITopBarStyle">@style/QDTopBar</item>
+
+    <!-- 配置app自己的theme -->
+    <item name="app_primary_color">@color/app_color_blue</item>
+    <item name="app_content_bg_color">@color/qmui_config_color_white</item>
+</style>
+```
+
 ## 登录接口
 
 - 获取appkey：登录后台->所有设置->应用管理->APP->appkey列
