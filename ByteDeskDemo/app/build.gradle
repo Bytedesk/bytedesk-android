@@ -51,14 +51,14 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // 加载默认UI库：https://bintray.com/jackning/maven/ui
-    implementation 'com.bytedesk:ui:1.0.5'
+    implementation 'com.bytedesk:ui:1.0.+'
     // 加载核心库：https://bintray.com/jackning/maven/core
-    implementation 'com.bytedesk:core:1.0.5'
+    implementation 'com.bytedesk:core:1.0.+'
 
 
     // http://jakewharton.github.io/butterknife/
     implementation 'com.jakewharton:butterknife:8.8.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
     // Android sqlite 调试库
