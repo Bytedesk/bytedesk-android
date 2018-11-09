@@ -34,7 +34,7 @@
             android:clickable="true"
             android:layout_width="@dimen/kfds_avatar_default_width_height"
             android:layout_height="@dimen/kfds_avatar_default_width_height"
-            android:src="@drawable/appkefu_ic_sex_female"/>
+            android:src="@drawable/bytedesk_sex_female"/>
 
         <RelativeLayout
             android:id="@+id/kfds_message_item_content_agent_layout"
