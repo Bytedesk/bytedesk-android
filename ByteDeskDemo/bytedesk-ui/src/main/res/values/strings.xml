@@ -1,8 +1,4 @@
 <resources>
-    <string name="app_name">对话窗口</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
     <!-- ChatFragment -->
@@ -20,7 +16,6 @@
     <string name="kfds_demo_chat_activity_start">Activity方式会话</string>
     <string name="kfds_demo_chat_fragment_start_txt">2. Fragment方式打开会话说明</string>
     <string name="kfds_demo_chat_fragment_start">Fragment方式打开会话</string>
-
 
     <!-- -->
     <string name="action_image">Image</string>

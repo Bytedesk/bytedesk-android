@@ -6,7 +6,7 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/kfds_message_item_timestamp_layout"
+        android:id="@+id/bytedesk_message_item_timestamp_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -23,7 +23,7 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/kfds_message_item_content_layout"
+        android:id="@+id/bytedesk_message_item_content_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp">
@@ -36,17 +36,16 @@
             android:layout_height="@dimen/kfds_avatar_default_width_height"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:src="@drawable/appkefu_ic_sex_male"/>
-
+            android:src="@drawable/bytedesk_sex_male"/>
 
         <ImageView
             android:id="@+id/bytedesk_message_item_image"
-            style="@style/kfds_chat_content_date_style"
+            style="@style/bytedesk_chat_content_date_style"
             android:layout_width="200sp"
             android:layout_height="200sp"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/bytedesk_message_item_header"
-            android:background="@drawable/wx_message_item_background_self" />
+            android:background="@drawable/bytedesk_message_item_background_self" />
 
 
     </RelativeLayout>

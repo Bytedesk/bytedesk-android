@@ -15,6 +15,7 @@ import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.demo.common.ListViewDecoration;
 import com.bytedesk.demo.visitor.adapter.ThreadAdapter;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 
@@ -130,6 +131,7 @@ public class ThreadFragment extends BaseFragment {
 
             @Override
             public void onError(JSONObject object) {
+                Logger.e("获取会话记录错误");
 
                 mSwipeRefreshLayout.setRefreshing(false);
             }

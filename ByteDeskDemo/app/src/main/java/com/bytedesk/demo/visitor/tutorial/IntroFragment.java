@@ -41,7 +41,7 @@ public class IntroFragment extends BaseFragment {
             }
         });
 
-        mTopBar.setTitle("吾协云简介");
+        mTopBar.setTitle("萝卜丝·Robot");
     }
 
     private void initGroupListView() {
@@ -50,7 +50,7 @@ public class IntroFragment extends BaseFragment {
 //        introItem.setDetailText("online");
 
         QMUIGroupListView.newSection(getContext())
-                .setTitle("吾协云简介")
+                .setTitle("萝卜丝·Robot简介")
 //                .setDescription("默认描述")
                 .addItemView(introItem, new View.OnClickListener() {
                     @Override

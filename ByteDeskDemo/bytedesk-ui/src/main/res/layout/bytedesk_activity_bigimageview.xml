@@ -7,9 +7,8 @@
     tools:context="com.bytedesk.ui.activity.BigImageViewActivity">
 
     <ImageView
-        android:id="@+id/kfds_bigimageview"
+        android:id="@+id/bytedesk_bigimageview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 
 </android.support.constraint.ConstraintLayout>

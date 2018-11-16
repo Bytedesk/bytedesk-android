@@ -26,7 +26,7 @@ import java.util.List;
 
 
 /**
- * Created by ningjinpeng on 2017/8/23.
+ * @author bytedesk.com on 2017/8/23.
  */
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
@@ -76,9 +76,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 layout = R.layout.bytedesk_message_item_voice_self;
                 break;
             case MessageEntity.TYPE_NOTIFICATION_ID:
-                layout = R.layout.bytedesk_message_item_notification;
-                break;
-            case MessageEntity.TYPE_QUEUE_NOTIFICATION_ID:
                 layout = R.layout.bytedesk_message_item_notification;
                 break;
             default:
@@ -158,8 +155,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 imageImageView = itemView.findViewById(R.id.bytedesk_message_item_image);
             }
             // 通知消息
-            else if (messageViewType == MessageEntity.TYPE_NOTIFICATION_ID
-                    || messageViewType == MessageEntity.TYPE_QUEUE_NOTIFICATION_ID) {
+            else if (messageViewType == MessageEntity.TYPE_NOTIFICATION_ID) {
                 notificationTextView = itemView.findViewById(R.id.bytedesk_message_item_notification_textview);
             }
 
@@ -172,7 +168,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
 
         public void setContent(final MessageEntity msgEntity) {
-//            Logger.d("createdAt:", msgEntity.getCreatedAt());
+            Logger.d("setContent uid:" + msgEntity.getUid() + " currentUid:" + msgEntity.getCurrentUid());
 
             timestampTextView.setText(BDUiUtils.friendlyTime(msgEntity.getCreatedAt(), mContext));
 
@@ -189,7 +185,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                         Logger.d("avatar clicked:" + msgEntity.getAvatar());
                     }
                 });
-
 
                 //
                 contentTextView.setText(msgEntity.getContent());
@@ -234,11 +229,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 });
             }
             // 通知消息
-            else if (messageViewType == MessageEntity.TYPE_NOTIFICATION_ID
-                    || messageViewType == MessageEntity.TYPE_QUEUE_NOTIFICATION_ID) {
+            else if (messageViewType == MessageEntity.TYPE_NOTIFICATION_ID) {
                 notificationTextView.setText(msgEntity.getContent());
             }
-
 
             // 收到的消息
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
@@ -252,6 +245,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         @Override
         public void onClick(View view) {
             if (null != itemClickListener) {
+
             }
         }
 

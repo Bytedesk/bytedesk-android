@@ -68,7 +68,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
             mContentTextView = itemView.findViewById(R.id.textview_content);
             mTimestampTextView = itemView.findViewById(R.id.textview_timestamp);
             mAvatarImageView = itemView.findViewById(R.id.imageview_avatar);
-
         }
 
         public void setThread(ThreadEntity thread) {
@@ -78,7 +77,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
             mContentTextView.setText(mThread.getContent());
             mTimestampTextView.setText(mThread.getTimestamp());
             Glide.with(mContext).load(mThread.getAvatar()).into(mAvatarImageView);
-
         }
 
 

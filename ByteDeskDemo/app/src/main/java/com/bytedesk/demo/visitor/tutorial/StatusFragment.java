@@ -8,6 +8,7 @@ import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
@@ -97,7 +98,7 @@ public class StatusFragment extends BaseFragment {
 
             @Override
             public void onError(JSONObject object) {
-
+                Logger.e("获取工作组在线状态错误");
             }
         });
 
@@ -116,6 +117,7 @@ public class StatusFragment extends BaseFragment {
 
             @Override
             public void onError(JSONObject object) {
+                Logger.e("获取客服在线状态错误");
 
             }
         });

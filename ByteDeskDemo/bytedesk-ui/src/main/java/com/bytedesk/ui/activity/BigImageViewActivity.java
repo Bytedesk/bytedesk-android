@@ -19,9 +19,7 @@ public class BigImageViewActivity extends AppCompatActivity {
 
         mImageUrl = getIntent().getStringExtra("image_url");
 
-        mImageView = findViewById(R.id.kfds_bigimageview);
+        mImageView = findViewById(R.id.bytedesk_bigimageview);
         Glide.with(this).load(mImageUrl).into(mImageView);
-
-
     }
 }

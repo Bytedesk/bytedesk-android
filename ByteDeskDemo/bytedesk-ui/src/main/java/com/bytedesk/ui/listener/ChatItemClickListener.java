@@ -1,7 +1,7 @@
 package com.bytedesk.ui.listener;
 
 /**
- * Created by ningjinpeng on 2017/8/28.
+ * @author bytedesk.com on 2017/8/28.
  */
 
 public interface ChatItemClickListener {

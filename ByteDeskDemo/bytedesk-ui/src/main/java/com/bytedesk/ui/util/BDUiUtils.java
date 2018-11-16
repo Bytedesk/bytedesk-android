@@ -11,7 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Created by ningjinpeng on 2018/3/28.
+ * @author bytedesk.com on 2018/3/28.
  */
 
 public class BDUiUtils {

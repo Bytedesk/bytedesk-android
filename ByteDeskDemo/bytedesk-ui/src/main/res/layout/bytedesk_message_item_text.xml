@@ -6,7 +6,7 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/kfds_message_item_timestamp_layout"
+        android:id="@+id/bytedesk_message_item_timestamp_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -23,7 +23,7 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/kfds_message_item_content_layout"
+        android:id="@+id/bytedesk_message_item_content_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp" >
@@ -37,7 +37,7 @@
             android:src="@drawable/bytedesk_sex_female"/>
 
         <RelativeLayout
-            android:id="@+id/kfds_message_item_content_agent_layout"
+            android:id="@+id/bytedesk_message_item_content_agent_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/bytedesk_message_item_header"
@@ -55,15 +55,14 @@
 
             <com.qmuiteam.qmui.widget.textview.QMUILinkTextView
                 android:id="@+id/bytedesk_message_item_content"
-                style="@style/kfds_chat_content_date_style"
+                style="@style/bytedesk_chat_content_date_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/bytedesk_message_item_nickname"
                 android:autoLink="phone|email"
-                android:background="@drawable/wx_message_item_background"
+                android:background="@drawable/bytedesk_message_item_background"
                 android:textColorLink="#0082CB"
                 android:textAlignment="center"/>
-            <!--app:qmui_linkTextColor="@color/wx_color_blue"-->
 
         </RelativeLayout>
 

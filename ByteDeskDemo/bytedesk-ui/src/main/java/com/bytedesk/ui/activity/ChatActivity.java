@@ -25,21 +25,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.bytedesk.core.api.BDMqttApi;
-import com.bytedesk.core.event.MessageEvent;
-import com.bytedesk.core.util.BDPreferenceManager;
-import com.bytedesk.ui.util.BDUiConstant;
 import com.bytedesk.core.api.BDCoreApi;
+import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
+import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.room.entity.MessageEntity;
 import com.bytedesk.core.util.BDCoreUtils;
+import com.bytedesk.core.util.BDPreferenceManager;
 import com.bytedesk.core.viewmodel.MessageViewModel;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.adapter.ChatAdapter;
 import com.bytedesk.ui.listener.ChatItemClickListener;
 import com.bytedesk.ui.util.BDPermissionUtils;
-import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.bytedesk.ui.util.BDUiConstant;
 import com.orhanobut.logger.Logger;
+import com.qmuiteam.qmui.util.QMUIViewHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -57,7 +58,6 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- *
  *  用途：
  *  1. 访客聊天界面
  *  2. 客服 工作组、1v1、群聊 聊天界面
@@ -66,15 +66,15 @@ import java.util.List;
  *    1. 访客关闭会话窗口的时候通知客服
  *    2. 客服端关闭会话之后，禁止访客继续发送消息
  *
+ * @author bytedesk.com
  */
 public class ChatActivity extends AppCompatActivity
         implements ChatItemClickListener, View.OnClickListener {
 
-    private QMUITopBar mTopBar;
+    private QMUITopBarLayout mTopBar;
     private QMUIPullRefreshLayout mPullRefreshLayout;
     private RecyclerView mRecyclerView;
-    private ChatAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private ChatAdapter mChatAdapter;
 
     private Button mPlusButton;
     private Button mSendButton;
@@ -90,6 +90,8 @@ public class ChatActivity extends AppCompatActivity
     private String wId;
     private String tId;
     private String mTitle;
+    private boolean mIsVisitor;
+
     private int mPage = 0;
     private int mSize = 20;
 
@@ -99,75 +101,33 @@ public class ChatActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bytedesk_activity_chat);
+
         //
         if (null != getIntent()) {
+            mIsVisitor = getIntent().getBooleanExtra(BDUiConstant.EXTRA_VISITOR, true);
+            if (mIsVisitor) {
+                wId = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
+            } else {
+                tId = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
+            }
             uId = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
-            wId = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
             mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
         }
         mPreferenceManager = BDPreferenceManager.getInstance(this);
-        //
-        mTopBar = findViewById(R.id.kfds_chat_topbar);
-        mTopBar.setTitle(mTitle);
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                popBackStack();
-                finish();
-            }
-        });
-        //
-        mPullRefreshLayout = findViewById(R.id.kfds_chat_pulltorefresh);
-        mPullRefreshLayout.setOnPullListener(new QMUIPullRefreshLayout.OnPullListener() {
-
-            @Override
-            public void onMoveTarget(int offset) {}
-
-            @Override
-            public void onMoveRefreshView(int offset) {}
-
-            @Override
-            public void onRefresh() {
-                getMessages();
-            }
-
-        });
-
-        // 初始化
-        mRecyclerView = findViewById(R.id.kfds_chat_fragment_recyclerview);
-        // 固定大小可以优化性能
-//        mRecyclerView.setHasFixedSize(true);
-        // 设置 LinearLayoutManager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        // 设置适配器adapter
-        mAdapter = new ChatAdapter(this, this);
-        mRecyclerView.setAdapter(mAdapter);
 
         //
-        mPlusButton = findViewById(R.id.kfds_chat_input_plus_button);
-        mPlusButton.setOnClickListener(this);
-        //
-        mSendButton = findViewById(R.id.kfds_chat_input_send_button);
-        mSendButton.setOnClickListener(this);
-        mInputEditText = findViewById(R.id.kfds_chat_fragment_input);
+        initTopBar();
+        initView();
+        initModel();
 
-        //
-        mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
-        mMessageViewModel.getWorkgroupMessages(wId).observe(this, new Observer<List<MessageEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-            //
-            mAdapter.setMessages(messageEntities);
-            mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-            }
-        });
-        //
-        startThread();
+        // 访客端请求会话
+        if (mIsVisitor) {
+            startThread();
+        } else {
+            // 客服端加载聊天记录
+            getMessages();
+        }
     }
-
 
     @Override
     public void onStart() {
@@ -181,11 +141,15 @@ public class ChatActivity extends AppCompatActivity
         EventBus.getDefault().unregister(this);
     }
 
-
+    /**
+     * TODO: 客服端输入框显示常用回复按钮
+     *
+     * @param view
+     */
     @Override
     public void onClick(View view) {
         //
-        if (view.getId() == R.id.kfds_chat_input_send_button) {
+        if (view.getId() == R.id.bytedesk_chat_input_send_button) {
             //
             final String content = mInputEditText.getText().toString();
             if (content.trim().length() > 0) {
@@ -196,7 +160,7 @@ public class ChatActivity extends AppCompatActivity
                 mInputEditText.setText(null);
             }
         }
-        else if (view.getId() == R.id.kfds_chat_input_plus_button) {
+        else if (view.getId() == R.id.bytedesk_chat_input_plus_button) {
 
             new QMUIBottomSheet.BottomListSheetBuilder(this)
                     .addItem("相册")
@@ -221,149 +185,6 @@ public class ChatActivity extends AppCompatActivity
         }
 
     }
-
-
-    /**
-     * 点击图片消息回调
-     */
-    @Override
-    public void onMessageImageItemClick(String imageUrl) {
-        Logger.d("imageUrl:" + imageUrl);
-
-        Intent intent = new Intent(this, BigImageViewActivity.class);
-        intent.putExtra("image_url", imageUrl);
-        startActivity(intent);
-    }
-
-
-    /**
-     * 请求相册读取权限
-     */
-    private void requestAlbumPermission() {
-
-        // android 6.0动态授权机制
-        // http://jijiaxin89.com/2015/08/30/Android-s-Runtime-Permission/
-        // http://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
-        if (Build.VERSION.SDK_INT >= 23) {
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                // 首先提示用户，待确认之后，请求用户授权
-                new QMUIDialog.MessageDialogBuilder(this)
-                        .setTitle("请求授权")
-                        .setMessage("相册需要授权，请授权")
-                        .addAction("取消", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .addAction("确定", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                                // 请求授权
-                                ActivityCompat.requestPermissions(ChatActivity.this,
-                                        new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
-                                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        BDUiConstant.PERMISSION_REQUEST_ALBUM);
-                            }
-                        })
-                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-            }
-            else {
-                pickImageFromAlbum();
-            }
-        }
-        else {
-            pickImageFromAlbum();
-        }
-    }
-
-    /**
-     * 从相册中选择图片
-     */
-    private void pickImageFromAlbum() {
-
-        Intent intent;
-        if (Build.VERSION.SDK_INT < 19) {
-            intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-        } else {
-            intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        }
-        startActivityForResult(intent, BDUiConstant.SELECT_PIC_BY_PICK_PHOTO);
-    }
-
-    
-    /**
-     * 请求摄像头权限
-     */
-    private void requestCameraPermission() {
-
-        // android 6.0动态授权机制
-        // http://jijiaxin89.com/2015/08/30/Android-s-Runtime-Permission/
-        // http://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
-        if (Build.VERSION.SDK_INT >= 23) {
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
-                
-                // 首先提示用户，待确认之后，请求用户授权
-                new QMUIDialog.MessageDialogBuilder(this)
-                        .setTitle("请求授权")
-                        .setMessage("拍照需要授权，请授权")
-                        .addAction("取消", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .addAction("确定", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                                // 请求授权
-                                ActivityCompat.requestPermissions(ChatActivity.this,
-                                        new String[] { Manifest.permission.CAMERA,
-                                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        BDUiConstant.PERMISSION_REQUEST_CAMERA);
-                            }
-                        })
-                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-            }
-            else {
-                takeCameraImage();
-            }
-        }
-        else {
-            takeCameraImage();
-        }
-    }
-
-    /**
-     * 摄像头拍摄图片
-     */
-    private void takeCameraImage() {
-
-        // TODO: 判断是否模拟器，如果是，则弹出tip提示，并返回
-
-        //
-        if (BDCoreUtils.isSDCardExist()) {
-            //
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            mImageCaptureFileName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp();
-            mPhotoUri = BDCoreUtils.getUri(BDCoreUtils.getTempImage(mImageCaptureFileName), this);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, mPhotoUri);
-            intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mPhotoUri);
-            startActivityForResult(intent, BDUiConstant.SELECT_PIC_BY_TAKE_PHOTO);
-        }
-        else {
-            Toast.makeText(this, "SD卡不存在，不能拍照", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -436,10 +257,9 @@ public class ChatActivity extends AppCompatActivity
                 uploadImage(filePath, fileName);
             }
 
-        } 
+        }
     }
 
-    
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -476,15 +296,254 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
+    /**
+     * 点击图片消息回调
+     */
+    @Override
+    public void onMessageImageItemClick(String imageUrl) {
+        Logger.d("imageUrl:" + imageUrl);
+
+        Intent intent = new Intent(this, BigImageViewActivity.class);
+        intent.putExtra("image_url", imageUrl);
+        startActivity(intent);
+    }
 
     /**
-     *
+     * 请求相册读取权限
+     */
+    private void requestAlbumPermission() {
+
+        // android 6.0动态授权机制
+        // http://jijiaxin89.com/2015/08/30/Android-s-Runtime-Permission/
+        // http://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
+        if (Build.VERSION.SDK_INT >= 23) {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                // 首先提示用户，待确认之后，请求用户授权
+                new QMUIDialog.MessageDialogBuilder(this)
+                        .setTitle("请求授权")
+                        .setMessage("相册需要授权，请授权")
+                        .addAction("取消", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .addAction("确定", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                                // 请求授权
+                                ActivityCompat.requestPermissions(ChatActivity.this,
+                                        new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
+                                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        BDUiConstant.PERMISSION_REQUEST_ALBUM);
+                            }
+                        })
+                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+            }
+            else {
+                pickImageFromAlbum();
+            }
+        }
+        else {
+            pickImageFromAlbum();
+        }
+    }
+
+    /**
+     * 从相册中选择图片
+     */
+    private void pickImageFromAlbum() {
+
+        Intent intent;
+        if (Build.VERSION.SDK_INT < 19) {
+            intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+        } else {
+            intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        }
+        startActivityForResult(intent, BDUiConstant.SELECT_PIC_BY_PICK_PHOTO);
+    }
+    
+    /**
+     * 请求摄像头权限
+     */
+    private void requestCameraPermission() {
+
+        // android 6.0动态授权机制
+        // http://jijiaxin89.com/2015/08/30/Android-s-Runtime-Permission/
+        // http://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
+        if (Build.VERSION.SDK_INT >= 23) {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
+                
+                // 首先提示用户，待确认之后，请求用户授权
+                new QMUIDialog.MessageDialogBuilder(this)
+                        .setTitle("请求授权")
+                        .setMessage("拍照需要授权，请授权")
+                        .addAction("取消", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .addAction("确定", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                                // 请求授权
+                                ActivityCompat.requestPermissions(ChatActivity.this,
+                                        new String[] { Manifest.permission.CAMERA,
+                                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        BDUiConstant.PERMISSION_REQUEST_CAMERA);
+                            }
+                        })
+                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+            }
+            else {
+                takeCameraImage();
+            }
+        }
+        else {
+            takeCameraImage();
+        }
+    }
+
+    /**
+     * 摄像头拍摄图片
+     */
+    private void takeCameraImage() {
+
+        // TODO: 判断是否模拟器，如果是，则弹出tip提示，并返回
+
+        //
+        if (BDCoreUtils.isSDCardExist()) {
+            //
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            mImageCaptureFileName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp();
+            mPhotoUri = BDCoreUtils.getUri(BDCoreUtils.getTempImage(mImageCaptureFileName), this);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, mPhotoUri);
+            intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mPhotoUri);
+            startActivityForResult(intent, BDUiConstant.SELECT_PIC_BY_TAKE_PHOTO);
+        }
+        else {
+            Toast.makeText(this, "SD卡不存在，不能拍照", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    /**
+     * 顶部topbar初始化
+     */
+    private void initTopBar() {
+        //
+        mTopBar = findViewById(R.id.bytedesk_chat_topbarlayout);
+        mTopBar.setTitle(mTitle);
+        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        if (!mIsVisitor) {
+            mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
+                    .setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showTopRightSheet();
+                }
+            });
+        }
+
+        // FIXME: 启用 沉浸式状态栏 之后，输入框不上移
+        // QMUIStatusBarHelper.translucent(this);
+    }
+
+    /**
+     * 界面初始化
+     */
+    private void initView () {
+
+        //
+        mPullRefreshLayout = findViewById(R.id.bytedesk_chat_pulltorefresh);
+        mPullRefreshLayout.setOnPullListener(new QMUIPullRefreshLayout.OnPullListener() {
+
+            @Override
+            public void onMoveTarget(int offset) {}
+
+            @Override
+            public void onMoveRefreshView(int offset) {}
+
+            @Override
+            public void onRefresh() {
+                getMessages();
+            }
+
+        });
+
+        // TODO: 增加点击聊天界面，去除输入框焦点，让其缩回底部
+        // 初始化
+        mRecyclerView = findViewById(R.id.bytedesk_chat_fragment_recyclerview);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        // 设置适配器adapter
+        mChatAdapter = new ChatAdapter(this, this);
+        mRecyclerView.setAdapter(mChatAdapter);
+
+        //
+        mPlusButton = findViewById(R.id.bytedesk_chat_input_plus_button);
+        mPlusButton.setOnClickListener(this);
+
+        //
+        mSendButton = findViewById(R.id.bytedesk_chat_input_send_button);
+        mSendButton.setOnClickListener(this);
+        mInputEditText = findViewById(R.id.bytedesk_chat_fragment_input);
+    }
+
+    /**
+     * 初始化ModelView
+     */
+    private void initModel () {
+        //
+        mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+
+        // FIXME: 当工作组设置有值班工作组的情况下，则界面无法显示值班工作组新消息
+        if (mIsVisitor) {
+            // 访客端
+            mMessageViewModel.getWorkGroupMessages(wId).observe(this, new Observer<List<MessageEntity>>() {
+                @Override
+                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+
+                    mChatAdapter.setMessages(messageEntities);
+                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
+                }
+            });
+        } else {
+            // 客服端接口
+            mMessageViewModel.getMessages(uId).observe(this, new Observer<List<MessageEntity>>() {
+                @Override
+                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+
+                    mChatAdapter.setMessages(messageEntities);
+                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
+                }
+            });
+        }
+    }
+
+    /**
      * 请求会话
-     *
      */
     private void startThread() {
+
         // 请求会话request thread
         BDCoreApi.visitorRequestThread(this, uId, wId, new BaseCallback() {
+
             @Override
             public void onSuccess(JSONObject object) {
                 //
@@ -548,7 +607,6 @@ public class ChatActivity extends AppCompatActivity
                         JSONObject message = object.getJSONObject("data");
                         String tip = message.getString("message");
                         Toast.makeText(ChatActivity.this, tip, Toast.LENGTH_SHORT).show();
-
                     }
 
 
@@ -575,7 +633,7 @@ public class ChatActivity extends AppCompatActivity
      */
     private void getMessages() {
 
-        BDCoreApi.getMessageWithUser(getBaseContext(), mPage, mSize, new BaseCallback() {
+        BDCoreApi.getMessages(getBaseContext(), uId, mPage, mSize, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -602,10 +660,40 @@ public class ChatActivity extends AppCompatActivity
             }
         });
 
-        // TODO: 客服端根据访客id获取其全部聊天记录
+
 
     }
 
+    /**
+     *
+     */
+    private void showTopRightSheet() {
+        new QMUIBottomSheet.BottomListSheetBuilder(this)
+                .addItem("关闭会话")
+//                .addItem("访客资料") // TODO: 查看访客资料
+                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
+                    @Override
+                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
+                        dialog.dismiss();
+                        //
+                        BDCoreApi.agentCloseThread(getApplication(), tId, new BaseCallback() {
+
+                            @Override
+                            public void onSuccess(JSONObject object) {
+                                // 关闭页面
+                                finish();
+                            }
+
+                            @Override
+                            public void onError(JSONObject object) {
+                                Toast.makeText(getApplication(), "关闭会话错误", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                })
+                .build()
+                .show();
+    }
 
     /**
      * 上传并发送图片
@@ -641,7 +729,6 @@ public class ChatActivity extends AppCompatActivity
         });
     }
 
-
     /**
      * 监听 EventBus 广播消息
      *
@@ -649,10 +736,9 @@ public class ChatActivity extends AppCompatActivity
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent messageEvent) {
-//        Logger.d("message received: " + messageEvent.getMessage());
 
         try {
-            JSONObject jsonObject = new JSONObject(messageEvent.getMessage());
+            JSONObject jsonObject = new JSONObject(messageEvent.getContent());
             mMessageViewModel.insertMessageJson(jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();

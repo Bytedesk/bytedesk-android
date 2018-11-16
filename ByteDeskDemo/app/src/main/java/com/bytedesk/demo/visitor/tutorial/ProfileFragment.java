@@ -206,7 +206,7 @@ public class ProfileFragment extends BaseFragment {
             @Override
             public void onError(JSONObject object) {
                 try {
-                    Logger.d("get userinfo failed message: " + object.get("message")
+                    Logger.e("获取用户信息错误: " + object.get("message")
                             + " status_code:" + object.get("status_code")
                             + " data:" + object.get("data"));
 

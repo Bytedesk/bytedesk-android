@@ -1,7 +1,7 @@
 package com.bytedesk.ui.util;
 
 /**
- * Created by ningjinpeng on 2017/8/28.
+ * @author bytedesk.com on 2017/8/28.
  */
 
 public class BDUiConstant {
@@ -9,8 +9,17 @@ public class BDUiConstant {
 
     public static final String EXTRA_UID = "uId";
     public static final String EXTRA_WID = "wId";
+    public static final String EXTRA_TID = "tId";
+    public static final String EXTRA_GID = "gId";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_URL = "url";
+    public static final String EXTRA_VISITOR = "visitor";
+    public static final String EXTRA_CHAT_TYPE = "chat_type";
+
+    //
+    public static final String EXTRA_CHAT_TYPE_THREAD = "chat_type_thread";
+    public static final String EXTRA_CHAT_TYPE_CONTACT = "chat_type_contact";
+    public static final String EXTRA_CHAT_TYPE_GROUP = "chat_type_group";
 
     //
     public static final int PERMISSION_REQUEST_CAMERA = 0;
@@ -20,8 +29,6 @@ public class BDUiConstant {
     public static final int  SELECT_PIC_BY_TAKE_PHOTO = 2;
     public static final int  SELECT_PIC_BY_PICK_PHOTO = 3;
     //
-    public static final int  REQUEST_CODE_SELECT = 100;
-    public static final int  REQUEST_CODE_PREVIEW = 101;
 
 
 }
