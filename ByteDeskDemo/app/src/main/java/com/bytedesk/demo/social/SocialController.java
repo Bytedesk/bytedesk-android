@@ -8,7 +8,6 @@ import android.view.View;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.AboutFragment;
 import com.bytedesk.demo.common.BaseController;
-import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
@@ -35,7 +34,7 @@ public class SocialController extends BaseController {
 
     @Override
     protected String getTitle() {
-        return "云通讯接口(暂未开放)";
+        return "云通讯接口(即将上线)";
     }
 
     protected void initTopBar() {

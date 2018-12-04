@@ -50,16 +50,16 @@ allprojects {
 
 ```java
 // 加载核心库
-implementation 'com.bytedesk:core:1.0.7'
+implementation 'com.bytedesk:core:1.1.0'
 // 加载默认UI库
-implementation 'com.bytedesk:ui:1.0.7'
+implementation 'com.bytedesk:ui:1.1.1'
 ```
 
 > 方法二：自定义对话界面UI
 
 ```java
 // 加载核心库
-implementation 'com.bytedesk:core:1.0.7'
+implementation 'com.bytedesk:core:1.1.0'
 // 首先将工程中的bytedesk-ui module加入自己项目
 implementation project(':bytedesk-ui')
 ```
@@ -298,6 +298,10 @@ BDCoreApi.visitorGetThreads(getContext(), new BaseCallback() {
 ```
 
 ## 更新日志
+
+> 2018-12-04
+
+- 增加客服端接口
 
 > 2018-11-16
 

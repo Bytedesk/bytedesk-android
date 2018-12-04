@@ -168,7 +168,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
 
         public void setContent(final MessageEntity msgEntity) {
-            Logger.d("setContent uid:" + msgEntity.getUid() + " currentUid:" + msgEntity.getCurrentUid());
+//            Logger.d("setContent uid:" + msgEntity.getUid() + " currentUid:" + msgEntity.getCurrentUid());
 
             timestampTextView.setText(BDUiUtils.friendlyTime(msgEntity.getCreatedAt(), mContext));
 

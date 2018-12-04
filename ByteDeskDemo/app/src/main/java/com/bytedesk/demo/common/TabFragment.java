@@ -95,13 +95,13 @@ public class TabFragment extends BaseFragment {
         QMUITabSegment.Tab contact = new QMUITabSegment.Tab(
                 ContextCompat.getDrawable(getContext(), R.drawable.ic_friends),
                 ContextCompat.getDrawable(getContext(), R.drawable.ic_friends),
-                "客服端接口(暂未开放)", false
+                "客服端接口(即将上线)", false
         );
 
         QMUITabSegment.Tab social = new QMUITabSegment.Tab(
                 ContextCompat.getDrawable(getContext(), R.drawable.ic_friends),
                 ContextCompat.getDrawable(getContext(), R.drawable.ic_friends),
-                "云通讯接口(暂未开放)", false
+                "云通讯接口(即将上线)", false
         );
 
         mTabSegment.addTab(home)

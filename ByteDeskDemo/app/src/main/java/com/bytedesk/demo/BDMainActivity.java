@@ -49,7 +49,7 @@ public class BDMainActivity extends BaseFragmentActivity {
                     Logger.d("login success message: " + object.get("message") + " status_code:" + object.get("status_code"));
 
                     // 建立长连接
-                    BDMqttApi.login(getApplicationContext());
+                    BDMqttApi.connect(getApplicationContext());
 
                 } catch (JSONException e) {
                     e.printStackTrace();

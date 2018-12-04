@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,7 +30,9 @@ import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.event.MessageEvent;
+import com.bytedesk.core.event.PreviewEvent;
 import com.bytedesk.core.room.entity.MessageEntity;
+import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDCoreUtils;
 import com.bytedesk.core.util.BDPreferenceManager;
 import com.bytedesk.core.viewmodel.MessageViewModel;
@@ -39,6 +42,7 @@ import com.bytedesk.ui.listener.ChatItemClickListener;
 import com.bytedesk.ui.util.BDPermissionUtils;
 import com.bytedesk.ui.util.BDUiConstant;
 import com.orhanobut.logger.Logger;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.util.QMUIViewHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
@@ -91,11 +95,13 @@ public class ChatActivity extends AppCompatActivity
     private String tId;
     private String mTitle;
     private boolean mIsVisitor;
+    private String mChatType;
 
     private int mPage = 0;
     private int mSize = 20;
 
     private BDPreferenceManager mPreferenceManager;
+    final Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,16 +110,32 @@ public class ChatActivity extends AppCompatActivity
 
         //
         if (null != getIntent()) {
+            //
             mIsVisitor = getIntent().getBooleanExtra(BDUiConstant.EXTRA_VISITOR, true);
+            mChatType = getIntent().getStringExtra(BDUiConstant.EXTRA_CHAT_TYPE);
+            //
             if (mIsVisitor) {
+                Logger.i("访客会话");
+
                 wId = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
-            } else {
+            } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_THREAD)) {
+                Logger.i("客服会话");
+
                 tId = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
+            } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+                Logger.i("一对一会话");
+
+                tId = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+            } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
+                Logger.i("群组会话");
+
+                tId = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
             }
             uId = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
             mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
         }
         mPreferenceManager = BDPreferenceManager.getInstance(this);
+        mPreferenceManager.setVisitor(mIsVisitor);
 
         //
         initTopBar();
@@ -123,10 +145,8 @@ public class ChatActivity extends AppCompatActivity
         // 访客端请求会话
         if (mIsVisitor) {
             startThread();
-        } else {
-            // 客服端加载聊天记录
-            getMessages();
         }
+        getMessages();
     }
 
     @Override
@@ -155,7 +175,7 @@ public class ChatActivity extends AppCompatActivity
             if (content.trim().length() > 0) {
 
                 // 发送文字消息
-                BDMqttApi.sendTextMessage(this, content, tId);
+                BDMqttApi.sendTextMessage(this, content, tId, mChatType);
 
                 mInputEditText.setText(null);
             }
@@ -186,6 +206,12 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
+    /**
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -260,6 +286,12 @@ public class ChatActivity extends AppCompatActivity
         }
     }
 
+    /**
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -435,7 +467,6 @@ public class ChatActivity extends AppCompatActivity
         }
     }
 
-
     /**
      * 顶部topbar初始化
      */
@@ -449,7 +480,10 @@ public class ChatActivity extends AppCompatActivity
                 finish();
             }
         });
-        if (!mIsVisitor) {
+
+        // 客服会话
+        if (!mIsVisitor && mChatType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_THREAD)) {
+            // 客服会话
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
                     .setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -457,33 +491,33 @@ public class ChatActivity extends AppCompatActivity
                     showTopRightSheet();
                 }
             });
+        } else if (mChatType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_CONTACT)) {
+            // 一对一会话
+
+        } else if (mChatType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_GROUP)) {
+            // 群组
+            mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
+                    .setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            //
+                            Intent intent = new Intent(ChatActivity.this, GroupProfileActivity.class);
+                            intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+                            startActivity(intent);
+                        }
+                    });
         }
 
-        // FIXME: 启用 沉浸式状态栏 之后，输入框不上移
-        // QMUIStatusBarHelper.translucent(this);
+        QMUIStatusBarHelper.translucent(this);
     }
 
     /**
      * 界面初始化
      */
     private void initView () {
-
         //
         mPullRefreshLayout = findViewById(R.id.bytedesk_chat_pulltorefresh);
-        mPullRefreshLayout.setOnPullListener(new QMUIPullRefreshLayout.OnPullListener() {
-
-            @Override
-            public void onMoveTarget(int offset) {}
-
-            @Override
-            public void onMoveRefreshView(int offset) {}
-
-            @Override
-            public void onRefresh() {
-                getMessages();
-            }
-
-        });
+        mPullRefreshLayout.setOnPullListener(pullListener);
 
         // TODO: 增加点击聊天界面，去除输入框焦点，让其缩回底部
         // 初始化
@@ -514,21 +548,44 @@ public class ChatActivity extends AppCompatActivity
 
         // FIXME: 当工作组设置有值班工作组的情况下，则界面无法显示值班工作组新消息
         if (mIsVisitor) {
-            // 访客端
+            Logger.i("访客会话");
+
             mMessageViewModel.getWorkGroupMessages(wId).observe(this, new Observer<List<MessageEntity>>() {
                 @Override
                 public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-
                     mChatAdapter.setMessages(messageEntities);
                     mRecyclerView.scrollToPosition(messageEntities.size() - 1);
                 }
             });
-        } else {
-            // 客服端接口
-            mMessageViewModel.getMessages(uId).observe(this, new Observer<List<MessageEntity>>() {
+        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
+            Logger.i("客服会话");
+
+            mMessageViewModel.getThreadMessages(uId).observe(this, new Observer<List<MessageEntity>>() {
                 @Override
                 public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+                    mChatAdapter.setMessages(messageEntities);
+                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
+                }
+            });
+            // 设置当前会话
+            updateCurrentThread();
+        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+            Logger.i("一对一会话");
 
+            mMessageViewModel.getContactMessages(uId).observe(this, new Observer<List<MessageEntity>>() {
+                @Override
+                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+                    mChatAdapter.setMessages(messageEntities);
+                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
+                }
+            });
+
+        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
+            Logger.i("群组会话");
+
+            mMessageViewModel.getGroupMessages(uId).observe(this, new Observer<List<MessageEntity>>() {
+                @Override
+                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
                     mChatAdapter.setMessages(messageEntities);
                     mRecyclerView.scrollToPosition(messageEntities.size() - 1);
                 }
@@ -541,7 +598,6 @@ public class ChatActivity extends AppCompatActivity
      */
     private void startThread() {
 
-        // 请求会话request thread
         BDCoreApi.visitorRequestThread(this, uId, wId, new BaseCallback() {
 
             @Override
@@ -552,7 +608,7 @@ public class ChatActivity extends AppCompatActivity
                             + " status_code:" + object.get("status_code"));
 
                     int status_code = object.getInt("status_code");
-                    if (status_code == 200) {
+                    if (status_code == 200 || status_code == 206) {
                         // 创建新会话
 
                         JSONObject message = object.getJSONObject("data");
@@ -564,9 +620,9 @@ public class ChatActivity extends AppCompatActivity
 
                     } else if (status_code == 201) {
                         // 继续进行中会话
+                        // FIXME: 修改服务器返回消息
 
                         JSONObject thread = object.getJSONObject("data");
-
                         tId = thread.getString("tid");
                         String threadTopic = "thread/" + tId;
                         BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
@@ -629,38 +685,143 @@ public class ChatActivity extends AppCompatActivity
     }
 
     /**
-     * 从服务器加载聊天记录
+     * 更新当前会话
      */
-    private void getMessages() {
+    private void updateCurrentThread() {
 
-        BDCoreApi.getMessages(getBaseContext(), uId, mPage, mSize, new BaseCallback() {
-
+        String preTid = mPreferenceManager.getCurrentTid();
+        BDCoreApi.agentUpdateCurrentThread(this, preTid, tId, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
-
-                try {
-
-                    JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                mPullRefreshLayout.finishRefresh();
-                mPage++;
+                // 设置当前tid
+                mPreferenceManager.setCurrentTid(tId);
+                //
             }
 
             @Override
             public void onError(JSONObject object) {
-
-                mPullRefreshLayout.finishRefresh();
+                Logger.e("更新当前会话失败");
             }
         });
+    }
 
+    /**
+     * 从服务器加载聊天记录
+     */
+    private void getMessages() {
 
+        if (mIsVisitor) {
+            Logger.i("访客端");
+
+            //
+            BDCoreApi.getMessagesWithUser(getBaseContext(), mPage, mSize, new BaseCallback() {
+
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    try {
+                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    mPullRefreshLayout.finishRefresh();
+                    mPage++;
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+
+                    mPullRefreshLayout.finishRefresh();
+                }
+            });
+
+        }  else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
+            Logger.i("客服会话 uid:" + uId);
+
+            // 客服端接口
+            BDCoreApi.getMessagesWithUser(getBaseContext(), uId, mPage, mSize, new BaseCallback() {
+
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    try {
+                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    mPullRefreshLayout.finishRefresh();
+                    mPage++;
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+
+                    mPullRefreshLayout.finishRefresh();
+                }
+            });
+
+        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+            Logger.i("一对一会话 cid: " + uId );
+
+            BDCoreApi.getMessagesWithContact(getBaseContext(), uId, mPage, mSize, new BaseCallback() {
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    try {
+                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    mPullRefreshLayout.finishRefresh();
+                    mPage++;
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+
+                    mPullRefreshLayout.finishRefresh();
+                }
+            });
+
+        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
+            Logger.i("群组会话 gid: " + uId);
+
+            BDCoreApi.getMessagesWithGroup(getBaseContext(), uId, mPage, mSize, new BaseCallback() {
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    try {
+                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    mPullRefreshLayout.finishRefresh();
+                    mPage++;
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+
+                    mPullRefreshLayout.finishRefresh();
+                }
+            });
+        }
 
     }
 
@@ -715,7 +876,8 @@ public class ChatActivity extends AppCompatActivity
                 try {
 
                     String image_url = object.getString("data");
-                    BDMqttApi.sendImageMessage(ChatActivity.this, image_url, tId);
+
+                    BDMqttApi.sendImageMessage(ChatActivity.this, image_url, tId, mChatType);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -736,14 +898,55 @@ public class ChatActivity extends AppCompatActivity
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent messageEvent) {
+        Logger.i("MessageEvent");
 
-        try {
-            JSONObject jsonObject = new JSONObject(messageEvent.getContent());
-            mMessageViewModel.insertMessageJson(jsonObject);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPreviewEvent(PreviewEvent previewEvent) {
+        Logger.i("onPreviewEvent");
+
+        if (previewEvent.getContent().trim().length() == 0) {
+            return;
+        }
+
+        if (mIsVisitor) {
+            mTopBar.setTitle("对方正在输入...");
+        } else {
+            mTopBar.setTitle("对方正在输入:" + previewEvent.getContent());
+        }
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mTopBar.setTitle(mTitle);
+            }
+        }, 5000);
+    }
+
+
+    /**
+     * 下拉刷新
+     */
+    private QMUIPullRefreshLayout.OnPullListener pullListener = new QMUIPullRefreshLayout.OnPullListener() {
+
+        @Override
+        public void onMoveTarget(int offset) {
+
+        }
+
+        @Override
+        public void onMoveRefreshView(int offset) {
+
+        }
+
+        @Override
+        public void onRefresh() {
+            Logger.i("refresh");
+            //
+            getMessages();
+        }
+    };
+
 
 
 }

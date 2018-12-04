@@ -3,13 +3,12 @@ package com.bytedesk.ui.api;
 import android.content.Context;
 import android.content.Intent;
 
+import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.ui.activity.BrowserActivity;
 import com.bytedesk.ui.activity.ChatActivity;
 import com.bytedesk.ui.util.BDUiConstant;
 
 /**
- *
- * @author bytedesk.com on 2017/8/23.
  *
  * @author bytedesk.com
  */
@@ -30,6 +29,7 @@ public class BDUiApi {
         intent.putExtra(BDUiConstant.EXTRA_UID, uId);
         intent.putExtra(BDUiConstant.EXTRA_WID, wId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
         context.startActivity(intent);
     }
 
@@ -45,7 +45,6 @@ public class BDUiApi {
         context.startActivity(intent);
     }
 
-
     /**
      * 客服端接口，开启原生会话页面Activity
      * 访客会话
@@ -60,7 +59,7 @@ public class BDUiApi {
         intent.putExtra(BDUiConstant.EXTRA_TID, tId);
         intent.putExtra(BDUiConstant.EXTRA_UID, uId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDUiConstant.EXTRA_CHAT_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
         context.startActivity(intent);
     }
 
@@ -68,15 +67,15 @@ public class BDUiApi {
      * 同事会话
      *
      * @param context
-     * @param uId
+     * @param cId
      * @param title
      */
-    public static void startContactChatActivity(Context context, String uId, String title) {
+    public static void startContactChatActivity(Context context, String cId, String title) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+        intent.putExtra(BDUiConstant.EXTRA_UID, cId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDUiConstant.EXTRA_CHAT_TYPE_CONTACT);
+        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDCoreConstant.THREAD_TYPE_CONTACT);
         context.startActivity(intent);
     }
 
@@ -90,9 +89,9 @@ public class BDUiApi {
     public static void startGroupChatActivity(Context context, String gId, String title) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_GID, gId);
+        intent.putExtra(BDUiConstant.EXTRA_UID, gId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDUiConstant.EXTRA_CHAT_TYPE_GROUP);
+        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
         context.startActivity(intent);
     }
 

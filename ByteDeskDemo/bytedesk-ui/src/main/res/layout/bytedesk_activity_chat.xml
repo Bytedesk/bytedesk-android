@@ -1,26 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<com.qmuiteam.qmui.widget.QMUIWindowInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <!--<com.qmuiteam.qmui.widget.QMUITopBar-->
-        <!--android:id="@+id/bytedesk_chat_topbarlayout"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="?attr/actionBarSize"/>-->
-
-    <com.qmuiteam.qmui.widget.QMUITopBarLayout
-        android:id="@+id/bytedesk_chat_topbarlayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"/>
+    android:layout_height="match_parent"
+    android:background="@color/qmui_config_color_white">
 
     <!-- 聊天记录 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_below="@+id/bytedesk_chat_topbarlayout">
+        android:layout_marginTop="?attr/qmui_topbar_height">
 
         <!--<com.qmuiteam.qmui.widget.QMUIEmptyView-->
             <!--android:id="@+id/bytedesk_chat_emptyView"-->
@@ -36,7 +27,6 @@
             android:id="@+id/bytedesk_chat_pulltorefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
             android:layout_weight="1">
 
             <android.support.v7.widget.RecyclerView
@@ -55,4 +45,10 @@
 
     </LinearLayout>
 
-</merge>
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/bytedesk_chat_topbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"/>
+
+</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>

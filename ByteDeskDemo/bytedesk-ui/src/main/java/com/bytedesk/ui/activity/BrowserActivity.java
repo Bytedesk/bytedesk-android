@@ -1,6 +1,5 @@
 package com.bytedesk.ui.activity;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -70,8 +69,6 @@ public class BrowserActivity extends AppCompatActivity {
 
         mWebView.loadUrl(mUrl);
     }
-
-
 
     /**
      * http://stackoverflow.com/questions/5907369/file-upload-in-webview

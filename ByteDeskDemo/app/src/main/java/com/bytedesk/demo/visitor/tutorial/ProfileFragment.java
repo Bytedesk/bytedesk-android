@@ -19,6 +19,7 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -180,23 +181,21 @@ public class ProfileFragment extends BaseFragment {
                             + " status_code:" + object.get("status_code")
                             + " data:" + object.get("data"));
 
+                    //
                     String nickname = object.getJSONObject("data").getString("nickname");
                     nicknameItem.setDetailText(nickname);
 
-                    //
-//                    Userinfo userinfo = (Userinfo) object.get("data");
-//                    // 设置昵称
-//                    mDefaultNickname = userinfo.getNickname();
-//                    nicknameItem.setDetailText(mDefaultNickname);
-//                    //
-//                    for (int i = 0; i < userinfo.getTags().size(); i++) {
-//                        Logger.i("key:" + userinfo.getTags().get(i).getKey() + " value:" + userinfo.getTags().get(i).getValue());
-//                        if (userinfo.getTags().get(i).getKey().equals(mTagKey)) {
-//                            // 获取并设置tag
-//                            mTagValue = userinfo.getTags().get(i).getValue();
-//                            selfDefineItem.setDetailText(mTagValue);
-//                        }
-//                    }
+                    // 解析自定义key/value
+                    JSONArray jsonArray = object.getJSONObject("data").getJSONArray("fingerPrints");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        String key = jsonObject.getString("key");
+                        String value = jsonObject.getString("value");
+                        if (key.equals(mTagKey)) {
+                            selfDefineItem.setDetailText(value);
+                        }
+                    }
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();

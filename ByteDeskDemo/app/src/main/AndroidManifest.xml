@@ -37,15 +37,20 @@
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
 
         <!--萝卜丝bytedesk.com代码 开始-->
+
+        <!--对话页面-->
         <activity
             android:name="com.bytedesk.ui.activity.ChatActivity"
             android:screenOrientation="portrait"/>
 
+        <!--URL浏览器页面-->
         <activity
             android:name="com.bytedesk.ui.activity.BrowserActivity"
             android:screenOrientation="portrait"/>
 
+        <!--长连接service-->
         <service android:name="com.bytedesk.paho.android.service.MqttService"/>
+
         <!--./萝卜丝bytedesk.com代码 结束-->
 
 

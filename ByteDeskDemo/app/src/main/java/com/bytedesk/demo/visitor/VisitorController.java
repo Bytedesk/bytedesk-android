@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.bytedesk.core.event.ConnectionEvent;
+import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.AboutFragment;
 import com.bytedesk.demo.common.BaseController;
@@ -12,9 +14,14 @@ import com.bytedesk.demo.visitor.tutorial.ProfileFragment;
 import com.bytedesk.demo.visitor.tutorial.StatusFragment;
 import com.bytedesk.demo.visitor.tutorial.ThreadFragment;
 import com.bytedesk.ui.api.BDUiApi;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,6 +41,8 @@ public class VisitorController extends BaseController {
 
         LayoutInflater.from(context).inflate(R.layout.controller_visitor, this);
         ButterKnife.bind(this);
+
+        EventBus.getDefault().register(this);
 
         initTopBar();
         initGroupListView();
@@ -124,5 +133,30 @@ public class VisitorController extends BaseController {
                 })
                 .addTo(mGroupListView);
     }
+
+
+    /**
+     * 监听 EventBus 连接消息
+     *
+     * @param connectionEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onConnectionEvent(ConnectionEvent connectionEvent) {
+
+        String connectionStatus = connectionEvent.getContent();
+        Logger.i("onConnectionEvent: " + connectionStatus);
+
+        if (connectionStatus.equals(BDCoreConstant.USER_STATUS_CONNECTING)) {
+
+            mTopBar.setTitle("萝卜丝(连接中...)");
+        } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_CONNECTED)) {
+
+            mTopBar.setTitle("萝卜丝");
+        } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_DISCONNECTED)) {
+
+            mTopBar.setTitle("萝卜丝(连接断开)");
+        }
+    }
+
 
 }
