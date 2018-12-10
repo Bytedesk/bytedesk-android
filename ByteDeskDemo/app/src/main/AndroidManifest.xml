@@ -21,6 +21,20 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
+        <!--适配全面屏 开始-->
+        <meta-data
+            android:name="android.notch_support"
+            android:value="true"/>
+
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.34"/>
+
+        <meta-data
+            android:name="notch.config"
+            android:value="portrait|landscape"/>
+        <!--适配全面屏 结束-->
+
         <activity
             android:name=".BDLauncherActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
