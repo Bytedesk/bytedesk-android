@@ -72,6 +72,11 @@
             android:name="com.bytedesk.ui.activity.BrowserActivity"
             android:screenOrientation="portrait"/>
 
+        <!--查看图片-->
+        <activity
+            android:name="com.bytedesk.ui.activity.BigImageViewActivity"
+            android:screenOrientation="portrait"/>
+
         <!--长连接service-->
         <service android:name="com.bytedesk.paho.android.service.MqttService"/>
 
