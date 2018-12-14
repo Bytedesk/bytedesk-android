@@ -6,8 +6,9 @@
         android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true">
-        <activity android:name="com.bytedesk.ui.activity.ChatActivity" />
-        <activity android:name="com.bytedesk.ui.activity.BigImageViewActivity"></activity>
+        <!--<activity android:name=".activity.ChatActivity" />-->
+        <!--<activity android:name=".activity.BigImageViewActivity" />-->
+        <!--<activity android:name=".activity.ContactActivity"/>-->
     </application>
 
 </manifest>

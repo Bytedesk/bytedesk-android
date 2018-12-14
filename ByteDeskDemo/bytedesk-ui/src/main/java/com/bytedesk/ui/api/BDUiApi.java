@@ -16,25 +16,49 @@ import com.bytedesk.ui.util.BDUiConstant;
 public class BDUiApi {
 
     /**
-     * 访客端接口，开启原生会话页面Activity
+     * 访客端接口：开启原生会话页面Activity
+     * 默认工作组会话
      *
      * @param context
-     * @param uId
      * @param wId
      * @param title
      */
-    public static void visitorStartChatActivity(Context context, String uId, String wId, String title) {
+    public static void visitorStartWorkGroupChatActivity(Context context, String wId, String title) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
-        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+        intent.putExtra(BDUiConstant.EXTRA_UID, "");
         intent.putExtra(BDUiConstant.EXTRA_WID, wId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_WORK_GROUP);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
         context.startActivity(intent);
     }
 
     /**
-     * 访客端接口，开启h5会话页面
+     * 访客端接口：开启原生会话页面Activity
+     * 指定客服会话
+     *
+     * TODO: 后台开放获取所有客服uid接口
+     *
+     * @param context
+
+     * @param title
+     */
+    public static void visitorStartAppointChatActivity(Context context, String aId, String title) {
+        Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
+        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+        intent.putExtra(BDUiConstant.EXTRA_WID, "");
+        intent.putExtra(BDUiConstant.EXTRA_AID, aId);
+        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+        intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        context.startActivity(intent);
+    }
+
+
+    /**
+     * 访客端接口：开启h5会话页面
      *
      * @param context
      * @param url
@@ -59,7 +83,7 @@ public class BDUiApi {
         intent.putExtra(BDUiConstant.EXTRA_TID, tId);
         intent.putExtra(BDUiConstant.EXTRA_UID, uId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
         context.startActivity(intent);
     }
 
@@ -75,7 +99,7 @@ public class BDUiApi {
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, cId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDCoreConstant.THREAD_TYPE_CONTACT);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_CONTACT);
         context.startActivity(intent);
     }
 
@@ -91,7 +115,7 @@ public class BDUiApi {
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, gId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_CHAT_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
         context.startActivity(intent);
     }
 

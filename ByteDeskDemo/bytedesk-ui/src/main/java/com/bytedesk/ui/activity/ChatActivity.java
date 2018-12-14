@@ -21,6 +21,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -90,16 +92,24 @@ public class ChatActivity extends AppCompatActivity
     private String mPicturePath;
     private Uri mPhotoUri;
 
-    private String uId;
-    private String wId;
-    private String tId;
+    // 根据会话类型不同所代表意义不同：
+    private String mUid;
+    // 工作组wid
+    private String mWorkGroupWid;
+    private String mThreadTid;
+    // 指定坐席uid
+    private String mAgentUid;
     private String mTitle;
+    // 是否访客端调用接口
     private boolean mIsVisitor;
-    private String mChatType;
-
+    // 区分客服会话thread、同事会话contact、群组会话group
+    private String mThreadType;
+    // 区分工作组会话、指定客服会话
+    private String mRequestType;
+    // 分页加载聊天记录
     private int mPage = 0;
     private int mSize = 20;
-
+    // 本地存储信息
     private BDPreferenceManager mPreferenceManager;
     final Handler mHandler = new Handler();
 
@@ -112,28 +122,39 @@ public class ChatActivity extends AppCompatActivity
         if (null != getIntent()) {
             //
             mIsVisitor = getIntent().getBooleanExtra(BDUiConstant.EXTRA_VISITOR, true);
-            mChatType = getIntent().getStringExtra(BDUiConstant.EXTRA_CHAT_TYPE);
+            mThreadType = getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TYPE);
             //
             if (mIsVisitor) {
                 Logger.i("访客会话");
 
-                wId = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
-            } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_THREAD)) {
+                mWorkGroupWid = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
+                mRequestType = getIntent().getStringExtra(BDUiConstant.EXTRA_REQUEST_TYPE);
+                // 判断是否指定客服会话
+                if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
+                    // 指定客服会话
+                    mAgentUid = getIntent().getStringExtra(BDUiConstant.EXTRA_AID);
+                } else {
+                    // 工作组会话
+                    mAgentUid = "";
+                }
+            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)) {
                 Logger.i("客服会话");
 
-                tId = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
-            } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+                mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
+            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
                 Logger.i("一对一会话");
 
-                tId = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
-            } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
+                mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
                 Logger.i("群组会话");
 
-                tId = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+                mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
             }
-            uId = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+            //
+            mUid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
             mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
         }
+        //
         mPreferenceManager = BDPreferenceManager.getInstance(this);
         mPreferenceManager.setVisitor(mIsVisitor);
 
@@ -144,20 +165,23 @@ public class ChatActivity extends AppCompatActivity
 
         // 访客端请求会话
         if (mIsVisitor) {
-            startThread();
+            requestThread();
         }
+        // 从服务器端加载聊天记录
         getMessages();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        // 注册监听
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        // 销毁监听
         EventBus.getDefault().unregister(this);
     }
 
@@ -174,13 +198,21 @@ public class ChatActivity extends AppCompatActivity
             final String content = mInputEditText.getText().toString();
             if (content.trim().length() > 0) {
 
+                // TODO: 无客服在线时，发送消息会返回机器人答案
+
+                // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
+
+                // TODO: 显示本地发送状态，转圈状态
+
                 // 发送文字消息
-                BDMqttApi.sendTextMessage(this, content, tId, mChatType);
+                BDMqttApi.sendTextMessage(this, mThreadTid, content, mThreadType);
 
                 mInputEditText.setText(null);
             }
         }
         else if (view.getId() == R.id.bytedesk_chat_input_plus_button) {
+
+            // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
             new QMUIBottomSheet.BottomListSheetBuilder(this)
                     .addItem("相册")
@@ -473,7 +505,11 @@ public class ChatActivity extends AppCompatActivity
     private void initTopBar() {
         //
         mTopBar = findViewById(R.id.bytedesk_chat_topbarlayout);
-        mTopBar.setTitle(mTitle);
+        if (!BDMqttApi.isConnected(this)) {
+            mTopBar.setTitle(mTitle+"(未连接)");
+        } else {
+            mTopBar.setTitle(mTitle);
+        }
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -482,7 +518,7 @@ public class ChatActivity extends AppCompatActivity
         });
 
         // 客服会话
-        if (!mIsVisitor && mChatType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_THREAD)) {
+        if (!mIsVisitor && mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_THREAD)) {
             // 客服会话
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
                     .setOnClickListener(new View.OnClickListener() {
@@ -491,10 +527,10 @@ public class ChatActivity extends AppCompatActivity
                     showTopRightSheet();
                 }
             });
-        } else if (mChatType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_CONTACT)) {
+        } else if (mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_CONTACT)) {
             // 一对一会话
 
-        } else if (mChatType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_GROUP)) {
+        } else if (mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_GROUP)) {
             // 群组
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
                     .setOnClickListener(new View.OnClickListener() {
@@ -502,7 +538,7 @@ public class ChatActivity extends AppCompatActivity
                         public void onClick(View view) {
                             //
                             Intent intent = new Intent(ChatActivity.this, GroupProfileActivity.class);
-                            intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+                            intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
                             startActivity(intent);
                         }
                     });
@@ -537,6 +573,7 @@ public class ChatActivity extends AppCompatActivity
         mSendButton = findViewById(R.id.bytedesk_chat_input_send_button);
         mSendButton.setOnClickListener(this);
         mInputEditText = findViewById(R.id.bytedesk_chat_fragment_input);
+        mInputEditText.addTextChangedListener(inputTextWatcher);
     }
 
     /**
@@ -547,20 +584,36 @@ public class ChatActivity extends AppCompatActivity
         mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
 
         // FIXME: 当工作组设置有值班工作组的情况下，则界面无法显示值班工作组新消息
+
         if (mIsVisitor) {
-            Logger.i("访客会话");
 
-            mMessageViewModel.getWorkGroupMessages(wId).observe(this, new Observer<List<MessageEntity>>() {
-                @Override
-                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                    mChatAdapter.setMessages(messageEntities);
-                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                }
-            });
-        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
-            Logger.i("客服会话");
+            // 判断是否指定客服会话
+            if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
+                Logger.i("访客会话: 指定客服聊天记录");
+                // 指定客服聊天记录
+                mMessageViewModel.getThreadMessages(mThreadTid).observe(this, new Observer<List<MessageEntity>>() {
+                    @Override
+                    public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+                        mChatAdapter.setMessages(messageEntities);
+                        mRecyclerView.scrollToPosition(messageEntities.size() - 1);
+                    }
+                });
+            } else {
+                Logger.i("访客会话: 工作组聊天记录");
+                // 工作组聊天记录, TODO: 是否沿用此方式待定，转接会话聊天
+                mMessageViewModel.getWorkGroupMessages(mWorkGroupWid).observe(this, new Observer<List<MessageEntity>>() {
+                    @Override
+                    public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+                        mChatAdapter.setMessages(messageEntities);
+                        mRecyclerView.scrollToPosition(messageEntities.size() - 1);
+                    }
+                });
+            }
 
-            mMessageViewModel.getThreadMessages(uId).observe(this, new Observer<List<MessageEntity>>() {
+        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
+            Logger.i("客服端：客服会话");
+
+            mMessageViewModel.getVisitorMessages(mUid).observe(this, new Observer<List<MessageEntity>>() {
                 @Override
                 public void onChanged(@Nullable List<MessageEntity> messageEntities) {
                     mChatAdapter.setMessages(messageEntities);
@@ -569,10 +622,10 @@ public class ChatActivity extends AppCompatActivity
             });
             // 设置当前会话
             updateCurrentThread();
-        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
-            Logger.i("一对一会话");
+        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+            Logger.i("客服端：一对一会话");
 
-            mMessageViewModel.getContactMessages(uId).observe(this, new Observer<List<MessageEntity>>() {
+            mMessageViewModel.getContactMessages(mUid).observe(this, new Observer<List<MessageEntity>>() {
                 @Override
                 public void onChanged(@Nullable List<MessageEntity> messageEntities) {
                     mChatAdapter.setMessages(messageEntities);
@@ -580,10 +633,10 @@ public class ChatActivity extends AppCompatActivity
                 }
             });
 
-        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
-            Logger.i("群组会话");
+        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
+            Logger.i("客服端：群组会话");
 
-            mMessageViewModel.getGroupMessages(uId).observe(this, new Observer<List<MessageEntity>>() {
+            mMessageViewModel.getGroupMessages(mUid).observe(this, new Observer<List<MessageEntity>>() {
                 @Override
                 public void onChanged(@Nullable List<MessageEntity> messageEntities) {
                     mChatAdapter.setMessages(messageEntities);
@@ -595,10 +648,11 @@ public class ChatActivity extends AppCompatActivity
 
     /**
      * 请求会话
+     * 请求工作组会话和指定客服会话统一接口
      */
-    private void startThread() {
+    private void requestThread() {
 
-        BDCoreApi.visitorRequestThread(this, uId, wId, new BaseCallback() {
+        BDCoreApi.visitorRequestThread(this, mWorkGroupWid, mRequestType, mAgentUid, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -608,23 +662,14 @@ public class ChatActivity extends AppCompatActivity
                             + " status_code:" + object.get("status_code"));
 
                     int status_code = object.getInt("status_code");
-                    if (status_code == 200 || status_code == 206) {
+                    if (status_code == 200 || status_code == 201) {
                         // 创建新会话
 
                         JSONObject message = object.getJSONObject("data");
                         mMessageViewModel.insertMessageJson(message);
 
-                        tId = message.getJSONObject("thread").getString("tid");
-                        String threadTopic = "thread/" + tId;
-                        BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
-
-                    } else if (status_code == 201) {
-                        // 继续进行中会话
-                        // FIXME: 修改服务器返回消息
-
-                        JSONObject thread = object.getJSONObject("data");
-                        tId = thread.getString("tid");
-                        String threadTopic = "thread/" + tId;
+                        mThreadTid = message.getJSONObject("thread").getString("tid");
+                        String threadTopic = "thread/" + mThreadTid;
                         BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
                     } else if (status_code == 202) {
@@ -633,8 +678,8 @@ public class ChatActivity extends AppCompatActivity
                         JSONObject message = object.getJSONObject("data");
                         mMessageViewModel.insertMessageJson(message);
 
-                        tId = message.getJSONObject("thread").getString("tid");
-                        String threadTopic = "thread/" + tId;
+                        mThreadTid = message.getJSONObject("thread").getString("tid");
+                        String threadTopic = "thread/" + mThreadTid;
                         BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
                     } else if (status_code == 203) {
@@ -643,8 +688,8 @@ public class ChatActivity extends AppCompatActivity
                         JSONObject message = object.getJSONObject("data");
                         mMessageViewModel.insertMessageJson(message);
 
-                        tId = message.getJSONObject("thread").getString("tid");
-                        String threadTopic = "thread/" + tId;
+                        mThreadTid = message.getJSONObject("thread").getString("tid");
+                        String threadTopic = "thread/" + mThreadTid;
                         BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
                     } else if (status_code == 204) {
@@ -653,8 +698,18 @@ public class ChatActivity extends AppCompatActivity
                         JSONObject message = object.getJSONObject("data");
                         mMessageViewModel.insertMessageJson(message);
 
-                        tId = message.getJSONObject("thread").getString("tid");
-                        String threadTopic = "thread/" + tId;
+                        mThreadTid = message.getJSONObject("thread").getString("tid");
+                        String threadTopic = "thread/" + mThreadTid;
+                        BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
+
+                    } else if (status_code == 205) {
+                        // 咨询前问卷
+
+                        JSONObject message = object.getJSONObject("data");
+                        mMessageViewModel.insertMessageJson(message);
+
+                        mThreadTid = message.getJSONObject("thread").getString("tid");
+                        String threadTopic = "thread/" + mThreadTid;
                         BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
                     } else {
@@ -665,6 +720,11 @@ public class ChatActivity extends AppCompatActivity
                         Toast.makeText(ChatActivity.this, tip, Toast.LENGTH_SHORT).show();
                     }
 
+                    //
+                    if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
+                        Logger.i("重新加载 指定客服聊天记录");
+                        initModel();
+                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -690,11 +750,11 @@ public class ChatActivity extends AppCompatActivity
     private void updateCurrentThread() {
 
         String preTid = mPreferenceManager.getCurrentTid();
-        BDCoreApi.agentUpdateCurrentThread(this, preTid, tId, new BaseCallback() {
+        BDCoreApi.agentUpdateCurrentThread(this, preTid, mThreadTid, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
                 // 设置当前tid
-                mPreferenceManager.setCurrentTid(tId);
+                mPreferenceManager.setCurrentTid(mThreadTid);
                 //
             }
 
@@ -739,11 +799,11 @@ public class ChatActivity extends AppCompatActivity
                 }
             });
 
-        }  else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
-            Logger.i("客服会话 uid:" + uId);
+        }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
+            Logger.i("客服端：客服会话 uid:" + mUid);
 
             // 客服端接口
-            BDCoreApi.getMessagesWithUser(getBaseContext(), uId, mPage, mSize, new BaseCallback() {
+            BDCoreApi.getMessagesWithUser(getBaseContext(), mUid, mPage, mSize, new BaseCallback() {
 
                 @Override
                 public void onSuccess(JSONObject object) {
@@ -768,10 +828,11 @@ public class ChatActivity extends AppCompatActivity
                 }
             });
 
-        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
-            Logger.i("一对一会话 cid: " + uId );
+        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+            Logger.i("一对一会话 cid: " + mUid);
 
-            BDCoreApi.getMessagesWithContact(getBaseContext(), uId, mPage, mSize, new BaseCallback() {
+            BDCoreApi.getMessagesWithContact(getBaseContext(), mUid, mPage, mSize, new BaseCallback() {
+
                 @Override
                 public void onSuccess(JSONObject object) {
 
@@ -795,10 +856,10 @@ public class ChatActivity extends AppCompatActivity
                 }
             });
 
-        } else if (mChatType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
-            Logger.i("群组会话 gid: " + uId);
+        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
+            Logger.i("群组会话 gid: " + mUid);
 
-            BDCoreApi.getMessagesWithGroup(getBaseContext(), uId, mPage, mSize, new BaseCallback() {
+            BDCoreApi.getMessagesWithGroup(getBaseContext(), mUid, mPage, mSize, new BaseCallback() {
                 @Override
                 public void onSuccess(JSONObject object) {
 
@@ -837,7 +898,7 @@ public class ChatActivity extends AppCompatActivity
                     public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
                         dialog.dismiss();
                         //
-                        BDCoreApi.agentCloseThread(getApplication(), tId, new BaseCallback() {
+                        BDCoreApi.agentCloseThread(getApplication(), mThreadTid, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -875,9 +936,15 @@ public class ChatActivity extends AppCompatActivity
 
                 try {
 
+                    // TODO: 无客服在线时，禁止发送图片
+
+                    // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
+
+                    // TODO: 显示本地发送状态，转圈状态
+
                     String image_url = object.getString("data");
 
-                    BDMqttApi.sendImageMessage(ChatActivity.this, image_url, tId, mChatType);
+                    BDMqttApi.sendImageMessage(ChatActivity.this, mThreadTid, image_url, mThreadType);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -902,6 +969,11 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
+    /**
+     * TODO: 区分是否当前会话
+     *
+     * @param previewEvent
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPreviewEvent(PreviewEvent previewEvent) {
         Logger.i("onPreviewEvent");
@@ -923,7 +995,6 @@ public class ChatActivity extends AppCompatActivity
         }, 5000);
     }
 
-
     /**
      * 下拉刷新
      */
@@ -942,12 +1013,36 @@ public class ChatActivity extends AppCompatActivity
         @Override
         public void onRefresh() {
             Logger.i("refresh");
-            //
             getMessages();
         }
     };
 
+    /**
+     * 监听输入框
+     */
+    private TextWatcher inputTextWatcher = new TextWatcher() {
 
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            String content = charSequence.toString();
+            Logger.i("input content: ", content);
+
+            // TODO: 输入框文字变化时，发送消息输入状态消息
+
+            // TODO: 查询常见问题，并高亮提示
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
 
 }
 

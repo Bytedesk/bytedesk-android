@@ -311,5 +311,6 @@
     <string name="appkefu_f104">[母企鹅]</string>
     <string name="appkefu_f105">[公企鹅]</string>
     <string name="title_activity_big_image">BigImageActivity</string>
+    <string name="title_activity_contact">ContactActivity</string>
 
 </resources>

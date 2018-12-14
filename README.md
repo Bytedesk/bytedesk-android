@@ -155,7 +155,7 @@ BDCoreApi.visitorLogin(getApplicationContext(), appKey, subDomain, new LoginCall
 ## 开始会话
 
 - 获取uId: 登录后台->所有设置->客服账号->超级管理员用户的：唯一ID(uId)
-- 获取wId: 登录后台->所有设置->工作组->超级管理员用户的：唯一ID(wId)
+- 获取wId: 登录后台->所有设置->技能组->超级管理员用户的：唯一ID(wId)
 
 ```java
 BDUiApi.visitorStartChatActivity(getContext(), uId, wId, '默认标题');
@@ -234,10 +234,10 @@ BDCoreApi.visitorSetUserinfo(getContext(), "自定义key", "自定义value", new
 
 提供两个接口：
 
-- 查询某个工作组id的在线状态
+- 查询某个技能组id的在线状态
 - 查询某个客服uId的在线状态（获取uId: 登录后台->所有设置->客服账号->客服：唯一ID(uId)）
 
-> 获取某个工作组的在线状态：1代表在线，注意需要替换真实参数
+> 获取某个技能组的在线状态：1代表在线，注意需要替换真实参数
 
 ```java
 BDCoreApi.visitorGetWorkgroupStatus(getContext(), mDefaultWorkgroupId, new BaseCallback() {
@@ -298,6 +298,10 @@ BDCoreApi.visitorGetThreads(getContext(), new BaseCallback() {
 ```
 
 ## 更新日志
+
+> 2018-12-14
+
+- 增加IM接口: 一对一、群聊相关接口
 
 > 2018-12-04
 

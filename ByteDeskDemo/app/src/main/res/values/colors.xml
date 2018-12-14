@@ -44,4 +44,7 @@
     <color name="colorHelper_square_from_ratio_background">@color/app_color_blue</color>
     <color name="colorHelper_square_to_ratio_background">@color/app_color_theme_3</color>
 
+    <color name="red_normal">#FF0000</color>
+    <color name="red_pressed">#FF6666</color>
+
 </resources>

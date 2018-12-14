@@ -9,9 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.bytedesk.demo.agent.AgentController;
-import com.bytedesk.demo.social.SocialController;
-import com.bytedesk.demo.visitor.VisitorController;
+import com.bytedesk.demo.im.IMController;
+import com.bytedesk.demo.kefu.KeFuController;
 import com.bytedesk.demo.R;
 import com.qmuiteam.qmui.util.QMUIResHelper;
 import com.qmuiteam.qmui.widget.QMUITabSegment;
@@ -87,25 +86,18 @@ public class TabFragment extends BaseFragment {
         mTabSegment.setDefaultSelectedColor(selectColor);
 
         QMUITabSegment.Tab home = new QMUITabSegment.Tab(
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_favorites),
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_favorites),
-                "访客端接口", false
-        );
-
-        QMUITabSegment.Tab contact = new QMUITabSegment.Tab(
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_friends),
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_friends),
-                "客服端接口(即将上线)", false
+                ContextCompat.getDrawable(getContext(), R.drawable.icon_tabbar_recent),
+                ContextCompat.getDrawable(getContext(), R.drawable.icon_tabbar_recent_selected),
+                "客服接口", false
         );
 
         QMUITabSegment.Tab social = new QMUITabSegment.Tab(
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_friends),
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_friends),
-                "云通讯接口(即将上线)", false
+                ContextCompat.getDrawable(getContext(), R.drawable.icon_tabbar_contact),
+                ContextCompat.getDrawable(getContext(), R.drawable.icon_tabbar_contact_selected),
+                "IM接口", false
         );
 
         mTabSegment.addTab(home)
-                .addTab(contact)
                 .addTab(social);
     }
 
@@ -120,35 +112,29 @@ public class TabFragment extends BaseFragment {
 
         mPages = new HashMap<>();
 
-        BaseController homeController = new VisitorController(getActivity());
+        BaseController homeController = new KeFuController(getActivity());
         homeController.setHomeControlListener(listener);
-        mPages.put(Pager.Visitor, homeController);
+        mPages.put(Pager.KEFU, homeController);
 
-        BaseController contactController = new AgentController(getActivity());
-        contactController.setHomeControlListener(listener);
-        mPages.put(Pager.Agent, contactController);
-
-        BaseController socialController = new SocialController(getActivity());
+        BaseController socialController = new IMController(getActivity());
         socialController.setHomeControlListener(listener);
-        mPages.put(Pager.Social, socialController);
+        mPages.put(Pager.IM, socialController);
 
         mViewPager.setAdapter(mPagerAdapter);
         mTabSegment.setupWithViewPager(mViewPager, false);
     }
 
     enum Pager {
-        Visitor, Agent, Social;
+        KEFU, IM;
 
         public static Pager getPagerFromPosition(int position) {
             switch (position) {
                 case 0:
-                    return Visitor;
+                    return KEFU;
                 case 1:
-                    return Agent;
-                case 2:
-                    return Social;
+                    return IM;
                 default:
-                    return Visitor;
+                    return KEFU;
             }
         }
     }

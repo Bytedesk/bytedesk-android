@@ -57,6 +57,16 @@
             android:name="com.bytedesk.ui.activity.ChatActivity"
             android:screenOrientation="portrait"/>
 
+        <!--群组会话详情页-->
+        <activity
+            android:name="com.bytedesk.ui.activity.GroupProfileActivity"
+            android:screenOrientation="portrait"/>
+
+        <!--联系人列表-->
+        <activity
+            android:name="com.bytedesk.ui.activity.ContactActivity"
+            android:screenOrientation="portrait"/>
+
         <!--URL浏览器页面-->
         <activity
             android:name="com.bytedesk.ui.activity.BrowserActivity"

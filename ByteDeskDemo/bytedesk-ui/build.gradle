@@ -24,7 +24,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // 加载默认UI库：https://bintray.com/jackning/maven/ui
-    implementation 'com.bytedesk:core:1.1.+'
+    implementation 'com.bytedesk:core:1.2.1'
 
     // http://qmuiteam.com/android/page/start.html
     // https://bintray.com/chanthuang/qmuirepo
@@ -34,11 +34,11 @@ dependencies {
     // 事件总线
     implementation 'org.greenrobot:eventbus:3.1.1'
 
-    //    https://github.com/orhanobut/logger
+    // https://github.com/orhanobut/logger
     implementation 'com.orhanobut:logger:2.2.0'
 
-    //    https://developer.android.com/topic/libraries/architecture/adding-components.html
-    //    For Lifecycles, LiveData, and ViewModel, add:
+    // https://developer.android.com/topic/libraries/architecture/adding-components.html
+    // For Lifecycles, LiveData, and ViewModel, add:
     implementation 'android.arch.lifecycle:runtime:' + rootProject.archLifecycleVersion
     implementation 'android.arch.lifecycle:extensions:' + rootProject.archLifecycleVersion
     annotationProcessor 'android.arch.lifecycle:compiler:' + rootProject.archLifecycleVersion
