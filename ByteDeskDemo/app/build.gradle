@@ -51,7 +51,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // 加载默认UI库：https://bintray.com/jackning/maven/ui
-    implementation 'com.bytedesk:ui:1.2.1'
+    implementation 'com.bytedesk:ui:1.2.2'
     // 加载核心库：https://bintray.com/jackning/maven/core
     implementation 'com.bytedesk:core:1.2.1'
 
@@ -79,8 +79,8 @@ dependencies {
     implementation 'com.yanzhenjie:recyclerview-swipe:1.1.4'
 
     // 图片加载：https://github.com/bumptech/glide
-    implementation 'com.github.bumptech.glide:glide:4.6.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
 
     // https://developer.android.com/topic/libraries/architecture/adding-components.html
     // For Lifecycles, LiveData, and ViewModel, add:

@@ -80,6 +80,18 @@
         <!--长连接service-->
         <service android:name="com.bytedesk.paho.android.service.MqttService"/>
 
+        <!-- 完善兼容android N, 24相机访问权限-->
+        <!-- FIXME 注意：修改 android:authorities为 ${自己程序的包名applicationId}.provider -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.bytedesk.demo.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/bytedesk_provider_paths"/>
+        </provider>
+
         <!--./萝卜丝bytedesk.com代码 结束-->
 
 
