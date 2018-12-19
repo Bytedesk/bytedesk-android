@@ -170,9 +170,6 @@ public class KeFuController extends BaseController {
                     Logger.d("login success message: " + object.get("message")
                             + " status_code:" + object.get("status_code"));
 
-                    // 建立长连接
-                    BDMqttApi.connect(getContext());
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

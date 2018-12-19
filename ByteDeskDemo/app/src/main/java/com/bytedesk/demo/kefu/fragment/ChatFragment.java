@@ -82,8 +82,7 @@ public class ChatFragment extends BaseFragment {
                 })
                 .addTo(mGroupListView);
 
-        /*
-        TODO: 待上线
+        // TODO: 待上线
         QMUICommonListItemView buyChatItem = mGroupListView.createItemView("开始会话：");
         QMUIGroupListView.newSection(getContext())
                 .setTitle("电商会话接口")
@@ -94,23 +93,6 @@ public class ChatFragment extends BaseFragment {
                     }
                 })
                 .addTo(mGroupListView);
-        */
-
-        //
-        /*
-        TODO: 待上线
-        QMUICommonListItemView oneChatItem = mGroupListView.createItemView("开始会话：");
-        QMUIGroupListView.newSection(getContext())
-                .setTitle("一对一会话接口")
-                .addItemView(oneChatItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
-                })
-                .addTo(mGroupListView);
-         */
-
 
     }
 

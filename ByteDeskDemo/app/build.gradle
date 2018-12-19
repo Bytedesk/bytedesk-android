@@ -53,7 +53,7 @@ dependencies {
     // 加载默认UI库：https://bintray.com/jackning/maven/ui
     implementation 'com.bytedesk:ui:1.2.2'
     // 加载核心库：https://bintray.com/jackning/maven/core
-    implementation 'com.bytedesk:core:1.2.1'
+    implementation 'com.bytedesk:core:1.2.2'
 
 
     // http://jakewharton.github.io/butterknife/

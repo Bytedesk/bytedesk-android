@@ -111,7 +111,7 @@ public class ChatActivity extends AppCompatActivity
     private int mSize = 20;
     // 本地存储信息
     private BDPreferenceManager mPreferenceManager;
-    final Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -250,7 +250,7 @@ public class ChatActivity extends AppCompatActivity
         if (requestCode == BDUiConstant.SELECT_PIC_BY_PICK_PHOTO) {
             if (resultCode == Activity.RESULT_OK) {
                 //
-                mImageCaptureFileName =  mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp() + ".jpg";
+                mImageCaptureFileName =  BDCoreUtils.uuid() + ".jpg";
                 if (data == null) {
                     Logger.d("data == null");
                     Toast.makeText(this, "appkefu_choose_picture_error", Toast.LENGTH_SHORT).show();
@@ -987,12 +987,13 @@ public class ChatActivity extends AppCompatActivity
         } else {
             mTopBar.setTitle("对方正在输入:" + previewEvent.getContent());
         }
+        //
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mTopBar.setTitle(mTitle);
             }
-        }, 5000);
+        }, 3000);
     }
 
     /**

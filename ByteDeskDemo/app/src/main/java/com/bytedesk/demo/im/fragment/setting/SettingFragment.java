@@ -17,8 +17,6 @@ import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUIRadiusImageView;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 
@@ -120,37 +118,6 @@ public class SettingFragment extends BaseFragment {
             public void onClick(View view) {
                 Logger.d("acceptStatusItem item clicked");
                 showAcceptStatusSheet();
-            }
-        }).addTo(mGroupListView);
-
-        //////
-
-        QMUICommonListItemView exitItem = mGroupListView.createItemView("退出登录");
-        QMUIGroupListView.newSection(getContext()).addItemView(exitItem, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                new QMUIDialog.MessageDialogBuilder(getContext())
-                        .setTitle("标题")
-                        .setMessage("确定要退出登录吗？")
-                        .addAction("取消", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .addAction("确定", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-
-                                // TODO: 调用登出接口，清理本地数据
-                                mPreferenceManager.clear();
-
-                            }
-                        })
-                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-
             }
         }).addTo(mGroupListView);
     }

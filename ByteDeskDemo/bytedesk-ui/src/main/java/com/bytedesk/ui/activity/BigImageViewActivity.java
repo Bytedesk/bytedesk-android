@@ -7,6 +7,15 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bytedesk.ui.R;
 
+
+/**
+ * 查看大图：
+ *
+ * TODO:
+ *  1. 修改背景为透明黑色
+ *  2. 支持缩放
+ *  3. 支持点击关闭
+ */
 public class BigImageViewActivity extends AppCompatActivity {
 
     private ImageView mImageView;

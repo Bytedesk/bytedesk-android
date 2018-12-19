@@ -9,12 +9,12 @@
 
     <Button
         android:id="@+id/bytedesk_chat_input_plus_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/bytedesk_inputbar_plus"
         />
 
@@ -32,7 +32,7 @@
     <Button
         android:id="@+id/bytedesk_chat_input_send_button"
         android:layout_width="60dp"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"

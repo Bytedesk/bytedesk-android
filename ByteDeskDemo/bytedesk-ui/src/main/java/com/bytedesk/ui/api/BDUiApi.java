@@ -88,6 +88,7 @@ public class BDUiApi {
     }
 
     /**
+     * 客服端接口，开启原生会话页面Activity
      * 同事会话
      *
      * @param context
@@ -104,6 +105,7 @@ public class BDUiApi {
     }
 
     /**
+     * 客服端接口，开启原生会话页面Activity
      * 群聊
      *
      * @param context

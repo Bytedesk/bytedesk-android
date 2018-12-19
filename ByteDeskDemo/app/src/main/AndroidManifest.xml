@@ -3,14 +3,25 @@
     package="com.bytedesk.demo"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permissions the Application Requires -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- 聊天界面拍照发送图片 -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 登录接口：检测/监听网络状态 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <!--获取IMEI号码-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- 聊天界面：录制语音,将语音文件保存在手机内存卡，检测是否装载文件系统 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <!-- 可选：监听手机重启自动重连服务器 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- 可选：webview上传文件 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- 收到消息后震动 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
 
     <application
         android:name=".BDApplication"
@@ -91,6 +102,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/bytedesk_provider_paths"/>
         </provider>
+
 
         <!--./萝卜丝bytedesk.com代码 结束-->
 

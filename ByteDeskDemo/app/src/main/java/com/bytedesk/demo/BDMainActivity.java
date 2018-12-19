@@ -3,8 +3,8 @@ package com.bytedesk.demo;
 import android.os.Bundle;
 
 import com.bytedesk.core.api.BDMqttApi;
+import com.bytedesk.demo.api.ApiFragment;
 import com.bytedesk.demo.common.BaseFragment;
-import com.bytedesk.demo.common.TabFragment;
 import com.bytedesk.ui.base.BaseFragmentActivity;
 
 public class BDMainActivity extends BaseFragmentActivity {
@@ -19,7 +19,8 @@ public class BDMainActivity extends BaseFragmentActivity {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
-            BaseFragment fragment = new TabFragment();
+            // BaseFragment fragment = new TabFragment();
+            BaseFragment fragment = new ApiFragment();
 
             getSupportFragmentManager()
                     .beginTransaction()
