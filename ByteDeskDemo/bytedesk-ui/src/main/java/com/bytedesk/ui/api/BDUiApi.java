@@ -7,13 +7,37 @@ import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.ui.activity.BrowserActivity;
 import com.bytedesk.ui.activity.ChatActivity;
 import com.bytedesk.ui.util.BDUiConstant;
+import com.bytedesk.ui.util.MediaLoader;
+import com.yanzhenjie.album.Album;
+import com.yanzhenjie.album.AlbumConfig;
+
+import java.util.Locale;
 
 /**
+ * UI对外开放接口
  *
  * @author bytedesk.com
  */
 
 public class BDUiApi {
+
+
+
+    /**
+     * 初始化
+     *
+     * @param context
+     */
+    public static void init(Context context) {
+
+
+        // 初始化相册
+        Album.initialize(AlbumConfig.newBuilder(context)
+            .setAlbumLoader(new MediaLoader())
+            .setLocale(Locale.getDefault())
+            .build()
+        );
+    }
 
     /**
      * 访客端接口：开启原生会话页面Activity
@@ -23,7 +47,7 @@ public class BDUiApi {
      * @param wId
      * @param title
      */
-    public static void visitorStartWorkGroupChatActivity(Context context, String wId, String title) {
+    public static void startWorkGroupChatActivity(Context context, String wId, String title) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
@@ -44,7 +68,7 @@ public class BDUiApi {
 
      * @param title
      */
-    public static void visitorStartAppointChatActivity(Context context, String aId, String title) {
+    public static void startAppointChatActivity(Context context, String aId, String title) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
@@ -63,7 +87,7 @@ public class BDUiApi {
      * @param context
      * @param url
      */
-    public static void visitorStartChatHtml5(Context context, String url) {
+    public static void startHtml5Chat(Context context, String url) {
         Intent intent = new Intent(context, BrowserActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_URL, url);
         context.startActivity(intent);

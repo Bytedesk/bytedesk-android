@@ -15,7 +15,7 @@
             android:id="@+id/bytedesk_message_item_timestamp_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/kfds_timestamp_margin_top"
+            android:layout_marginTop="@dimen/bytedesk_timestamp_margin_top"
             android:textSize="10dp"
             android:text="timestamp"/>
 
@@ -32,7 +32,7 @@
             android:id="@+id/bytedesk_message_item_notification_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/kfds_timestamp_margin_top"
+            android:layout_marginTop="@dimen/bytedesk_timestamp_margin_top"
             android:textSize="10dp"
             android:text="notification"/>
 

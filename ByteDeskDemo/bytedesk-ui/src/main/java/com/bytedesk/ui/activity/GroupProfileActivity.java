@@ -151,15 +151,15 @@ public class GroupProfileActivity extends AppCompatActivity {
                         dialog.dismiss();
 
                         final String nickname = text.toString();
+
                         // TODO: 调用服务器接口
-                        BDCoreApi.agentGroupUpdateNickname(context, gId, nickname, new BaseCallback() {
+                        BDCoreApi.updateGroupNickname(context, gId, nickname, new BaseCallback() {
                             @Override
                             public void onSuccess(JSONObject object) {
 
                                 nicknameItem.setDetailText(nickname);
 
                                 // TODO: 更新本地群组会话thread昵称
-
                             }
 
                             @Override
@@ -205,7 +205,7 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                                     final String description = text.toString();
                                     // TODO: 调用服务器接口
-                                    BDCoreApi.agentGroupUpdateDescription(context, gId, description, new BaseCallback() {
+                                    BDCoreApi.updateGroupDescription(context, gId, description, new BaseCallback() {
 
                                         @Override
                                         public void onSuccess(JSONObject object) {
@@ -257,7 +257,7 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                         final String announcement = text.toString();
                         // TODO: 调用服务器接口
-                        BDCoreApi.agentGroupUpdateAnnouncement(context, gId, announcement, new BaseCallback() {
+                        BDCoreApi.updateGroupAnnouncement(context, gId, announcement, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -291,7 +291,7 @@ public class GroupProfileActivity extends AppCompatActivity {
      */
     private void initModel () {
 
-        BDCoreApi.agentGroupDetail(this, gId, new BaseCallback() {
+        BDCoreApi.getGroupDetail(this, gId, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -374,7 +374,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                             public void onClick(QMUIDialog dialog, int index) {
 
                                 // TODO: 调用退群接口
-                                BDCoreApi.agentGroupWithdraw(context, gId, new BaseCallback() {
+                                BDCoreApi.withdrawGroup(context, gId, new BaseCallback() {
 
                                     @Override
                                     public void onSuccess(JSONObject object) {
@@ -424,7 +424,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                         public void onClick(QMUIDialog dialog, int index) {
 
                             // TODO: 调用服务器接口
-                            BDCoreApi.agentGroupDismiss(context, gId, new BaseCallback() {
+                            BDCoreApi.dismissGroup(context, gId, new BaseCallback() {
 
                                 @Override
                                 public void onSuccess(JSONObject object) {

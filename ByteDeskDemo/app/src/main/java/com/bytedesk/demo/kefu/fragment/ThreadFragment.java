@@ -1,6 +1,5 @@
 package com.bytedesk.demo.kefu.fragment;
 
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -54,7 +53,6 @@ public class ThreadFragment extends BaseFragment {
     }
 
     private void initTopBar() {
-        mTopBar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.app_color_blue));
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

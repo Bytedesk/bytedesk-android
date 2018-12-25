@@ -12,7 +12,6 @@ import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.ui.util.BDUiUtils;
 import com.orhanobut.logger.Logger;
-import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -90,7 +89,7 @@ public class ProfileFragment extends BaseFragment {
 
                                               mDefaultNickname = text.toString();
                                               // 调用接口设置昵称
-                                              BDCoreApi.visitorSetNickname(getContext(), mDefaultNickname, new BaseCallback() {
+                                              BDCoreApi.setNickname(getContext(), mDefaultNickname, new BaseCallback() {
                                                   @Override
                                                   public void onSuccess(JSONObject object) {
                                                       //解析 object
@@ -147,7 +146,7 @@ public class ProfileFragment extends BaseFragment {
 
                                             // 调用接口设置自定义标签
                                             mTagValue = text.toString();
-                                            BDCoreApi.visitorSetUserInfo(getContext(), "", mTagKey, mTagValue, new BaseCallback() {
+                                            BDCoreApi.setFingerPrint(getContext(), "", mTagKey, mTagValue, new BaseCallback() {
                                                 @Override
                                                 public void onSuccess(JSONObject object) {
                                                     selfDefineItem.setDetailText(mTagValue);
@@ -172,7 +171,7 @@ public class ProfileFragment extends BaseFragment {
 
 
         ///////
-        BDCoreApi.visitorGetUserInfo(getContext(), new BaseCallback() {
+        BDCoreApi.getFingerPrint(getContext(), new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -218,11 +217,6 @@ public class ProfileFragment extends BaseFragment {
 
         });
 
-    }
-
-    @Override
-    public QMUIFragment.TransitionConfig onFetchTransitionConfig() {
-        return SCALE_TRANSITION_CONFIG;
     }
 
 

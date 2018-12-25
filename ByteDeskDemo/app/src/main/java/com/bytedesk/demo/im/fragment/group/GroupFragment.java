@@ -152,13 +152,13 @@ public class GroupFragment extends BaseFragment implements SwipeItemClickListene
      */
     private void getGroups() {
 
-        BDCoreApi.agentGroups(getActivity(), new BaseCallback() {
+        BDCoreApi.getGroups(getActivity(), new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
 
                 try {
-                    Logger.d("agentGroups message: " + object.getString("message"));
+                    Logger.d("getGroups message: " + object.getString("message"));
 
                     JSONArray groupsArray = object.getJSONArray("data");
                     for (int i = 0; i < groupsArray.length(); i++) {

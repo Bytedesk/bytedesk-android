@@ -1,16 +1,13 @@
 package com.bytedesk.demo.kefu.fragment;
 
 
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.qmuiteam.qmui.arch.QMUIFragment;
-import com.qmuiteam.qmui.widget.QMUITopBarLayout;
-import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
-
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
+import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,14 +39,13 @@ public class MessageFragment extends BaseFragment {
     }
 
     private void initTopBar() {
-        mTopBar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.app_color_blue));
+        //
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popBackStack();
             }
         });
-
         mTopBar.setTitle("聊天记录");
     }
 
@@ -64,18 +60,13 @@ public class MessageFragment extends BaseFragment {
 //                    public void onClick(View view) {
 //
 //                        //
-//                        WXUIApi.visitorStartWorkGroupChatActivity(getContext(), mDefaultWorkgroupId, mTitle);
+//                        WXUIApi.startWorkGroupChatActivity(getContext(), mDefaultWorkgroupId, mTitle);
 //
 //                    }
 //                })
 //                .addTo(mGroupListView);
 
 
-    }
-
-    @Override
-    public QMUIFragment.TransitionConfig onFetchTransitionConfig() {
-        return SCALE_TRANSITION_CONFIG;
     }
 
 }

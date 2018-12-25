@@ -8,16 +8,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bytedesk.ui.util.BDUiUtils;
-import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.bytedesk.core.room.entity.MessageEntity;
+import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.listener.ChatItemClickListener;
+import com.bytedesk.ui.util.BDUiUtils;
 import com.orhanobut.logger.Logger;
+import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.QMUIRadiusImageView;
 import com.qmuiteam.qmui.widget.textview.QMUILinkTextView;
 
@@ -119,13 +121,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         private ImageView imageImageView;
         // 通知消息
         private TextView notificationTextView;
-
+        //
+        private ProgressBar progressBar;
+        private ImageView errorImageView;
+        //
         private ChatItemClickListener itemClickListener;
 
-        public ViewHolder(View itemView, int msgeViewType) {
+        public ViewHolder(View itemView, int msgViewType) {
             super(itemView);
             //
-            messageViewType = msgeViewType;
+            messageViewType = msgViewType;
             timestampTextView = itemView.findViewById(R.id.bytedesk_message_item_timestamp_textview);
 
             // 文字消息
@@ -165,6 +170,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     || messageViewType == MessageEntity.TYPE_VOICE_ID) {
                 nicknameTextView = itemView.findViewById(R.id.bytedesk_message_item_nickname);
             }
+
+            // 发送的消息
+            if (messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID) {
+                progressBar = itemView.findViewById(R.id.bytedesk_message_item_loading);
+                errorImageView = itemView.findViewById(R.id.bytedesk_message_item_error);
+            }
+
         }
 
         public void setContent(final MessageEntity msgEntity) {
@@ -223,8 +237,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     @Override
                     public void onClick(View view) {
                         Logger.d("image clicked:" + msgEntity.getImageUrl());
-                        if (null != itemClickListener)
+                        if (null != itemClickListener) {
+//                            int[] location = new int[2];
+//                            // 获取在整个屏幕内的绝对坐标
+//                            imageImageView.getLocationOnScreen(location);
+//                            ViewData viewData = new ViewData();
+//                            viewData.setTargetX(location[0]);
+//                            // 此处注意，获取 Y 轴坐标时，需要根据实际情况来处理《状态栏》的高度，判断是否需要计算进去
+//                            viewData.setTargetY(location[1]);
+//                            viewData.setTargetWidth(imageImageView.getWidth());
+//                            viewData.setTargetHeight(imageImageView.getHeight());
+//                            itemClickListener.onMessageImageItemClick(viewData, msgEntity.getImageUrl());
                             itemClickListener.onMessageImageItemClick(msgEntity.getImageUrl());
+                        }
                     }
                 });
             }
@@ -238,6 +263,30 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     || messageViewType == MessageEntity.TYPE_IMAGE_ID
                     || messageViewType == MessageEntity.TYPE_VOICE_ID) {
                 nicknameTextView.setText(msgEntity.getNickname());
+            }
+
+            // 发送的消息
+            if (messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID) {
+                //
+                if (msgEntity.getStatus() == null) {
+                    return;
+                }
+                //
+                if (msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_SENDING)) {
+
+                    progressBar.setVisibility(View.VISIBLE);
+                    errorImageView.setVisibility(View.GONE);
+                } else if (msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_ERROR)) {
+
+                    progressBar.setVisibility(View.GONE);
+                    errorImageView.setVisibility(View.VISIBLE);
+                } else {
+
+                    progressBar.setVisibility(View.GONE);
+                    errorImageView.setVisibility(View.GONE);
+                }
             }
 
         }

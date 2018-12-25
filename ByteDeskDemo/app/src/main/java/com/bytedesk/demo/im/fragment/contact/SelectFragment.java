@@ -102,7 +102,7 @@ public class SelectFragment extends BaseFragment implements SwipeItemClickListen
                     selectedContactUids.add(contactEntity.getUid());
                 }
                 // 调用建群接口
-                BDCoreApi.agentGroupCreate(getContext(), nickname, selectedContactUids, new BaseCallback() {
+                BDCoreApi.createGroup(getContext(), nickname, selectedContactUids, new BaseCallback() {
                     @Override
                     public void onSuccess(JSONObject object) {
 
@@ -170,7 +170,7 @@ public class SelectFragment extends BaseFragment implements SwipeItemClickListen
     private void getContacts() {
         Logger.i("getContacts");
 
-        BDCoreApi.agentContacts(getContext(), new BaseCallback() {
+        BDCoreApi.getContacts(getContext(), new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

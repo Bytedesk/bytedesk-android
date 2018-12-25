@@ -24,16 +24,27 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // 加载默认UI库：https://bintray.com/jackning/maven/ui
-    implementation 'com.bytedesk:core:1.2.2'
+    implementation 'com.bytedesk:core:1.3.0'
 
+    // 腾讯QMUI界面库
     // http://qmuiteam.com/android/page/start.html
     // https://bintray.com/chanthuang/qmuirepo
     implementation 'com.qmuiteam:qmui:1.1.7'
     implementation 'com.qmuiteam:arch:0.1.4'
 
+    // 自定义相册样式
+    // https://github.com/yanzhenjie/Album
+    implementation 'com.yanzhenjie:album:2.1.3'
+
+    // 图片放大/查看/缩放
+    // https://github.com/albert-lii/ImageViewer
+//    implementation 'com.liyi.view:image-viewer:2.1.2'
+
     // 事件总线
+    // https://github.com/greenrobot/EventBus
     implementation 'org.greenrobot:eventbus:3.1.1'
 
+    // 打印日志
     // https://github.com/orhanobut/logger
     implementation 'com.orhanobut:logger:2.2.0'
 
@@ -41,9 +52,10 @@ dependencies {
     // For Lifecycles, LiveData, and ViewModel, add:
     implementation 'android.arch.lifecycle:runtime:' + rootProject.archLifecycleVersion
     implementation 'android.arch.lifecycle:extensions:' + rootProject.archLifecycleVersion
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support:design:27.1.1'
     annotationProcessor 'android.arch.lifecycle:compiler:' + rootProject.archLifecycleVersion
-
-    //    For Room, add:
+    // For Room, add:
     implementation 'android.arch.persistence.room:runtime:' + rootProject.archRoomVersion
     annotationProcessor 'android.arch.persistence.room:compiler:' + rootProject.archRoomVersion
 

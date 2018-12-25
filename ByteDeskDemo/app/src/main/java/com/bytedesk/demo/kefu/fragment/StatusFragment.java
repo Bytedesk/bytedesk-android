@@ -1,6 +1,5 @@
 package com.bytedesk.demo.kefu.fragment;
 
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -9,7 +8,6 @@ import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.orhanobut.logger.Logger;
-import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
@@ -41,14 +39,13 @@ public class StatusFragment extends BaseFragment {
     }
 
     private void initTopBar() {
-        mTopBar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.app_color_blue));
+        //
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popBackStack();
             }
         });
-
         mTopBar.setTitle("查询在线状态接口");
     }
 
@@ -83,7 +80,7 @@ public class StatusFragment extends BaseFragment {
 
 
         // 获取某个工作组的在线状态：online代表在线，offline代表离线
-        BDCoreApi.visitorGetWorkGroupStatus(getContext(), mDefaultWorkGroupWid, new BaseCallback() {
+        BDCoreApi.getWorkGroupStatus(getContext(), mDefaultWorkGroupWid, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
 
@@ -103,7 +100,7 @@ public class StatusFragment extends BaseFragment {
         });
 
         // 获取某个客服账号的在线状态：online代表在线，offline代表离线
-        BDCoreApi.visitorGetAgentStatus(getContext(), mDefaultAgentUid, new BaseCallback() {
+        BDCoreApi.getAgentStatus(getContext(), mDefaultAgentUid, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
 
@@ -122,11 +119,6 @@ public class StatusFragment extends BaseFragment {
             }
         });
 
-    }
-
-    @Override
-    public QMUIFragment.TransitionConfig onFetchTransitionConfig() {
-        return SCALE_TRANSITION_CONFIG;
     }
 
 }

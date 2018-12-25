@@ -37,6 +37,13 @@
 
     </LinearLayout>
 
+    <com.liyi.viewer.widget.ScaleImageView
+        android:id="@+id/bytedesk_image_preivew"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:visibility="gone" />
+
     <com.qmuiteam.qmui.widget.QMUITopBarLayout
         android:id="@+id/bytedesk_chat_topbarlayout"
         android:layout_width="match_parent"

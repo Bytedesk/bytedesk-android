@@ -65,7 +65,6 @@ public class QueueFragment extends BaseFragment implements SwipeItemClickListene
         initRecycleView();
         initModel();
 
-        // tabfragment中初始化接口中返回，所以暂时不需要重复调用
         getQueues();
 
         return root;
@@ -159,7 +158,7 @@ public class QueueFragment extends BaseFragment implements SwipeItemClickListene
     private void getQueues() {
         Logger.d("getQueues");
         //
-        BDCoreApi.agentQueues(getContext(), new BaseCallback() {
+        BDCoreApi.getQueues(getContext(), new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -200,7 +199,7 @@ public class QueueFragment extends BaseFragment implements SwipeItemClickListene
 
         final QueueEntity queueEntity = mQueueEntities.get(position);
         //
-        BDCoreApi.agentQueueAccept(getContext(), queueEntity.getQid(), new BaseCallback() {
+        BDCoreApi.acceptQueue(getContext(), queueEntity.getQid(), new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

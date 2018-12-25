@@ -161,7 +161,7 @@ public class IMController extends BaseController {
         String subDomain = "vip";
 
         // 调用登录接口
-        BDCoreApi.agentLogin(getContext(), username, password, appKey, subDomain, new BaseCallback() {
+        BDCoreApi.login(getContext(), username, password, appKey, subDomain, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

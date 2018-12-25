@@ -147,7 +147,7 @@ public class KeFuController extends BaseController {
                     public void onClick(View view) {
                         // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
                         String url = "https://vip.bytedesk.com/visitor/chat?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph";
-                        BDUiApi.visitorStartChatHtml5(getContext(), url);
+                        BDUiApi.startHtml5Chat(getContext(), url);
                     }
                 })
                 .addTo(mGroupListView);

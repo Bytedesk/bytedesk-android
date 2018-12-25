@@ -112,7 +112,7 @@ public class ContactActivity extends AppCompatActivity implements ContactItemCli
     private void getContacts() {
         Logger.i("getContacts");
 
-        BDCoreApi.agentContacts(this, new BaseCallback() {
+        BDCoreApi.getContacts(this, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

@@ -22,6 +22,8 @@ allprojects {
         maven {
             url  "https://dl.bintray.com/jackning/maven"
         }
+        // 此句maven是为因为项目中使用了jitpack上的开源项目PhotoView
+//        maven { url 'https://jitpack.io' }
     }
 }
 

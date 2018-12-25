@@ -142,7 +142,7 @@ public class SettingFragment extends BaseFragment {
                         //
                         boolean isAutoReply = position == 0 ? false : true;
                         final String content = tag;
-                        BDCoreApi.agentUpdateAutoReply(getContext(), isAutoReply, content, new BaseCallback() {
+                        BDCoreApi.updateAutoReply(getContext(), isAutoReply, content, new BaseCallback() {
                             @Override
                             public void onSuccess(JSONObject object) {
 
@@ -187,7 +187,7 @@ public class SettingFragment extends BaseFragment {
                             status = BDConstants.USER_STATUS_REST;
                         }
                         //
-                        BDCoreApi.agentSetStatus(getContext(), status, new BaseCallback() {
+                        BDCoreApi.setAcceptStatus(getContext(), status, new BaseCallback() {
                             @Override
                             public void onSuccess(JSONObject object) {
 

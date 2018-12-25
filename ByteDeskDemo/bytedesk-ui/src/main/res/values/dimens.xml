@@ -6,6 +6,6 @@
     <dimen name="fab_margin">16dp</dimen>
 
 
-    <dimen name="kfds_timestamp_margin_top">10dp</dimen>
-    <dimen name="kfds_avatar_default_width_height">40dp</dimen>
+    <dimen name="bytedesk_timestamp_margin_top">10dp</dimen>
+    <dimen name="bytedesk_avatar_width_height">40dp</dimen>
 </resources>

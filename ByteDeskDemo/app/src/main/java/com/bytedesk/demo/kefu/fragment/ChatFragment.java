@@ -1,13 +1,11 @@
 package com.bytedesk.demo.kefu.fragment;
 
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.ui.api.BDUiApi;
-import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
@@ -48,7 +46,6 @@ public class ChatFragment extends BaseFragment {
 
     private void initTopBar() {
         //
-        mTopBar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.app_color_blue));
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,34 +67,17 @@ public class ChatFragment extends BaseFragment {
                     @Override
                     public void onClick(View view) {
                         //
-                        BDUiApi.visitorStartWorkGroupChatActivity(getContext(), wId, "工作组会话");
+                        BDUiApi.startWorkGroupChatActivity(getContext(), wId, "工作组会话");
                     }
                 })
                 .addItemView(appointChatItem, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         //
-                        BDUiApi.visitorStartAppointChatActivity(getContext(), agentUid, "指定客服会话");
+                        BDUiApi.startAppointChatActivity(getContext(), agentUid, "指定客服会话");
                     }
                 })
                 .addTo(mGroupListView);
-
-        // TODO: 待上线
-        QMUICommonListItemView buyChatItem = mGroupListView.createItemView("开始会话：");
-        QMUIGroupListView.newSection(getContext())
-                .setTitle("电商会话接口")
-                .addItemView(buyChatItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
-                })
-                .addTo(mGroupListView);
-
     }
 
-    @Override
-    public QMUIFragment.TransitionConfig onFetchTransitionConfig() {
-        return SCALE_TRANSITION_CONFIG;
-    }
 }

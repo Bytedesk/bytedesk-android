@@ -157,7 +157,7 @@ public class ContactFragment extends BaseFragment implements SwipeItemClickListe
     private void getContacts() {
         Logger.i("getContacts");
 
-        BDCoreApi.agentContacts(getContext(), new BaseCallback() {
+        BDCoreApi.getContacts(getContext(), new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

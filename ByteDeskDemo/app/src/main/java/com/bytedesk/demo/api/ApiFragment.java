@@ -14,8 +14,10 @@ import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.demo.im.fragment.contact.ContactFragment;
 import com.bytedesk.demo.im.fragment.group.GroupFragment;
+import com.bytedesk.demo.im.fragment.notice.NoticeFragment;
 import com.bytedesk.demo.im.fragment.queue.QueueFragment;
 import com.bytedesk.demo.im.fragment.setting.SettingFragment;
+import com.bytedesk.demo.im.fragment.social.TabFragment;
 import com.bytedesk.demo.kefu.fragment.ChatFragment;
 import com.bytedesk.demo.kefu.fragment.ProfileFragment;
 import com.bytedesk.demo.kefu.fragment.StatusFragment;
@@ -70,8 +72,11 @@ public class ApiFragment extends BaseFragment {
 
         // 公共接口
         QMUICommonListItemView registerItem = mGroupListView.createItemView("1. 注册接口");
+        registerItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         loginItem = mGroupListView.createItemView("2. 登录接口");
+        loginItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView logoutItem = mGroupListView.createItemView("3. 退出登录接口");
+        logoutItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("公共接口")
                 .addItemView(registerItem, new View.OnClickListener() {
@@ -99,10 +104,15 @@ public class ApiFragment extends BaseFragment {
 
         // 客服接口
         QMUICommonListItemView chatItem = mGroupListView.createItemView("1.联系客服接口");
+        chatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView userInfoItem = mGroupListView.createItemView("2.自定义用户信息接口");
+        userInfoItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView statusItem = mGroupListView.createItemView("3.在线状态接口");
+        statusItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView sessionHistoryItem = mGroupListView.createItemView("4.历史会话记录接口");
+        sessionHistoryItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView wapChatItem = mGroupListView.createItemView("5.网页会话演示");
+        wapChatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
                 .addItemView(chatItem, new View.OnClickListener() {
@@ -137,20 +147,38 @@ public class ApiFragment extends BaseFragment {
                     @Override
                     public void onClick(View view) {
                         // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
-                        String url = "https://vip.bytedesk.com/visitor/chat?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph";
-                        BDUiApi.visitorStartChatHtml5(getContext(), url);
+                        String url = "https://vip.bytedesk.com/chat?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph";
+                        BDUiApi.startHtml5Chat(getContext(), url);
                     }
                 })
                 .addTo(mGroupListView);
 
         // IM接口
-        QMUICommonListItemView contactItem = mGroupListView.createItemView("1.联系人接口");
-        QMUICommonListItemView groupItem = mGroupListView.createItemView("2.群组接口");
-        QMUICommonListItemView threadItem = mGroupListView.createItemView("3.会话接口");
-        QMUICommonListItemView queueItem = mGroupListView.createItemView("4.排队接口");
-        QMUICommonListItemView settingItem = mGroupListView.createItemView("5.设置接口");
+        QMUICommonListItemView friendItem = mGroupListView.createItemView("1.好友接口");
+        friendItem.setDetailText("社交：关注/粉丝/好友/黑名单");
+        friendItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView contactItem = mGroupListView.createItemView("2.联系人接口");
+        contactItem.setDetailText("客服同事");
+        contactItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView groupItem = mGroupListView.createItemView("3.群组接口");
+        groupItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView threadItem = mGroupListView.createItemView("4.会话接口");
+        threadItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView queueItem = mGroupListView.createItemView("5.排队接口");
+        queueItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.通知接口");
+        noticeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView settingItem = mGroupListView.createItemView("7.设置接口");
+        settingItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("IM接口")
+                .addItemView(friendItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        TabFragment tabFragment = new TabFragment();
+                        startFragment(tabFragment);
+                    }
+                })
                 .addItemView(contactItem, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -177,6 +205,12 @@ public class ApiFragment extends BaseFragment {
                     public void onClick(View view) {
                         QueueFragment queueFragment = new QueueFragment();
                         startFragment(queueFragment);
+                    }
+                }).addItemView(noticeItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        NoticeFragment noticeFragment = new NoticeFragment();
+                        startFragment(noticeFragment);
                     }
                 })
                 .addItemView(settingItem, new View.OnClickListener() {
@@ -254,7 +288,7 @@ public class ApiFragment extends BaseFragment {
         String subDomain = "vip";
 
         // 调用登录接口
-        BDCoreApi.agentLogin(getContext(), username, password, appKey, subDomain, new BaseCallback() {
+        BDCoreApi.login(getContext(), username, password, appKey, subDomain, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
