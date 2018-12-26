@@ -281,7 +281,7 @@ public class ApiFragment extends BaseFragment {
     private void login() {
         // 测试账号：test1，密码：123456
         // 或者：test1~test15 共15个测试账号，密码均为：123456
-        String username = "test2";
+        String username = "test14";
         String password = "123456";
         String appKey = "201809171553112";
         // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
