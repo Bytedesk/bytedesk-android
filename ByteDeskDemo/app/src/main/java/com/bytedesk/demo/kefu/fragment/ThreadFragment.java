@@ -53,13 +53,13 @@ public class ThreadFragment extends BaseFragment {
     }
 
     private void initTopBar() {
+        //
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popBackStack();
             }
         });
-
         mTopBar.setTitle("会话历史记录接口");
     }
 

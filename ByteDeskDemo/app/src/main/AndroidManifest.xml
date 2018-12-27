@@ -9,6 +9,8 @@
     <!-- 登录接口：检测/监听网络状态 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <!--获取IMEI号码-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!-- 聊天界面：录制语音,将语音文件保存在手机内存卡，检测是否装载文件系统 -->
@@ -90,6 +92,34 @@
 
         <!--长连接service-->
         <service android:name="com.bytedesk.paho.android.service.MqttService"/>
+
+        <!-- 监听网络变化 -->
+        <receiver android:name="com.bytedesk.core.receiver.BDNetworkConnectivityReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.bytedesk.core.receiver.BDBootReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.bytedesk.core.receiver.BDPowerReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 监听屏幕解锁 -->
+        <receiver android:name="com.bytedesk.core.receiver.BDScreenReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
 
         <!-- 完善兼容android N, 24相机访问权限-->
         <!-- FIXME 注意：修改 android:authorities为 ${自己程序的包名applicationId}.provider -->

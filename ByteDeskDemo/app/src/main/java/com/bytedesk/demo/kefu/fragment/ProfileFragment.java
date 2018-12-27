@@ -72,7 +72,7 @@ public class ProfileFragment extends BaseFragment {
                     public void onClick(View view) {
                         //
                         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                        builder.setTitle("标题")
+                        builder.setTitle("自定义昵称")
                                 .setPlaceholder("在此输入您的昵称")
                                 .setInputType(InputType.TYPE_CLASS_TEXT)
                                 .addAction("取消", new QMUIDialogAction.ActionListener() {
@@ -129,7 +129,7 @@ public class ProfileFragment extends BaseFragment {
                     public void onClick(View view) {
 //
                         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                        builder.setTitle("标题")
+                        builder.setTitle("自定义标签")
                                 .setPlaceholder("在此输入自定义标签")
                                 .setInputType(InputType.TYPE_CLASS_TEXT)
                                 .addAction("取消", new QMUIDialogAction.ActionListener() {

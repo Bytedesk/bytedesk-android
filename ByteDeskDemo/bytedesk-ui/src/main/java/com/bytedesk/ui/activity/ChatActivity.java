@@ -1021,7 +1021,7 @@ public class ChatActivity extends AppCompatActivity
                     // BDMqttApi.sendImageMessage(ChatActivity.this, mThreadTid, image_url, localId, mThreadType);
 
                     // 2. 同步发送图片消息(推荐)
-                    BDCoreApi.sendImageMessage(ChatActivity.this, mThreadTid, imageUrl, localId, mRequestType, new BaseCallback() {
+                    BDCoreApi.sendImageMessage(ChatActivity.this, mThreadTid, imageUrl, localId, mThreadType, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {

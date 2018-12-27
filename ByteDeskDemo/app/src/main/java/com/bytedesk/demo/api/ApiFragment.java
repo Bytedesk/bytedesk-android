@@ -1,5 +1,6 @@
 package com.bytedesk.demo.api;
 
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -26,6 +27,8 @@ import com.bytedesk.ui.api.BDUiApi;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 
@@ -238,6 +241,10 @@ public class ApiFragment extends BaseFragment {
                         if (tag.equals("自定义用户名")) {
 
                             registerUser();
+
+
+
+
                         } else {
 
                             Toast.makeText(getContext(), "匿名用户不需要注册，直接调用匿名登录接口即可", Toast.LENGTH_LONG).show();
@@ -277,29 +284,59 @@ public class ApiFragment extends BaseFragment {
 
     /**
      * 自定义用户名登录
+     *
+     * TODO: 当多个安卓客户端同时登录同一个账号的时候，会被踢掉线，此客户端会自动重连，导致不断重新登录的情况，待处理：弹出提示框
+     * TODO：弹出登录框让用户手动输入用户名/密码
      */
     private void login() {
-        // 测试账号：test1，密码：123456
-        // 或者：test1~test15 共15个测试账号，密码均为：123456
-        String username = "test14";
-        String password = "123456";
-        String appKey = "201809171553112";
-        // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
-        String subDomain = "vip";
 
-        // 调用登录接口
-        BDCoreApi.login(getContext(), username, password, appKey, subDomain, new BaseCallback() {
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        builder.setTitle("自定义用户名登录")
+            .setPlaceholder("在此输入自定义用户名")
+            .setInputType(InputType.TYPE_CLASS_TEXT)
+            .addAction("取消", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    dialog.dismiss();
+                }
+            })
+            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
 
-            @Override
-            public void onSuccess(JSONObject object) {
+                        //
+                        String username = text.toString();
+                        String password = "123456";
+                        String appKey = "201809171553112";
+                        // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
+                        String subDomain = "vip";
 
-            }
+                        // 调用登录接口
+                        BDCoreApi.login(getContext(), username, password, appKey, subDomain, new BaseCallback() {
 
-            @Override
-            public void onError(JSONObject object) {
-                Logger.e("login failed message");
-            }
-        });
+                            @Override
+                            public void onSuccess(JSONObject object) {
+
+                                Toast.makeText(getContext(), "登录成功", Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void onError(JSONObject object) {
+                                Logger.e("login failed message");
+
+                                Toast.makeText(getContext(), "登录失败", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(getActivity(), "请填入自定义用户名", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            })
+            .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
     }
 
 
@@ -364,40 +401,68 @@ public class ApiFragment extends BaseFragment {
 
     /**
      * 自定义用户名注册
+     *
+     * TODO：弹出登录框让用户手动输入用户名/密码
      */
     private void registerUser() {
-        //
-        String username = "androidtest1";
-        String nickname = "安卓测试1";
-        String password = "123456";
-        // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
-        String subDomain = "vip";
-        //
-        BDCoreApi.registerUser(username, nickname, password, subDomain, new BaseCallback() {
 
-            @Override
-            public void onSuccess(JSONObject object) {
-
-                try {
-                    String message = object.getString("message");
-                    int status_code = object.getInt("status_code");
-                    //
-                    if (status_code == 200) {
-                        Toast.makeText(getContext(), "注册成功", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        builder.setTitle("自定义用户登录名")
+            .setPlaceholder("在此输入您的用户名(只能包含字母和数字)")
+            .setInputType(InputType.TYPE_CLASS_TEXT)
+            .addAction("取消", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    dialog.dismiss();
                 }
-            }
+            })
+            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
 
-            @Override
-            public void onError(JSONObject object) {
-                Toast.makeText(getContext(), "注册失败", Toast.LENGTH_LONG).show();
-            }
-        });
+                        //
+                        String username = text.toString();
+                        String nickname = "自定义测试账号"+username;
+                        String password = "123456";
+                        // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
+                        String subDomain = "vip";
+                        //
+                        BDCoreApi.registerUser(username, nickname, password, subDomain, new BaseCallback() {
+
+                            @Override
+                            public void onSuccess(JSONObject object) {
+
+                                try {
+                                    String message = object.getString("message");
+                                    int status_code = object.getInt("status_code");
+                                    //
+                                    if (status_code == 200) {
+                                        Toast.makeText(getContext(), "注册成功", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                                    }
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onError(JSONObject object) {
+                                Toast.makeText(getContext(), "注册失败", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            })
+            .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+
     }
 
     /**
@@ -423,6 +488,19 @@ public class ApiFragment extends BaseFragment {
 
             title = "萝卜丝(连接断开)";
             loginItem.setDetailText("当前未连接");
+        } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_KICKOFF)) {
+
+            title = "萝卜丝(异地登录，被踢掉线)";
+            // 弹窗提示
+            new QMUIDialog.MessageDialogBuilder(getActivity())
+                .setTitle("异地登录提示")
+                .setMessage("此账号在其他安卓设备登录，被踢掉线")
+                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                }).show();
         }
         mTopBar.setTitle(title);
     }
