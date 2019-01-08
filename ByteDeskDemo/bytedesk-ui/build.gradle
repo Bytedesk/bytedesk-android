@@ -24,7 +24,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // 加载默认UI库：https://bintray.com/jackning/maven/ui
-    implementation 'com.bytedesk:core:1.3.1'
+    implementation 'com.bytedesk:core:1.4.0'
 
     // 腾讯QMUI界面库
     // http://qmuiteam.com/android/page/start.html

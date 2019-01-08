@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
+import com.bytedesk.core.event.KickoffEvent;
 import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.event.PreviewEvent;
 import com.bytedesk.core.repository.BDRepository;
@@ -1105,6 +1106,32 @@ public class ChatActivity extends AppCompatActivity
                 mTopBar.setTitle(mTitle);
             }
         }, 3000);
+    }
+
+    /**
+     * 账号异地登录通知提示，开发者可自行决定是否退出当前账号登录
+     *
+     * @param kickoffEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onKickoffEvent(KickoffEvent kickoffEvent) {
+
+        String content = kickoffEvent.getContent();
+        Logger.w("onKickoffEvent: " + content);
+
+        // 弹窗提示
+        new QMUIDialog.MessageDialogBuilder(this)
+            .setTitle("异地登录提示")
+            .setMessage(content)
+            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    dialog.dismiss();
+
+                    // 开发者可自行决定是否退出登录
+
+                }
+            }).show();
     }
 
     /**

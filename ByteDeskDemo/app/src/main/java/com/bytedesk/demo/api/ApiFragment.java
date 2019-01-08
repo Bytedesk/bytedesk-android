@@ -9,6 +9,7 @@ import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.callback.LoginCallback;
 import com.bytedesk.core.event.ConnectionEvent;
+import com.bytedesk.core.event.KickoffEvent;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDPreferenceManager;
 import com.bytedesk.demo.R;
@@ -85,21 +86,18 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(registerItem, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
                         showRegisterSheet();
                     }
                 })
                 .addItemView(loginItem, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
                         showLoginSheet();
                     }
                 })
                 .addItemView(logoutItem, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
                         logout();
                     }
                 })
@@ -114,7 +112,11 @@ public class ApiFragment extends BaseFragment {
         statusItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView sessionHistoryItem = mGroupListView.createItemView("4.历史会话记录接口");
         sessionHistoryItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView wapChatItem = mGroupListView.createItemView("5.网页会话演示");
+        QMUICommonListItemView feedbackItem = mGroupListView.createItemView("5.意见反馈接口(TODO)");
+        feedbackItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView helpCenterItem = mGroupListView.createItemView("6.帮助中心接口(TODO)");
+        helpCenterItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView wapChatItem = mGroupListView.createItemView("7.网页会话演示");
         wapChatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
@@ -146,6 +148,18 @@ public class ApiFragment extends BaseFragment {
                         startFragment(threadFragment);
                     }
                 })
+                .addItemView(feedbackItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 意见反馈接口
+                    }
+                })
+                .addItemView(helpCenterItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 帮助中心接口
+                    }
+                })
                 .addItemView(wapChatItem, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -169,7 +183,7 @@ public class ApiFragment extends BaseFragment {
         threadItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView queueItem = mGroupListView.createItemView("5.排队接口");
         queueItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.通知接口");
+        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.通知接口(TODO)");
         noticeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView settingItem = mGroupListView.createItemView("7.设置接口");
         settingItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
@@ -238,17 +252,14 @@ public class ApiFragment extends BaseFragment {
                     public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
                         dialog.dismiss();
 
-                        if (tag.equals("自定义用户名")) {
+                    if (tag.equals("自定义用户名")) {
 
-                            registerUser();
+                        registerUser();
 
+                    } else {
 
-
-
-                        } else {
-
-                            Toast.makeText(getContext(), "匿名用户不需要注册，直接调用匿名登录接口即可", Toast.LENGTH_LONG).show();
-                        }
+                        Toast.makeText(getContext(), "匿名用户不需要注册，直接调用匿名登录接口即可", Toast.LENGTH_LONG).show();
+                    }
 
                     }
                 })
@@ -466,7 +477,7 @@ public class ApiFragment extends BaseFragment {
     }
 
     /**
-     * 监听 EventBus 连接消息
+     * 监听 EventBus 长连接状态
      *
      * @param connectionEvent
      */
@@ -488,21 +499,37 @@ public class ApiFragment extends BaseFragment {
 
             title = "萝卜丝(连接断开)";
             loginItem.setDetailText("当前未连接");
-        } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_KICKOFF)) {
-
-            title = "萝卜丝(异地登录，被踢掉线)";
-            // 弹窗提示
-            new QMUIDialog.MessageDialogBuilder(getActivity())
-                .setTitle("异地登录提示")
-                .setMessage("此账号在其他安卓设备登录，被踢掉线")
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        dialog.dismiss();
-                    }
-                }).show();
         }
         mTopBar.setTitle(title);
+    }
+
+
+    /**
+     * 监听账号异地登录通知
+     *
+     * @param kickoffEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onKickoffEvent(KickoffEvent kickoffEvent) {
+
+        String content = kickoffEvent.getContent();
+        Logger.w("onKickoffEvent: " + content);
+
+        // 弹窗提示
+        new QMUIDialog.MessageDialogBuilder(getActivity())
+            .setTitle("异地登录提示")
+            .setMessage(content)
+            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    dialog.dismiss();
+
+                    // 开发者可自行决定是否退出登录
+                    // 注意: 同一账号同时登录多个客户端不影响正常会话
+                    logout();
+
+                }
+            }).show();
     }
 
 
