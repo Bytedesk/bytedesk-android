@@ -116,7 +116,9 @@ public class ApiFragment extends BaseFragment {
         feedbackItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView helpCenterItem = mGroupListView.createItemView("6.帮助中心接口(TODO)");
         helpCenterItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView wapChatItem = mGroupListView.createItemView("7.网页会话演示");
+        QMUICommonListItemView faqItem = mGroupListView.createItemView("7.常见问题接口(TODO)");
+        faqItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView wapChatItem = mGroupListView.createItemView("8.网页会话演示");
         wapChatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
@@ -158,6 +160,12 @@ public class ApiFragment extends BaseFragment {
                     @Override
                     public void onClick(View view) {
                         // TODO: 帮助中心接口
+                    }
+                })
+                .addItemView(faqItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 常见问题接口
                     }
                 })
                 .addItemView(wapChatItem, new View.OnClickListener() {

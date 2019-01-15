@@ -215,7 +215,7 @@ public class ChatActivity extends AppCompatActivity
                 // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
                 // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
-                String localId = BDCoreUtils.uuid();
+                final String localId = BDCoreUtils.uuid();
 
                 // 插入本地消息
                 mRepository.insertTextMessageLocal(mThreadTid, mWorkGroupWid, content, localId, mThreadType);
@@ -232,11 +232,12 @@ public class ChatActivity extends AppCompatActivity
                         //
                         try {
 
-                            String localId = object.getJSONObject("data").getString("localId");
-                            Logger.i("callback localId: " + localId);
-
                             int status_code = object.getInt("status_code");
                             if (status_code == 200) {
+
+                                String localId = object.getJSONObject("data").getString("localId");
+                                Logger.i("callback localId: " + localId);
+
 
                                 // 发送成功
                             } else {
@@ -516,9 +517,8 @@ public class ChatActivity extends AppCompatActivity
                     } else {
                         // 请求会话失败
 
-                        JSONObject message = object.getJSONObject("data");
-                        String tip = message.getString("message");
-                        Toast.makeText(ChatActivity.this, tip, Toast.LENGTH_SHORT).show();
+                        String message = object.getString("message");
+                        Toast.makeText(ChatActivity.this, message, Toast.LENGTH_SHORT).show();
                     }
 
                     //
@@ -1010,7 +1010,7 @@ public class ChatActivity extends AppCompatActivity
                     // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
                     // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
-                    String localId = BDCoreUtils.uuid();
+                    final String localId = BDCoreUtils.uuid();
 
                     String imageUrl = object.getString("data");
 
@@ -1029,11 +1029,11 @@ public class ChatActivity extends AppCompatActivity
                             //
                             try {
 
-                                String localId = object.getJSONObject("data").getString("localId");
-                                Logger.i("callback localId: " + localId);
-
                                 int status_code = object.getInt("status_code");
                                 if (status_code == 200) {
+
+                                    String localId = object.getJSONObject("data").getString("localId");
+                                    Logger.i("callback localId: " + localId);
 
                                     // 发送成功
                                 } else {

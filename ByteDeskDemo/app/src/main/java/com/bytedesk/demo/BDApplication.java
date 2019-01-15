@@ -6,6 +6,7 @@ import com.bytedesk.ui.api.BDUiApi;
 import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
+import com.qmuiteam.qmui.arch.QMUISwipeBackActivityManager;
 
 /**
  * @author bytedesk.com on 2017/9/20.
@@ -22,10 +23,11 @@ public class BDApplication extends Application{
         Stetho.initializeWithDefaults(this);
         // https://github.com/orhanobut/logger
         Logger.addLogAdapter(new AndroidLogAdapter());
-
+        QMUISwipeBackActivityManager.init(this);
 
         // 初始化萝卜丝UI界面库
         BDUiApi.init(this);
+
     }
 
 

@@ -47,4 +47,10 @@
     <color name="red_normal">#FF0000</color>
     <color name="red_pressed">#FF6666</color>
 
+    <color name="yellow_normal">#FFCF47</color>
+    <color name="yellow_pressed">#FE6D4B</color>
+
+    <color name="gray_normal">#858C96</color>
+    <color name="gray_pressed">#717882</color>
+
 </resources>

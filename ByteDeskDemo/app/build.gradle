@@ -8,7 +8,7 @@ android {
         applicationId "com.bytedesk.demo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode 5
         versionName "5.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -36,24 +36,21 @@ android {
     lintOptions {
         abortOnError false
     }
-
     // 防止出现rxjava重复报错： Duplicated file rxjava.properties
 //    packagingOptions {
 //        exclude 'META-INF/rxjava.properties'
 //    }
 
-//    dataBinding {
-//        enabled = true
-//    }
+    dataBinding {
+        enabled = true
+    }
 
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    // 加载默认UI库：https://bintray.com/jackning/maven/ui
-    implementation 'com.bytedesk:ui:1.4.0'
-    // 加载核心库：https://bintray.com/jackning/maven/core
-    implementation 'com.bytedesk:core:1.4.0'
+    implementation 'com.bytedesk:core:1.4.5'
+    implementation 'com.bytedesk:ui:1.4.5'
 
     // Butterknife
     // http://jakewharton.github.io/butterknife/
@@ -64,7 +61,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.1.1'
 
     // 会话列表左滑按钮
-    implementation 'com.yanzhenjie:recyclerview-swipe:1.1.4'
+    implementation 'com.yanzhenjie:recyclerview-swipe:1.2.1'
 
     // Android sqlite 调试库
     // https://github.com/facebook/stetho
@@ -75,8 +72,8 @@ dependencies {
     // 腾讯QMUI界面库
     // http://qmuiteam.com/android/page/start.html
     // https://bintray.com/chanthuang/qmuirepo
-    implementation 'com.qmuiteam:qmui:1.1.7'
-    implementation 'com.qmuiteam:arch:0.1.4'
+    implementation 'com.qmuiteam:qmui:1.1.12'
+    implementation 'com.qmuiteam:arch:0.3.0'
 
     // logger框架
     // https://github.com/orhanobut/logger
@@ -94,6 +91,7 @@ dependencies {
 
     implementation 'com.android.support:support-v4:' + rootProject.supportLibVersion
     implementation 'com.android.support:appcompat-v7:' + rootProject.supportLibVersion
+    implementation 'com.android.support:recyclerview-v7:' + rootProject.supportLibVersion
 
     // 替换com.android.support为androidx
 //    implementation 'androidx.appcompat:appcompat:1.0.2'

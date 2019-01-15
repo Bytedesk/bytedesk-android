@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 7
+        versionName "1.0.6"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -23,14 +23,13 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    // 加载默认UI库：https://bintray.com/jackning/maven/ui
-    implementation 'com.bytedesk:core:1.4.0'
+    implementation 'com.bytedesk:core:1.4.5'
 
     // 腾讯QMUI界面库
     // http://qmuiteam.com/android/page/start.html
     // https://bintray.com/chanthuang/qmuirepo
-    implementation 'com.qmuiteam:qmui:1.1.7'
-    implementation 'com.qmuiteam:arch:0.1.4'
+    implementation 'com.qmuiteam:qmui:1.1.12'
+    implementation 'com.qmuiteam:arch:0.3.0'
 
     // 自定义相册样式
     // https://github.com/yanzhenjie/Album

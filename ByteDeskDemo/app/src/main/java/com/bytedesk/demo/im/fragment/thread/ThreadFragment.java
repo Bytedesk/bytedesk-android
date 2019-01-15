@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
@@ -338,7 +339,7 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
      */
     private SwipeMenuCreator swipeMenuCreator = new SwipeMenuCreator() {
         @Override
-        public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int viewType) {
+        public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int position) {
 
             int width = getResources().getDimensionPixelSize(R.dimen.dp_70);
 
@@ -347,13 +348,95 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
             // 3. WRAP_CONTENT，自身高度，不推荐;
             int height = ViewGroup.LayoutParams.MATCH_PARENT;
 
+            int viewType = mThreadAdapter.getItemViewType(position);
+
+            Logger.i("viewType fragment: " + viewType);
+            //
+            if (viewType == ThreadAdapter.ViewType.TOP_UNREAD.ordinal()) {
+
+                SwipeMenuItem markUnReadItem = new SwipeMenuItem(getContext())
+                        .setBackground(R.drawable.bytedesk_selector_gray)
+                        .setText("取消标记未读")
+                        .setTextColor(Color.WHITE)
+                        .setWidth(width)
+                        .setHeight(height);
+                swipeRightMenu.addMenuItem(markUnReadItem);
+
+                SwipeMenuItem markTopItem = new SwipeMenuItem(getContext())
+                        .setBackground(R.drawable.bytedesk_selector_yellow)
+                        .setText("取消置顶")
+                        .setTextColor(Color.WHITE)
+                        .setWidth(width)
+                        .setHeight(height);
+                swipeRightMenu.addMenuItem(markTopItem);
+
+            } else if (viewType == ThreadAdapter.ViewType.TOP_READ.ordinal()) {
+
+                //
+                SwipeMenuItem markUnReadItem = new SwipeMenuItem(getContext())
+                        .setBackground(R.drawable.bytedesk_selector_gray)
+                        .setText("标记未读")
+                        .setTextColor(Color.WHITE)
+                        .setWidth(width)
+                        .setHeight(height);
+                swipeRightMenu.addMenuItem(markUnReadItem);
+
+                SwipeMenuItem markTopItem = new SwipeMenuItem(getContext())
+                        .setBackground(R.drawable.bytedesk_selector_yellow)
+                        .setText("取消置顶")
+                        .setTextColor(Color.WHITE)
+                        .setWidth(width)
+                        .setHeight(height);
+                swipeRightMenu.addMenuItem(markTopItem);
+
+            } else if (viewType == ThreadAdapter.ViewType.UNTOP_UNREAD.ordinal()) {
+
+                //
+                SwipeMenuItem markUnReadItem = new SwipeMenuItem(getContext())
+                        .setBackground(R.drawable.bytedesk_selector_gray)
+                        .setText("取消标记未读")
+                        .setTextColor(Color.WHITE)
+                        .setWidth(width)
+                        .setHeight(height);
+                swipeRightMenu.addMenuItem(markUnReadItem);
+
+                //
+                SwipeMenuItem markTopItem = new SwipeMenuItem(getContext())
+                        .setBackground(R.drawable.bytedesk_selector_yellow)
+                        .setText("置顶")
+                        .setTextColor(Color.WHITE)
+                        .setWidth(width)
+                        .setHeight(height);
+                swipeRightMenu.addMenuItem(markTopItem);
+
+            } else if (viewType == ThreadAdapter.ViewType.UNTOP_READ.ordinal()) {
+
+                //
+                SwipeMenuItem markUnReadItem = new SwipeMenuItem(getContext())
+                        .setBackground(R.drawable.bytedesk_selector_gray)
+                        .setText("标记未读")
+                        .setTextColor(Color.WHITE)
+                        .setWidth(width)
+                        .setHeight(height);
+                swipeRightMenu.addMenuItem(markUnReadItem);
+
+                //
+                SwipeMenuItem markTopItem = new SwipeMenuItem(getContext())
+                        .setBackground(R.drawable.bytedesk_selector_yellow)
+                        .setText("置顶")
+                        .setTextColor(Color.WHITE)
+                        .setWidth(width)
+                        .setHeight(height);
+                swipeRightMenu.addMenuItem(markTopItem);
+            }
+
             SwipeMenuItem deleteItem = new SwipeMenuItem(getContext())
                     .setBackground(R.drawable.bytedesk_selector_red)
                     .setText("删除")
                     .setTextColor(Color.WHITE)
                     .setWidth(width)
                     .setHeight(height);
-            swipeRightMenu.addMenuItem(deleteItem);// 添加菜单到右侧。
+            swipeRightMenu.addMenuItem(deleteItem);
         }
     };
 
@@ -361,25 +444,275 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
      * 点击右划菜单监听
      */
     private SwipeMenuItemClickListener swipeMenuItemClickListener = new SwipeMenuItemClickListener() {
+
         @Override
-        public void onItemClick(SwipeMenuBridge menuBridge) {
+        public void onItemClick(SwipeMenuBridge menuBridge, final int position) {
             menuBridge.closeMenu();
 
             int direction = menuBridge.getDirection(); // 左侧还是右侧菜单。
-            int adapterPosition = menuBridge.getAdapterPosition(); // RecyclerView的Item的position。
             int menuPosition = menuBridge.getPosition(); // 菜单在RecyclerView的Item中的Position。
+            int viewType = mThreadAdapter.getItemViewType(position);
 
             if (direction == SwipeMenuRecyclerView.RIGHT_DIRECTION) {
-                Logger.d( "list第" + adapterPosition + "; 右侧菜单第" + menuPosition);
-                // 仅删除本地会话记录
-                ThreadEntity threadEntity = mThreadEntities.get(adapterPosition);
-                mThreadViewModel.deleteThreadEntity(threadEntity);
+                Logger.d( "list第" + position + "; 右侧菜单第" + menuPosition);
+                ThreadEntity threadEntity = mThreadEntities.get(position);
+                Logger.d("thread item swipe " + position + " string: " + threadEntity.toString());
+
+                //
+                if (viewType == ThreadAdapter.ViewType.TOP_UNREAD.ordinal()) {
+
+                    if (menuPosition == 0) {
+                        // 取消标记未读
+                        unmarkUnreadThread(threadEntity.getTid(), position);
+                    } else if (menuPosition == 1) {
+                        // 取消置顶
+                        unmarkTopThread(threadEntity.getTid(), position);
+                    }
+
+                } else if (viewType == ThreadAdapter.ViewType.TOP_READ.ordinal()) {
+
+                    if (menuPosition == 0) {
+                        // 标记未读
+                        markUnreadThread(threadEntity.getTid(), position);
+
+                    } else if (menuPosition == 1) {
+                        // 取消置顶
+                        unmarkTopThread(threadEntity.getTid(), position);
+                    }
+
+                } else if (viewType == ThreadAdapter.ViewType.UNTOP_UNREAD.ordinal()) {
+
+                    if (menuPosition == 0) {
+                        // 取消标记未读
+                        unmarkUnreadThread(threadEntity.getTid(), position);
+
+                    } else if (menuPosition == 1) {
+                        // 置顶
+                        markTopThread(threadEntity.getTid(), position);
+                    }
+
+                } else if (viewType == ThreadAdapter.ViewType.UNTOP_READ.ordinal()) {
+
+                    if (menuPosition == 0) {
+                        // 标记未读
+                        markUnreadThread(threadEntity.getTid(), position);
+
+                    } else if (menuPosition == 1) {
+                        // 置顶
+                        markTopThread(threadEntity.getTid(), position);
+                    }
+                }
+
+                //
+                if (menuPosition == 2) {
+
+                    deleteThread(threadEntity.getTid(), position);
+                }
 
             } else if (direction == SwipeMenuRecyclerView.LEFT_DIRECTION) {
-                Logger.d("list第" + adapterPosition + "; 左侧菜单第" + menuPosition);
+                Logger.d("list第" + position + "; 左侧菜单第" + menuPosition);
             }
         }
     };
+
+
+    /**
+     * 会话置顶
+     *
+     * @param tid
+     * @param position
+     */
+    private void markTopThread(String tid, final int position) {
+        // 置顶
+        BDCoreApi.markTopThread(getContext(), tid, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+
+                        // TODO: 待优化
+                        mThreadAdapter.notifyDataSetChanged();
+                    } else {
+
+                        String message = object.getString("message");
+                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                Toast.makeText(getContext(), "会话置顶失败", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * 取消会话置顶
+     *
+     * @param tid
+     * @param position
+     */
+    private void unmarkTopThread(String tid, final int position) {
+        //
+        BDCoreApi.unmarkTopThread(getContext(), tid, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+
+                        // TODO: 待优化
+                        mThreadAdapter.notifyDataSetChanged();
+                    } else {
+
+                        String message = object.getString("message");
+                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                Toast.makeText(getContext(), "取消会话置顶失败", Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    /**
+     * 标记未读
+     *
+     * @param tid
+     * @param position
+     */
+    private void markUnreadThread(String tid, final int position) {
+        //
+        BDCoreApi.markUnreadThread(getContext(), tid, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+
+                        // TODO: 待优化
+                        mThreadAdapter.notifyDataSetChanged();
+                    } else {
+
+                        String message = object.getString("message");
+                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                Toast.makeText(getContext(), "标记未读失败", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * 取消标记未读
+     *
+     * @param tid
+     * @param position
+     */
+    private void unmarkUnreadThread(String tid, final int position) {
+        //
+        BDCoreApi.unmarkUnreadThread(getContext(), tid, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+                        // 成功
+
+                        // TODO: 待优化
+                        mThreadAdapter.notifyDataSetChanged();
+                    } else {
+
+                        String message = object.getString("message");
+                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                Toast.makeText(getContext(), "取消标记未读失败", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * 删除会话
+     *
+     * @param tid
+     * @param position
+     */
+    private void deleteThread(String tid, final int position) {
+
+        // 删除
+        BDCoreApi.markDeletedThread(getContext(), tid, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+
+                        // 删除本地会话记录
+                        ThreadEntity threadEntity = mThreadEntities.get(position);
+                        //
+                        mThreadEntities.remove(threadEntity);
+                        mThreadAdapter.notifyDataSetChanged();
+                        mThreadViewModel.deleteThreadEntity(threadEntity);
+
+                    } else {
+
+                        String message = object.getString("message");
+                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                Toast.makeText(getContext(), "删除会话失败", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
 
 }

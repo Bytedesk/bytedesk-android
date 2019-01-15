@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.bytedesk.demo.R;
 import com.bytedesk.core.room.entity.ThreadEntity;
 import com.bytedesk.ui.util.BDUiUtils;
+import com.orhanobut.logger.Logger;
 
 import java.util.List;
 
@@ -41,6 +42,28 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
     @Override
     public int getItemCount() {
         return mThreadList == null ? 0 : mThreadList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        ThreadEntity threadEntity = mThreadList.get(position);
+        Logger.i("is mark Top: " + threadEntity.isMarkTop() +
+                " is mark unread: " + threadEntity.isMarkUnread());
+
+        int viewType = 0;
+        if (threadEntity.isMarkTop() && threadEntity.isMarkUnread()) {
+            viewType = ViewType.TOP_UNREAD.ordinal();
+        } else if (threadEntity.isMarkTop() && !threadEntity.isMarkUnread()) {
+            viewType = ViewType.TOP_READ.ordinal();
+        } else if (!threadEntity.isMarkTop() && threadEntity.isMarkUnread()) {
+            viewType = ViewType.UNTOP_UNREAD.ordinal();
+        } else if (!threadEntity.isMarkTop() && !threadEntity.isMarkUnread()) {
+            viewType = ViewType.UNTOP_READ.ordinal();
+        }
+
+        Logger.i("viewType adapter: " + viewType);
+
+        return viewType;
     }
 
     @Override
@@ -83,7 +106,19 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
             if (thread.getUnreadCount() == 0) {
                 mUnreadNumTextView.setVisibility(View.GONE);
             }
+
+            if (thread.isMarkUnread()) {
+                mUnreadNumTextView.setVisibility(View.VISIBLE);
+            }
+
         }
+    }
+
+    public enum ViewType {
+        TOP_UNREAD,
+        TOP_READ,
+        UNTOP_UNREAD,
+        UNTOP_READ
     }
 
 }
