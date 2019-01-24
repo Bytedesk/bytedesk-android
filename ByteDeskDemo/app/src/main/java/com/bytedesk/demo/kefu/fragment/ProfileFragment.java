@@ -155,6 +155,7 @@ public class ProfileFragment extends BaseFragment {
                                                 @Override
                                                 public void onError(JSONObject object) {
                                                     BDUiUtils.showTipDialog(getContext(), "设置自定义标签失败");
+
                                                 }
                                             });
 

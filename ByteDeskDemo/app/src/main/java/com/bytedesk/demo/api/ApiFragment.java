@@ -120,6 +120,8 @@ public class ApiFragment extends BaseFragment {
         faqItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView wapChatItem = mGroupListView.createItemView("8.网页会话演示");
         wapChatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView ticketItem = mGroupListView.createItemView("9.提交工单(TODO)");
+        ticketItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
                 .addItemView(chatItem, new View.OnClickListener() {
@@ -174,6 +176,12 @@ public class ApiFragment extends BaseFragment {
                         // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
                         String url = "https://vip.bytedesk.com/chatvue?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph";
                         BDUiApi.startHtml5Chat(getContext(), url);
+                    }
+                })
+                .addItemView(ticketItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 提交工单
                     }
                 })
                 .addTo(mGroupListView);

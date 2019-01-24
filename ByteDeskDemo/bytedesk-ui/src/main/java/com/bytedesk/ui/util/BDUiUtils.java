@@ -16,9 +16,6 @@ import java.util.TimerTask;
 
 public class BDUiUtils {
 
-
-
-
     /**
      * 判断是否应该显示时间戳
      */
