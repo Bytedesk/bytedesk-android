@@ -44,7 +44,8 @@ public class GroupProfileActivity extends AppCompatActivity {
 
     private String gId;
     private QMUICommonListItemView nicknameItem;
-     private QMUICommonListItemView descriptionItem;
+    private QMUICommonListItemView qrCodeItem;
+    private QMUICommonListItemView descriptionItem;
     private QMUICommonListItemView announcementItem;
     private QMUICommonListItemView transferItem;
     private QMUICommonListItemView withdrawItem;
@@ -112,6 +113,10 @@ public class GroupProfileActivity extends AppCompatActivity {
         nicknameItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
 
         //
+        qrCodeItem = mGroupListView.createItemView("群二维码");
+        qrCodeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+
+        //
         descriptionItem = mGroupListView.createItemView("群简介");
         descriptionItem.setDetailText("未设置");
         descriptionItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
@@ -174,6 +179,14 @@ public class GroupProfileActivity extends AppCompatActivity {
                     }
                     }
                 }).create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+            }
+        }).addItemView(qrCodeItem, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //  TODO: 群二维码
+                Logger.i("群二维码");
+
             }
         }).addItemView(descriptionItem, new View.OnClickListener() {
             @Override

@@ -77,6 +77,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             case MessageEntity.TYPE_VOICE_SELF_ID:
                 layout = R.layout.bytedesk_message_item_voice_self;
                 break;
+            case MessageEntity.TYPE_QUESTIONNAIRE_ID:
+                layout = R.layout.bytedesk_message_item_questionnaire;
+                break;
             case MessageEntity.TYPE_NOTIFICATION_ID:
                 layout = R.layout.bytedesk_message_item_notification;
                 break;
@@ -138,26 +141,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     || messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
                     || messageViewType == MessageEntity.TYPE_EVENT_ID
                     || messageViewType == MessageEntity.TYPE_EVENT_SELF_ID) {
-                avatarImageView = itemView.findViewById(R.id.bytedesk_message_item_header);
-                avatarImageView.setBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_6));
-                avatarImageView.setBorderWidth(QMUIDisplayHelper.dp2px(mContext, 1));
-                avatarImageView.setSelectedMaskColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_8));
-                avatarImageView.setSelectedBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_4));
-                avatarImageView.setTouchSelectModeEnabled(true);
-                avatarImageView.setCircle(true);
+                initAvatar();
                 contentTextView = itemView.findViewById(R.id.bytedesk_message_item_content);
             }
             // 图片消息
             else if (messageViewType == MessageEntity.TYPE_IMAGE_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID) {
-                avatarImageView = itemView.findViewById(R.id.bytedesk_message_item_header);
-                avatarImageView.setBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_6));
-                avatarImageView.setBorderWidth(QMUIDisplayHelper.dp2px(mContext, 1));
-                avatarImageView.setSelectedMaskColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_8));
-                avatarImageView.setSelectedBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_4));
-                avatarImageView.setTouchSelectModeEnabled(true);
-                avatarImageView.setCircle(true);
+                initAvatar();
                 imageImageView = itemView.findViewById(R.id.bytedesk_message_item_image);
+            }
+            // 问卷消息
+            else if (messageViewType == MessageEntity.TYPE_QUESTIONNAIRE_ID) {
+                initAvatar();
+                contentTextView = itemView.findViewById(R.id.bytedesk_message_item_content);
             }
             // 通知消息
             else if (messageViewType == MessageEntity.TYPE_NOTIFICATION_ID) {
@@ -206,16 +202,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
                     @Override
                     public void onTelLinkClick(String phoneNumber) {
+                        // TODO:
                         Toast.makeText(mContext, "识别到电话号码是：" + phoneNumber, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onMailLinkClick(String mailAddress) {
+                        // TODO:
                         Toast.makeText(mContext, "识别到邮件地址是：" + mailAddress, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onWebUrlLinkClick(String url) {
+                        // TODO:
                         Toast.makeText(mContext, "识别到网页链接是：" + url, Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -252,6 +251,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                         }
                     }
                 });
+            }
+            // TODO: 问卷消息
+            else if (messageViewType == MessageEntity.TYPE_QUESTIONNAIRE_ID) {
+                contentTextView.setText(msgEntity.getContent());
             }
             // 通知消息
             else if (messageViewType == MessageEntity.TYPE_NOTIFICATION_ID) {
@@ -300,6 +303,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
         public void setItemClickListener(ChatItemClickListener chatItemClickListener) {
             this.itemClickListener = chatItemClickListener;
+        }
+
+        private void initAvatar() {
+            avatarImageView = itemView.findViewById(R.id.bytedesk_message_item_header);
+            avatarImageView.setBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_6));
+            avatarImageView.setBorderWidth(QMUIDisplayHelper.dp2px(mContext, 1));
+            avatarImageView.setSelectedMaskColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_8));
+            avatarImageView.setSelectedBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_4));
+            avatarImageView.setTouchSelectModeEnabled(true);
+            avatarImageView.setCircle(true);
         }
 
     }

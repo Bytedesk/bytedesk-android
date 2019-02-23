@@ -81,6 +81,7 @@ public class ApiFragment extends BaseFragment {
         loginItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView logoutItem = mGroupListView.createItemView("3. 退出登录接口");
         logoutItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView scanItem = mGroupListView.createItemView("4. 扫一扫(TODO)");
         QMUIGroupListView.newSection(getContext())
                 .setTitle("公共接口")
                 .addItemView(registerItem, new View.OnClickListener() {
@@ -99,6 +100,12 @@ public class ApiFragment extends BaseFragment {
                     @Override
                     public void onClick(View view) {
                         logout();
+                    }
+                })
+                .addItemView(scanItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 扫一扫
                     }
                 })
                 .addTo(mGroupListView);
@@ -203,6 +210,7 @@ public class ApiFragment extends BaseFragment {
         noticeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView settingItem = mGroupListView.createItemView("7.设置接口");
         settingItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+
         QMUIGroupListView.newSection(getContext())
                 .setTitle("IM接口")
                 .addItemView(friendItem, new View.OnClickListener() {

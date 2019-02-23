@@ -27,8 +27,6 @@ public class BDApplication extends Application{
 
         // 初始化萝卜丝UI界面库
         BDUiApi.init(this);
-
     }
-
 
 }

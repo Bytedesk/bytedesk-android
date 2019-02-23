@@ -29,8 +29,12 @@ public class ChatFragment extends BaseFragment {
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
     @BindView(R.id.groupListView) QMUIGroupListView mGroupListView;
 
+    // 默认设置工作组wid
     private String wId = "201807171659201";
+    // 指定坐席uid
     private String agentUid = "201808221551193";
+    // 设置有前置选择的工作组
+    private String preWid = "201808101819291";
 
     @Override
     protected View onCreateView() {
@@ -78,6 +82,41 @@ public class ChatFragment extends BaseFragment {
                     }
                 })
                 .addTo(mGroupListView);
+        //
+        QMUICommonListItemView shopWorkGroupChatItem = mGroupListView.createItemView("电商客服工作组:" + wId);
+        QMUICommonListItemView shopAppointedChatItem = mGroupListView.createItemView("指定客服会话:" + agentUid);
+        //
+        QMUIGroupListView.newSection(getContext())
+                .setTitle("电商客服")
+                .setDescription("在web管理后台开启/关闭机器人")
+                .addItemView(shopWorkGroupChatItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //
+                    }
+                })
+                .addItemView(shopAppointedChatItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //
+                    }
+                }).addTo(mGroupListView);
+
+        //
+        QMUICommonListItemView preChoiceChatItem = mGroupListView.createItemView("工作组会话:" +  preWid);
+        //
+        QMUIGroupListView.newSection(getContext())
+                .setTitle("前置选择")
+                .setDescription("在后台启用问卷选择")
+                .addItemView(preChoiceChatItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //
+                        BDUiApi.startWorkGroupChatActivity(getContext(), preWid, "工作组会话");
+                    }
+            }).addTo(mGroupListView);
+
+
     }
 
 }

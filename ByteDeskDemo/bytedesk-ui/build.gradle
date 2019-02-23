@@ -23,7 +23,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.bytedesk:core:1.4.7'
+    implementation 'com.bytedesk:core:1.4.9'
 
     // 腾讯QMUI界面库
     // http://qmuiteam.com/android/page/start.html
