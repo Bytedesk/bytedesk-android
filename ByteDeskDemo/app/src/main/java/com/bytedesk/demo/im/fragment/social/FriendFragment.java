@@ -158,10 +158,10 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
 
         final ContactEntity contactEntity = mContactEntities.get(position);
 
-        final String[] items = new String[]{"添加关注", "取消关注", "拉黑", "取消拉黑"};
-        final int checkedIndex = 0;
+        final String[] items = new String[]{ "拉黑", "删除好友"};
+//        final int checkedIndex = 0;
         new QMUIDialog.CheckableDialogBuilder(getActivity())
-                .setCheckedIndex(checkedIndex)
+//                .setCheckedIndex(checkedIndex)
                 .addItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int index) {
@@ -170,33 +170,26 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
                         dialog.dismiss();
 
                         if (index == 0) {
-                            // 添加关注
-                            addFollow(contactEntity.getUid());
-
-                        } else if (index == 1) {
-                            // 取消关注
-                            unFollow(contactEntity.getUid());
-
-                        } else if (index == 2) {
                             // 拉黑
                             addBlock(contactEntity.getUid());
 
-                        } else if (index == 3) {
-                            // 取消拉黑
-                            unBlock(contactEntity.getUid());
+                        } else if (index == 1) {
+                            // 删除好友
+                            removeFriend(contactEntity.getUid());
+
                         }
                     }
                 }).show();
     }
 
     /**
-     * 添加关注
+     * 删除好友
      *
      * @param uid
      */
-    private void addFollow(String uid) {
+    private void removeFriend(String uid) {
         //
-        BDCoreApi.addFollow(getContext(), uid, new BaseCallback() {
+        BDCoreApi.removeFriend(getContext(), uid, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -210,7 +203,7 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
                         return;
                     }
 
-                    Toast.makeText(getContext(), "添加关注成功", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "删除好友成功", Toast.LENGTH_LONG).show();
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -220,46 +213,11 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
             @Override
             public void onError(JSONObject object) {
 
-                Toast.makeText(getContext(), "添加关注失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "删除好友失败", Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    /**
-     * 取消关注
-     *
-     * @param uid
-     */
-    private void unFollow(String uid) {
-        //
-        BDCoreApi.unFollow(getContext(), uid, new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-
-                try {
-
-                    String message = object.getString("message");
-                    int status_code = object.getInt("status_code");
-                    if (status_code != 200) {
-                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-                        return;
-                    }
-
-                    Toast.makeText(getContext(), "取消关注成功", Toast.LENGTH_LONG).show();
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-
-                Toast.makeText(getContext(), "取消关注失败", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 
     /**
      * 拉黑
@@ -293,42 +251,6 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
             public void onError(JSONObject object) {
 
                 Toast.makeText(getContext(), "拉黑失败", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    /**
-     * 取消拉黑
-     *
-     * @param uid
-     */
-    private void unBlock(String uid) {
-        //
-        BDCoreApi.unBlock(getContext(), uid, new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-
-                try {
-
-                    String message = object.getString("message");
-                    int status_code = object.getInt("status_code");
-                    if (status_code != 200) {
-                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-                        return;
-                    }
-
-                    Toast.makeText(getContext(), "取消拉黑成功", Toast.LENGTH_LONG).show();
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-
-                Toast.makeText(getContext(), "取消拉黑失败", Toast.LENGTH_LONG).show();
             }
         });
     }

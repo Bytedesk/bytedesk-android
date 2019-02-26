@@ -88,7 +88,7 @@ public class ChatFragment extends BaseFragment {
         //
         QMUIGroupListView.newSection(getContext())
                 .setTitle("电商客服")
-                .setDescription("在web管理后台开启/关闭机器人")
+                .setDescription("")
                 .addItemView(shopWorkGroupChatItem, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

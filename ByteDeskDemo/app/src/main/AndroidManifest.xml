@@ -70,6 +70,10 @@
             android:name="com.bytedesk.ui.activity.ChatActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name="com.bytedesk.ui.activity.ChatWxActivity"
+            android:screenOrientation="portrait"/>
+
         <!--群组会话详情页-->
         <activity
             android:name="com.bytedesk.ui.activity.GroupProfileActivity"

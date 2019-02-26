@@ -472,6 +472,7 @@ public class ChatActivity extends AppCompatActivity
                     Logger.d("request thread message: " + object.get("message")
                             + " status_code:" + object.get("status_code")
                             + " data:" + object.get("data"));
+                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -495,6 +496,11 @@ public class ChatActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 Logger.e("更新当前会话失败");
+                try {
+                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -530,6 +536,12 @@ public class ChatActivity extends AppCompatActivity
                 public void onError(JSONObject object) {
 
                     mPullRefreshLayout.finishRefresh();
+
+                    try {
+                        Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
 
@@ -559,6 +571,12 @@ public class ChatActivity extends AppCompatActivity
                 public void onError(JSONObject object) {
 
                     mPullRefreshLayout.finishRefresh();
+
+                    try {
+                        Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
 
@@ -587,6 +605,12 @@ public class ChatActivity extends AppCompatActivity
                 public void onError(JSONObject object) {
 
                     mPullRefreshLayout.finishRefresh();
+
+                    try {
+                        Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
 
@@ -614,6 +638,12 @@ public class ChatActivity extends AppCompatActivity
                 public void onError(JSONObject object) {
 
                     mPullRefreshLayout.finishRefresh();
+
+                    try {
+                        Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }
@@ -678,7 +708,7 @@ public class ChatActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 try {
-                    Logger.d(object.get("message") + " status_code:" + object.get("status_code") + " data:" + object.get("data"));
+                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -711,9 +741,7 @@ public class ChatActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 try {
-                    Logger.d(object.get("message")
-                            + " status_code:" + object.get("status_code")
-                            + " data:" + object.get("data"));
+                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -151,10 +151,10 @@ public class TestUserFragment extends BaseFragment implements SwipeItemClickList
 
         final ContactEntity contactEntity = mContactEntities.get(position);
 
-        final String[] items = new String[]{"添加关注", "取消关注", "拉黑", "取消拉黑"};
-        final int checkedIndex = 0;
+        final String[] items = new String[]{"添加关注", "取消关注", "拉黑", "取消拉黑", "添加好友", "删除好友"};
+//        final int checkedIndex = 0;
         new QMUIDialog.CheckableDialogBuilder(getActivity())
-                .setCheckedIndex(checkedIndex)
+//                .setCheckedIndex(checkedIndex)
                 .addItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int index) {
@@ -177,6 +177,15 @@ public class TestUserFragment extends BaseFragment implements SwipeItemClickList
                         } else if (index == 3) {
                             // 取消拉黑
                             unBlock(contactEntity.getUid());
+
+                        } else if (index == 4) {
+                            // 添加好友之后，不需要对方同意，直接成为双向好友
+                            addFriend(contactEntity.getUid());
+
+                        } else if (index == 5) {
+                            // 删除好友
+                            removeFriend(contactEntity.getUid());
+
                         }
                     }
                 }).show();
@@ -251,6 +260,78 @@ public class TestUserFragment extends BaseFragment implements SwipeItemClickList
             public void onError(JSONObject object) {
 
                 Toast.makeText(getContext(), "取消关注失败", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * 添加好友
+     *
+     * @param uid
+     */
+    private void addFriend(String uid) {
+        //
+        BDCoreApi.addFriend(getContext(), uid, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    String message = object.getString("message");
+                    int status_code = object.getInt("status_code");
+                    if (status_code != 200) {
+                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    Toast.makeText(getContext(), "添加好友成功", Toast.LENGTH_LONG).show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+                Toast.makeText(getContext(), "添加好友失败", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * 删除好友
+     *
+     * @param uid
+     */
+    private void removeFriend(String uid) {
+        //
+        BDCoreApi.removeFriend(getContext(), uid, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    String message = object.getString("message");
+                    int status_code = object.getInt("status_code");
+                    if (status_code != 200) {
+                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    Toast.makeText(getContext(), "删除好友成功", Toast.LENGTH_LONG).show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+                Toast.makeText(getContext(), "删除好友失败", Toast.LENGTH_LONG).show();
             }
         });
     }

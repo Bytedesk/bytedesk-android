@@ -313,5 +313,6 @@
     <string name="title_activity_big_image">BigImageActivity</string>
     <string name="title_activity_contact">ContactActivity</string>
     <string name="title_activity_feedback">FeedbackActivity</string>
+    <string name="title_activity_chat_wx">ChatWxActivity</string>
 
 </resources>

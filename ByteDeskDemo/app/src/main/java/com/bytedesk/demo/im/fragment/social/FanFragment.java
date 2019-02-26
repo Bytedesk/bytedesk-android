@@ -161,9 +161,9 @@ public class FanFragment extends BaseFragment implements SwipeItemClickListener 
         final ContactEntity contactEntity = mContactEntities.get(position);
 
         final String[] items = new String[]{"添加关注", "取消关注", "拉黑", "取消拉黑"};
-        final int checkedIndex = 0;
+//        final int checkedIndex = 0;
         new QMUIDialog.CheckableDialogBuilder(getActivity())
-                .setCheckedIndex(checkedIndex)
+//                .setCheckedIndex(checkedIndex)
                 .addItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int index) {
