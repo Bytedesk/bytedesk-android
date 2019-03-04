@@ -573,7 +573,9 @@ public class ChatActivity extends AppCompatActivity
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatActivity.this,
+                                object.getString("message"),
+                                Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

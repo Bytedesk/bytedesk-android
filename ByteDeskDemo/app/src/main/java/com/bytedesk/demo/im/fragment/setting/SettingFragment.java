@@ -82,7 +82,7 @@ public class SettingFragment extends BaseFragment {
         Glide.with(getContext()).load(mPreferenceManager.getAvatar()).into(avatarImageView);
 
         ////
-        profileItem = mGroupListView.createItemView(mPreferenceManager.getRealName());
+        profileItem = mGroupListView.createItemView(mPreferenceManager.getNickname());
         profileItem.setOrientation(QMUICommonListItemView.VERTICAL);
         profileItem.setDetailText(mPreferenceManager.getDescription());
 //        profileItem.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.icon_tabbar_contact));
@@ -95,6 +95,7 @@ public class SettingFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 Logger.d("profile item clicked");
+
             }
         }).addTo(mGroupListView);
 

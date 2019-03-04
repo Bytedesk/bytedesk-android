@@ -21,8 +21,6 @@ import java.util.Locale;
 
 public class BDUiApi {
 
-
-
     /**
      * 初始化
      *

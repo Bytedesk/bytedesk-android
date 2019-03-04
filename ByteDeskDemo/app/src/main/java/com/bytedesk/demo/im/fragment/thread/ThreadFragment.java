@@ -235,7 +235,6 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
             BDUiApi.startGroupChatActivity(getContext(),
                     threadEntity.getGroupGid(),
                     threadEntity.getNickname());
-
         }
 
         // 清空本地未读数目
@@ -525,6 +524,7 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
     private void markTopThread(String tid, final int position) {
         // 置顶
         BDCoreApi.markTopThread(getContext(), tid, new BaseCallback() {
+
             @Override
             public void onSuccess(JSONObject object) {
 

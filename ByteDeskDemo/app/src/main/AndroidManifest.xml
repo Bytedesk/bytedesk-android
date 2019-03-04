@@ -79,9 +79,14 @@
             android:name="com.bytedesk.ui.activity.GroupProfileActivity"
             android:screenOrientation="portrait"/>
 
+        <!--二维码-->
+        <activity
+            android:name="com.bytedesk.ui.activity.QRCodeActivity"
+            android:screenOrientation="portrait"/>
+
         <!--联系人列表-->
         <activity
-            android:name="com.bytedesk.ui.activity.ContactActivity"
+            android:name="com.bytedesk.ui.activity.ContactSelectActivity"
             android:screenOrientation="portrait"/>
 
         <!--URL浏览器页面-->

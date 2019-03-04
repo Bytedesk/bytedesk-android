@@ -1,12 +1,16 @@
 package com.bytedesk.ui.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,7 +46,9 @@ public class GroupProfileActivity extends AppCompatActivity {
     private QMUIFloatLayout mMembersFloatLayout;
     private QMUIGroupListView mGroupListView;
 
-    private String gId;
+    private String mGid;
+    private String mTid;
+
     private QMUICommonListItemView nicknameItem;
     private QMUICommonListItemView qrCodeItem;
     private QMUICommonListItemView descriptionItem;
@@ -50,10 +56,13 @@ public class GroupProfileActivity extends AppCompatActivity {
     private QMUICommonListItemView transferItem;
     private QMUICommonListItemView withdrawItem;
     private QMUICommonListItemView dismissItem;
+    private QMUICommonListItemView clearMessageItem;
+    private QMUICommonListItemView makeTopItem;
 
     private BDPreferenceManager mPreferenceManager;
 
     private Boolean mIsAdmin;
+//    private ThreadEntity mThreadEntity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +71,15 @@ public class GroupProfileActivity extends AppCompatActivity {
         setContentView(R.layout.bytedesk_activity_group_profile);
         mPreferenceManager = BDPreferenceManager.getInstance(this);
         //
-        gId = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+        mGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
         mIsAdmin = false;
+//        mThreadEntity = BDRepository.getInstance(this).getThread(mTid);
         //
         initTopBar();
         initView();
         initModel();
+        //
+        addOtherItemToLayout();
     }
 
 
@@ -81,14 +93,6 @@ public class GroupProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
-        //
-//        mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
-//                .setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        Logger.i("搜索聊天记录");
-//                    }
-//                });
         //
         QMUIStatusBarHelper.translucent(this);
     }
@@ -114,7 +118,10 @@ public class GroupProfileActivity extends AppCompatActivity {
 
         //
         qrCodeItem = mGroupListView.createItemView("群二维码");
-        qrCodeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        qrCodeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CUSTOM);
+        ImageView imageView = new ImageView(this);
+        imageView.setImageDrawable(getResources().getDrawable(R.drawable.bytedesk_qr_code));
+        qrCodeItem.addAccessoryCustomView(imageView);
 
         //
         descriptionItem = mGroupListView.createItemView("群简介");
@@ -136,8 +143,6 @@ public class GroupProfileActivity extends AppCompatActivity {
                 return;
             }
 
-            // FIXME: android.view.InflateException: Binary XML file line #17: Error inflating class com.qmuiteam.qmui.widget.dialog.QMUIDialogView
-
             final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(context);
             builder.setTitle("群聊名称")
                 .setPlaceholder("在此输入群聊名称")
@@ -158,13 +163,13 @@ public class GroupProfileActivity extends AppCompatActivity {
                         final String nickname = text.toString();
 
                         // TODO: 调用服务器接口
-                        BDCoreApi.updateGroupNickname(context, gId, nickname, new BaseCallback() {
+                        BDCoreApi.updateGroupNickname(context, mGid, nickname, new BaseCallback() {
                             @Override
                             public void onSuccess(JSONObject object) {
 
                                 nicknameItem.setDetailText(nickname);
-
                                 // TODO: 更新本地群组会话thread昵称
+
                             }
 
                             @Override
@@ -186,6 +191,9 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                 //  TODO: 群二维码
                 Logger.i("群二维码");
+                Intent intent = new Intent(GroupProfileActivity.this, QRCodeActivity.class);
+                intent.putExtra(BDUiConstant.EXTRA_GID, mGid);
+                startActivity(intent);
 
             }
         }).addItemView(descriptionItem, new View.OnClickListener() {
@@ -218,7 +226,7 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                                     final String description = text.toString();
                                     // TODO: 调用服务器接口
-                                    BDCoreApi.updateGroupDescription(context, gId, description, new BaseCallback() {
+                                    BDCoreApi.updateGroupDescription(context, mGid, description, new BaseCallback() {
 
                                         @Override
                                         public void onSuccess(JSONObject object) {
@@ -270,7 +278,7 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                         final String announcement = text.toString();
                         // TODO: 调用服务器接口
-                        BDCoreApi.updateGroupAnnouncement(context, gId, announcement, new BaseCallback() {
+                        BDCoreApi.updateGroupAnnouncement(context, mGid, announcement, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -294,7 +302,6 @@ public class GroupProfileActivity extends AppCompatActivity {
             }
         }).addTo(mGroupListView);
 
-
     }
 
     /**
@@ -304,7 +311,8 @@ public class GroupProfileActivity extends AppCompatActivity {
      */
     private void initModel () {
 
-        BDCoreApi.getGroupDetail(this, gId, new BaseCallback() {
+        // 查询群组详情
+        BDCoreApi.getGroupDetail(this, mGid, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -312,30 +320,38 @@ public class GroupProfileActivity extends AppCompatActivity {
                 try {
 
                     JSONObject dataObject = object.getJSONObject("data");
+                    // 群组信息
+                    JSONObject groupObject = dataObject.getJSONObject("group");
+                    // 群组对应会话tid
+                    mTid = dataObject.getString("threadTid");
+                    // 会话是否被置顶
+                    boolean isTopThread = dataObject.getBoolean("isTopThread");
+                    makeTopItem.getSwitch().setChecked(isTopThread);
                     //
-                    String nickname = dataObject.getString("nickname");
-                    nicknameItem.setDetailText(nickname);
+                    String groupNickname = groupObject.getString("nickname");
+                    nicknameItem.setDetailText(groupNickname);
                     //
-                    String description = dataObject.getString("description");
+                    String description = groupObject.getString("description");
                     descriptionItem.setDetailText(description);
                     //
-                    String announcement = dataObject.getString("announcement");
+                    String announcement = groupObject.getString("announcement");
                     announcementItem.setDetailText(announcement);
                     //
-                    JSONArray membersArray = dataObject.getJSONArray("members");
+                    JSONArray membersArray = groupObject.getJSONArray("members");
                     //
                     for (int i = 0; i < membersArray.length(); i++) {
                         JSONObject memberObject = membersArray.getJSONObject(i);
                         //
-                        String realName = memberObject.getString("realName");
+                        String uid = memberObject.getString("uid");
+                        String nickname = memberObject.getString("nickname");
                         String avatarUrl = memberObject.getString("avatar");
                         //
-                        addItemToFloatLayout(realName, avatarUrl);
+                        addItemToFloatLayout(uid, nickname, avatarUrl);
                     }
                     // TODO: 待完善
-                    // addPlusItemToFloatLayout();
+                     addPlusItemToFloatLayout();
                     //
-                    JSONArray adminsArray = dataObject.getJSONArray("admins");
+                    JSONArray adminsArray = groupObject.getJSONArray("admins");
                     for (int i = 0; i < adminsArray.length(); i++) {
                         JSONObject adminObject = adminsArray.getJSONObject(i);
                         //
@@ -387,12 +403,10 @@ public class GroupProfileActivity extends AppCompatActivity {
                             public void onClick(QMUIDialog dialog, int index) {
 
                                 // TODO: 调用退群接口
-                                BDCoreApi.withdrawGroup(context, gId, new BaseCallback() {
+                                BDCoreApi.withdrawGroup(context, mGid, new BaseCallback() {
 
                                     @Override
                                     public void onSuccess(JSONObject object) {
-
-                                        // TODO: 删除本地会话，关闭会话窗口，直接退出到thread会话列表
 
                                         Toast.makeText(getApplication(), "退群成功", Toast.LENGTH_SHORT).show();
                                     }
@@ -437,14 +451,14 @@ public class GroupProfileActivity extends AppCompatActivity {
                         public void onClick(QMUIDialog dialog, int index) {
 
                             // TODO: 调用服务器接口
-                            BDCoreApi.dismissGroup(context, gId, new BaseCallback() {
+                            BDCoreApi.dismissGroup(context, mGid, new BaseCallback() {
 
                                 @Override
                                 public void onSuccess(JSONObject object) {
 
-                                    // TODO: 删除本地group、及thread
-
                                     Toast.makeText(getApplication(), "解散成功", Toast.LENGTH_SHORT).show();
+
+                                    // TODO: 关闭当前页面
                                 }
 
                                 @Override
@@ -462,51 +476,285 @@ public class GroupProfileActivity extends AppCompatActivity {
         }).addTo(mGroupListView);
     }
 
-    private void addItemToFloatLayout(String realName, final String avatarUrl) {
+    private void addOtherItemToLayout() {
+
+        clearMessageItem = mGroupListView.createItemView("清空聊天记录");
+        makeTopItem = mGroupListView.createItemView("会话置顶");
+        makeTopItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_SWITCH);
+        makeTopItem.getSwitch().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+
+                    BDCoreApi.markTopThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+
+                        @Override
+                        public void onSuccess(JSONObject object) {
+
+                            try {
+
+                                JSONObject dataObject = object.getJSONObject("data");
+                                String message = dataObject.getString("message");
+
+                                Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+
+                        }
+                    });
+
+                } else {
+
+                    BDCoreApi.unmarkTopThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+                        @Override
+                        public void onSuccess(JSONObject object) {
+
+                            try {
+
+                                JSONObject dataObject = object.getJSONObject("data");
+                                String message = dataObject.getString("message");
+
+                                Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+
+                        }
+                    });
+                }
+            }
+        });
+
+        final Context context = this;
+        QMUIGroupListView.newSection(this).addItemView(clearMessageItem, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Logger.d("清空聊天记录");
+
+            new QMUIDialog.MessageDialogBuilder(context)
+                .setTitle("清空")
+                .setMessage("确定要清空聊天记录吗？")
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction(0, "清空", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+
+                        // FIXME: 传递threadId or groupId
+                        BDCoreApi.markClearGroupMessage(GroupProfileActivity.this, mGid, new BaseCallback() {
+
+                            @Override
+                            public void onSuccess(JSONObject object) {
+
+                                try {
+
+                                    JSONObject dataObject = object.getJSONObject("data");
+                                    String message = dataObject.getString("message");
+
+                                    Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+
+                            @Override
+                            public void onError(JSONObject object) {
+
+                            }
+                        });
+
+                        dialog.dismiss();
+                    }
+                }).show();
+
+            }
+        }).addItemView(makeTopItem, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Logger.d("会话置顶");
+
+            // FIXME: 传递threadId or groupId
+            BDCoreApi.markTopThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    try {
+
+                        JSONObject dataObject = object.getJSONObject("data");
+                        String message = dataObject.getString("message");
+
+                        Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+
+                }
+            });
+
+            }
+        }).addTo(mGroupListView);
+    }
+
+
+    private void addItemToFloatLayout(final String uid, final String nickname, final String avatarUrl) {
+
+        LinearLayout linearLayout = new LinearLayout(GroupProfileActivity.this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        linearLayout.setLayoutParams(layoutParams);
 
         //
         QMUIRadiusImageView avatarImageView = new QMUIRadiusImageView(this);
+        ViewGroup.LayoutParams avatarLayoutParams = new LinearLayout.LayoutParams(100, 100);
+        avatarImageView.setLayoutParams(avatarLayoutParams);
         Glide.with(this).load(avatarUrl).into(avatarImageView);
         avatarImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Logger.d("avatar clicked:" + avatarUrl);
+                Logger.d("nickname clicked: " + nickname);
+
+                // 非管理员 或者 点击了自己的头像，直接返回
+                if (!mIsAdmin || uid.equals(mPreferenceManager.getUid())) {
+                    return;
+                }
+
+                // 管理员操作
+                final String[] items = new String[]{"转交群", "踢出群"};
+                new QMUIDialog.CheckableDialogBuilder(GroupProfileActivity.this)
+                    .addItems(items, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int index) {
+
+                            if (index == 0) {
+                                // 转交群
+                                Logger.d("转交群");
+
+                                BDCoreApi.transferGroup(GroupProfileActivity.this, uid, mGid, new BaseCallback() {
+
+                                    @Override
+                                    public void onSuccess(JSONObject object) {
+
+                                        try {
+
+                                            JSONObject dataObject = object.getJSONObject("data");
+                                            String message = dataObject.getString("message");
+
+                                            Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onError(JSONObject object) {
+
+                                    }
+                                });
+
+                            } else if (index == 1) {
+                                // 踢出群
+                                Logger.d("踢出群");
+
+                                BDCoreApi.kickGroupMember(GroupProfileActivity.this, uid, mGid, new BaseCallback() {
+                                    @Override
+                                    public void onSuccess(JSONObject object) {
+
+                                        // TODO: 从本地删除，更新UI
+
+                                        try {
+
+                                            JSONObject dataObject = object.getJSONObject("data");
+                                            String message = dataObject.getString("message");
+
+                                            Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onError(JSONObject object) {
+
+                                    }
+                                });
+
+                            }
+
+                            dialog.dismiss();
+                        }
+                    }).show();
+
             }
         });
         avatarImageView.setBorderWidth(0);
-
-        //
-
+        linearLayout.addView(avatarImageView);
 
         //
         TextView textView = new TextView(this);
-        textView.setText(realName);
+        textView.setTextSize(12);
+        textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        textView.setText(nickname);
+        linearLayout.addView(textView);
 
-        int textViewSize = QMUIDisplayHelper.dpToPx(60);
-        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(textViewSize, textViewSize);
-        mMembersFloatLayout.addView(avatarImageView, lp);
+//        int textViewSize = QMUIDisplayHelper.dpToPx(60);
+//        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(textViewSize, textViewSize);
+
+//        mMembersFloatLayout.addView(avatarImageView, lp);
+//        mMembersFloatLayout.addView(linearLayout, lp);
+        mMembersFloatLayout.addView(linearLayout);
     }
 
     private void addPlusItemToFloatLayout() {
 
         //
-        QMUIRadiusImageView avatarImageView = new QMUIRadiusImageView(this);
-        avatarImageView.setImageResource(R.drawable.bytedesk_group_plus);
-        avatarImageView.setOnClickListener(new View.OnClickListener() {
+        QMUIRadiusImageView plusImageView = new QMUIRadiusImageView(this);
+        ViewGroup.LayoutParams avatarLayoutParams = new LinearLayout.LayoutParams(100, 100);
+        plusImageView.setLayoutParams(avatarLayoutParams);
+        plusImageView.setImageResource(R.drawable.bytedesk_group_plus);
+        plusImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Logger.d("plus clicked:");
                 //
-                Intent intent = new Intent(GroupProfileActivity.this, ContactActivity.class);
-                intent.putExtra(BDUiConstant.EXTRA_UID, gId);
+                Intent intent = new Intent(GroupProfileActivity.this, ContactSelectActivity.class);
+                intent.putExtra(BDUiConstant.EXTRA_UID, mGid);
                 startActivity(intent);
             }
         });
-        avatarImageView.setBorderWidth(0);
+        plusImageView.setBorderWidth(0);
 
-        int textViewSize = QMUIDisplayHelper.dpToPx(60);
-        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(textViewSize, textViewSize);
-        mMembersFloatLayout.addView(avatarImageView, lp);
+        mMembersFloatLayout.addView(plusImageView);
     }
 
     private void addMinusItemToFloatLayout() {

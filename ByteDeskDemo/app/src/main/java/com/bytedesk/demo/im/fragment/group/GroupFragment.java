@@ -174,6 +174,8 @@ public class GroupFragment extends BaseFragment implements SwipeItemClickListene
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                mPullRefreshLayout.finishRefresh();
             }
 
             @Override
@@ -183,6 +185,8 @@ public class GroupFragment extends BaseFragment implements SwipeItemClickListene
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                mPullRefreshLayout.finishRefresh();
             }
         });
     }

@@ -1,6 +1,9 @@
 package com.bytedesk.demo.im.fragment.social;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
@@ -9,13 +12,14 @@ import android.widget.Toast;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
-import com.bytedesk.core.room.entity.ContactEntity;
+import com.bytedesk.core.room.entity.FriendEntity;
 import com.bytedesk.core.util.JsonToEntity;
+import com.bytedesk.core.viewmodel.FriendViewModel;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.demo.common.ListViewDecoration;
 import com.bytedesk.demo.common.TabEvent;
-import com.bytedesk.demo.im.adapter.ContactAdapter;
+import com.bytedesk.demo.im.adapter.FriendAdapter;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUIEmptyView;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
@@ -46,8 +50,9 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
     @BindView(R.id.pull_to_refresh) QMUIPullRefreshLayout mPullRefreshLayout;
     @BindView(R.id.recycler_view) SwipeMenuRecyclerView mSwipeMenuRecyclerView;
 
-    private ContactAdapter mContactAdapter;
-    private List<ContactEntity> mContactEntities;
+    private FriendAdapter mFriendAdapter;
+    private List<FriendEntity> mFriendEntities;
+    private FriendViewModel mFriendViewModel;
 
     private JsonToEntity jsonToEntity;
 
@@ -56,8 +61,9 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_friend, null);
         ButterKnife.bind(this, root);
 
-        mContactEntities = new ArrayList<>();
+        mFriendEntities = new ArrayList<>();
         jsonToEntity = JsonToEntity.instance(getContext());
+
         initRecycleView();
         initModel();
 
@@ -91,15 +97,23 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
         mSwipeMenuRecyclerView.addItemDecoration(new ListViewDecoration(getContext()));// 添加分割线。
         mSwipeMenuRecyclerView.setSwipeItemClickListener(this); //
         //
-        mContactAdapter = new ContactAdapter(getContext());
-        mSwipeMenuRecyclerView.setAdapter(mContactAdapter);
+        mFriendAdapter = new FriendAdapter(getContext());
+        mSwipeMenuRecyclerView.setAdapter(mFriendAdapter);
     }
 
     /**
      *
      */
     private void initModel() {
-
+        //
+        mFriendViewModel = ViewModelProviders.of(this).get(FriendViewModel.class);
+        mFriendViewModel.getFriends().observe(this, new Observer<List<FriendEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<FriendEntity> friendEntities) {
+                mFriendEntities = friendEntities;
+                mFriendAdapter.setFriends(friendEntities);
+            }
+        });
     }
 
     /**
@@ -113,7 +127,7 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
             @Override
             public void onSuccess(JSONObject object) {
 
-                mContactEntities.clear();
+//                mFriendEntities.clear();
 
                 //
                 try {
@@ -127,14 +141,16 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
 
                     JSONArray contactArray = object.getJSONObject("data").getJSONArray("content");
                     for (int i = 0; i < contactArray.length(); i++) {
-                        ContactEntity contactEntity = jsonToEntity.contactEntity(contactArray.getJSONObject(i));
-                        mContactEntities.add(contactEntity);
-                    }
-                    mContactAdapter.setContacts(mContactEntities);
+                        mFriendViewModel.insertFriendJson(contactArray.getJSONObject(i));
 
-                    if (mContactEntities.size() > 0) {
-                        mEmptyView.hide();
+//                        ContactEntity contactEntity = jsonToEntity.contactEntity(contactArray.getJSONObject(i));
+//                        mFriendEntities.add(contactEntity);
                     }
+//                    mFriendAdapter.setFriends(mFriendEntities);
+
+//                    if (mFriendEntities.size() > 0) {
+//                        mEmptyView.hide();
+//                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -156,7 +172,7 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
         // SwipeItemClickListener
         Logger.d("item clicked");
 
-        final ContactEntity contactEntity = mContactEntities.get(position);
+        final FriendEntity friendEntity = mFriendEntities.get(position);
 
         final String[] items = new String[]{ "拉黑", "删除好友"};
 //        final int checkedIndex = 0;
@@ -171,11 +187,11 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
 
                         if (index == 0) {
                             // 拉黑
-                            addBlock(contactEntity.getUid());
+                            addBlock(friendEntity.getUid());
 
                         } else if (index == 1) {
                             // 删除好友
-                            removeFriend(contactEntity.getUid());
+                            removeFriend(friendEntity.getUid());
 
                         }
                     }

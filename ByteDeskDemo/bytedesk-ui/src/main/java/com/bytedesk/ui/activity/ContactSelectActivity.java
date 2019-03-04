@@ -28,7 +28,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class ContactActivity extends AppCompatActivity implements ContactItemClickListener {
+public class ContactSelectActivity extends AppCompatActivity implements ContactItemClickListener {
 
     private QMUITopBarLayout mTopBar;
     private QMUIPullRefreshLayout mPullRefreshLayout;
@@ -41,7 +41,7 @@ public class ContactActivity extends AppCompatActivity implements ContactItemCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bytedesk_activity_contact);
+        setContentView(R.layout.bytedesk_activity_contact_select);
         //
         initTopBar();
         initRecycleView();
@@ -79,7 +79,6 @@ public class ContactActivity extends AppCompatActivity implements ContactItemCli
         // 设置适配器adapter
         mContactAdapter = new ContactAdapter(this);
         mRecyclerView.setAdapter(mContactAdapter);
-
     }
 
     /**
@@ -91,8 +90,12 @@ public class ContactActivity extends AppCompatActivity implements ContactItemCli
         mContactViewModel.getContacts().observe(this, new Observer<List<ContactEntity>>() {
             @Override
             public void onChanged(@Nullable List<ContactEntity> contactEntities) {
+
+                //
+
+
                 mContactEntities = contactEntities;
-                mContactAdapter.setContacts(contactEntities);
+                mContactAdapter.setContacts(mContactEntities);
             }
         });
     }
@@ -103,6 +106,7 @@ public class ContactActivity extends AppCompatActivity implements ContactItemCli
      */
     @Override
     public void onItemClicked(int position) {
+        Logger.i("contact item clicked: " + position);
 
     }
 

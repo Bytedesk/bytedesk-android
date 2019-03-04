@@ -1,14 +1,23 @@
 package com.bytedesk.demo.im.fragment.notice;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 
+import com.bytedesk.core.api.BDCoreApi;
+import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.event.MessageEvent;
+import com.bytedesk.core.room.entity.NoticeEntity;
+import com.bytedesk.core.viewmodel.NoticeViewModel;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.demo.common.ListViewDecoration;
+import com.bytedesk.demo.im.adapter.NoticeAdapter;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUIEmptyView;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
@@ -19,17 +28,17 @@ import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * @author bytedesk.com on 2018/3/26.
- *
- * TODO: 暂未上线
- *
  */
 public class NoticeFragment extends BaseFragment implements SwipeItemClickListener {
 
@@ -38,14 +47,21 @@ public class NoticeFragment extends BaseFragment implements SwipeItemClickListen
     @BindView(R.id.pull_to_refresh) QMUIPullRefreshLayout mPullRefreshLayout;
     @BindView(R.id.recycler_view) SwipeMenuRecyclerView mSwipeMenuRecyclerView;
 
+    private NoticeAdapter mNoticeAdapter;
+    private NoticeViewModel mNoticeViewModel;
+
+    private List<NoticeEntity> mNoticeEntities;
+
     @Override
     protected View onCreateView() {
-        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_queue, null);
+        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_notice, null);
         ButterKnife.bind(this, root);
 
         initTopBar();
         initRecycleView();
         initModel();
+
+        getNotices();
 
         return root;
     }
@@ -89,13 +105,30 @@ public class NoticeFragment extends BaseFragment implements SwipeItemClickListen
         mSwipeMenuRecyclerView.setItemAnimator(new DefaultItemAnimator());// 设置Item默认动画，加也行，不加也行。
         mSwipeMenuRecyclerView.addItemDecoration(new ListViewDecoration(getContext()));// 添加分割线。
         mSwipeMenuRecyclerView.setSwipeItemClickListener(this); //
+        //
+        mNoticeAdapter = new NoticeAdapter(getContext());
+        mSwipeMenuRecyclerView.setAdapter(mNoticeAdapter);
     }
 
     /**
      *
      */
     private void initModel() {
+        //
+        mNoticeViewModel = ViewModelProviders.of(this).get(NoticeViewModel.class);
+        mNoticeViewModel.getNotices().observe(this, new Observer<List<NoticeEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<NoticeEntity> noticeEntities) {
+                mNoticeEntities = noticeEntities;
+                mNoticeAdapter.setNotices(noticeEntities);
 
+                if (mNoticeEntities.size() == 0) {
+                    mEmptyView.setVisibility(View.VISIBLE);
+                } else {
+                    mEmptyView.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     /**
@@ -103,6 +136,43 @@ public class NoticeFragment extends BaseFragment implements SwipeItemClickListen
      */
     private void getNotices() {
         Logger.d("getNotices");
+
+        BDCoreApi.getNotices(getContext(), 0, 20, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                JSONArray jsonArray = null;
+
+                try {
+
+                    jsonArray = object.getJSONObject("data").getJSONArray("content");
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        mNoticeViewModel.insertNoticeJson(jsonArray.getJSONObject(i));
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                mPullRefreshLayout.finishRefresh();
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                try {
+
+                    String message = object.getString("message") + object.getString("data");
+                    Logger.e(message);
+
+                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 

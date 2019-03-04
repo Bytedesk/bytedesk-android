@@ -8,14 +8,14 @@
     android:gravity="center_vertical">
 
     <Button
-        android:id="@+id/bytedesk_chat_input_plus_button"
+        android:id="@+id/bytedesk_chat_input_voice_button"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="4dp"
-        android:background="@drawable/bytedesk_inputbar_plus"
+        android:background="@drawable/bytedesk_inputbar_voicebtn"
         />
 
     <EditText
@@ -36,9 +36,31 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/bytedesk_inputbar_sendbtn"
         android:text="发送"
+        />
+
+    <Button
+        android:id="@+id/bytedesk_chat_input_emotionbtn"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="4dp"
+        android:layout_toLeftOf="@+id/bytedesk_chat_input_plus_button"
+        android:background="@drawable/bytedesk_inputbar_emotionbtn" />
+
+    <Button
+        android:id="@+id/bytedesk_chat_input_plus_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bytedesk_inputbar_plus"
         />
 
 </LinearLayout>

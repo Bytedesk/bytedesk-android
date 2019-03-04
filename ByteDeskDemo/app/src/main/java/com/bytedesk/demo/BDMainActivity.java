@@ -30,7 +30,7 @@ public class BDMainActivity extends BaseFragmentActivity {
         }
 
         // 建立长连接
-        BDMqttApi.connect(this);
+        BDMqttApi.connect(getApplicationContext());
     }
 
 }

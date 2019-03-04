@@ -26,7 +26,7 @@ public class BDApplication extends Application{
         QMUISwipeBackActivityManager.init(this);
 
         // 初始化萝卜丝UI界面库
-        BDUiApi.init(this);
+        BDUiApi.init(getApplicationContext());
     }
 
 }

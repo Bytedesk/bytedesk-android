@@ -12,6 +12,7 @@ public class BDUiConstant {
     public static final String EXTRA_WID = "wId";
     public static final String EXTRA_TID = "tId";
     public static final String EXTRA_AID = "aId";
+    public static final String EXTRA_GID = "gId";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VISITOR = "visitor";

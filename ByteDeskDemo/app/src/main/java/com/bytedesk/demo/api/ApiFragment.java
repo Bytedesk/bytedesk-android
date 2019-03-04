@@ -1,5 +1,6 @@
 package com.bytedesk.demo.api;
 
+import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,8 @@ import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDPreferenceManager;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
+import com.bytedesk.demo.common.QRCodeFragment;
+import com.bytedesk.demo.common.ScanFragment;
 import com.bytedesk.demo.im.fragment.contact.ContactFragment;
 import com.bytedesk.demo.im.fragment.group.GroupFragment;
 import com.bytedesk.demo.im.fragment.notice.NoticeFragment;
@@ -81,7 +84,8 @@ public class ApiFragment extends BaseFragment {
         loginItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView logoutItem = mGroupListView.createItemView("3. 退出登录接口");
         logoutItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView scanItem = mGroupListView.createItemView("4. 扫一扫(TODO)");
+        QMUICommonListItemView scanItem = mGroupListView.createItemView("4. 扫码登录/扫一扫");
+        QMUICommonListItemView multiAccountItem = mGroupListView.createItemView("5. 多账号管理(TODO)");
         QMUIGroupListView.newSection(getContext())
                 .setTitle("公共接口")
                 .addItemView(registerItem, new View.OnClickListener() {
@@ -105,7 +109,35 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(scanItem, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        // TODO: 扫一扫
+
+                        final String[] items = new String[]{"登录二维码", "扫一扫"};
+                        new QMUIDialog.CheckableDialogBuilder(getActivity())
+                            .addItems(items, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int index) {
+
+                                    dialog.dismiss();
+
+                                    if (index == 0) {
+                                        // 生成登录二维码
+                                        QRCodeFragment qrCodeFragment = new QRCodeFragment();
+                                        startFragment(qrCodeFragment);
+
+                                    } else if (index == 1) {
+                                        // 扫一扫
+                                        ScanFragment scanFragment = new ScanFragment();
+                                        startFragment(scanFragment);
+                                    }
+                                }
+                            }).show();
+
+                    }
+                })
+                .addItemView(multiAccountItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 多账号管理
+
                     }
                 })
                 .addTo(mGroupListView);
@@ -206,7 +238,7 @@ public class ApiFragment extends BaseFragment {
         threadItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView queueItem = mGroupListView.createItemView("5.排队接口");
         queueItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.通知接口(TODO)");
+        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.通知接口");
         noticeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView settingItem = mGroupListView.createItemView("7.设置接口");
         settingItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);

@@ -224,7 +224,6 @@ public class QueueFragment extends BaseFragment implements SwipeItemClickListene
 
             @Override
             public void onError(JSONObject object) {
-
                 try {
 
                     String message = object.getString("message") + object.getString("data");
