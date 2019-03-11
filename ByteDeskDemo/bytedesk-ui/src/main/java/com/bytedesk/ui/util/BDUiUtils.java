@@ -1,6 +1,9 @@
 package com.bytedesk.ui.util;
 
 import android.content.Context;
+import android.view.inputmethod.InputMethodManager;
+
+import com.bytedesk.ui.activity.ChatWxActivity;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import java.text.ParseException;
@@ -15,6 +18,34 @@ import java.util.TimerTask;
  */
 
 public class BDUiUtils {
+
+
+    /**
+     * 显示或隐藏系统软键盘
+     * @param isShowSoftkeybord true:显示，false:隐藏
+     */
+    public static void showSysSoftKeybord(Context context, boolean isShowSoftkeybord)
+    {
+        try {
+            if(context == null)
+                return;
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            if(imm == null)
+                return;
+
+            if (isShowSoftkeybord) {
+                imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);//SHOW_FORCED表示强制显示
+            }
+            else {
+                imm.hideSoftInputFromWindow(((ChatWxActivity)context).getCurrentFocus().getWindowToken(), 0);////强制隐藏键盘
+            }
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * 判断是否应该显示时间戳

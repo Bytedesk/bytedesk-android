@@ -34,10 +34,11 @@
             android:layout_width="@dimen/bytedesk_avatar_width_height"
             android:layout_height="@dimen/bytedesk_avatar_width_height"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"/>
+            android:layout_alignParentTop="true"
+            android:src="@drawable/bytedesk_sex_male"/>
 
         <TextView
-            android:id="@+id/bytedesk_message_item_content"
+            android:id="@+id/bytedesk_message_item_content_voice"
             style="@style/bytedesk_chat_content_date_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,6 +49,15 @@
             android:textColorLink="#0082CB"
             android:background="@drawable/bytedesk_message_item_background_self"
             />
+
+        <TextView
+            android:id="@+id/bytedesk_message_item_voice_length"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/bytedesk_message_item_content_voice"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp"
+            android:text="5s"/>
 
         <ProgressBar
             android:id="@+id/bytedesk_message_item_loading"

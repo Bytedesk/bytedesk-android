@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
+    <!--红包布局-->
     <LinearLayout
         android:id="@+id/bytedesk_message_item_timestamp_layout"
         android:layout_width="fill_parent"
@@ -17,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/bytedesk_timestamp_margin_top"
+            android:textSize="10dp"
             android:text="timestamp"/>
 
     </LinearLayout>
@@ -46,7 +48,7 @@
             >
 
             <TextView
-                android:id="@+id/bytedesk_message_item_agentnickname"
+                android:id="@+id/bytedesk_message_item_nickname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -54,35 +56,13 @@
                 android:text="客服小薇"
                 />
 
-            <TextView
-                android:id="@+id/bytedesk_message_item_content_voice"
+            <ImageView
+                android:id="@+id/bytedesk_message_item_image"
                 style="@style/bytedesk_chat_content_date_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/bytedesk_message_item_agentnickname"
-                android:autoLink="phone|email"
-                android:background="@drawable/bytedesk_message_item_background"
-                android:textColorLink="#0082CB" />
-
-            <TextView
-                android:id="@+id/bytedesk_message_item_voice_length"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="15dp"
-                android:layout_toRightOf="@+id/bytedesk_message_item_content_voice"
-                android:text="5s"
-                />
-
-            <View
-                android:id="@+id/bytedesk_message_item_voice_unplayed"
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:background="@color/qmui_config_color_red"
-                android:layout_toRightOf="@+id/bytedesk_message_item_content_voice"
-                android:layout_marginLeft="5dp"
-                android:layout_alignBottom="@+id/bytedesk_message_item_content_voice"
-                />
+                android:layout_width="200sp"
+                android:layout_height="200sp"
+                android:layout_below="@+id/bytedesk_message_item_nickname"
+                android:background="@drawable/bytedesk_message_item_background" />
 
         </RelativeLayout>
 

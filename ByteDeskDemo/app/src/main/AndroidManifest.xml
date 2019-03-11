@@ -101,6 +101,10 @@
 
         <!--长连接service-->
         <service android:name="com.bytedesk.paho.android.service.MqttService"/>
+        <!--下载录音-->
+        <service android:name="com.bytedesk.core.service.BDDownloadService"/>
+        <!--录音以及播放-->
+        <service android:name="com.bytedesk.ui.recorder.KFRecorderService"/>
 
         <!-- 监听网络变化 -->
         <receiver android:name="com.bytedesk.core.receiver.BDNetworkConnectivityReceiver" >

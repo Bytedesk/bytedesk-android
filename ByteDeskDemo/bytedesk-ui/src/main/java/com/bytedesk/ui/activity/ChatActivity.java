@@ -118,6 +118,8 @@ public class ChatActivity extends AppCompatActivity
     private BDPreferenceManager mPreferenceManager;
     private BDRepository mRepository;
     private final Handler mHandler = new Handler();
+    //
+//    private JsonCustom mJsonCustom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +131,10 @@ public class ChatActivity extends AppCompatActivity
             //
             mIsVisitor = getIntent().getBooleanExtra(BDUiConstant.EXTRA_VISITOR, true);
             mThreadType = getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TYPE);
+            //
+            mPreferenceManager = BDPreferenceManager.getInstance(this);
+            mPreferenceManager.setVisitor(mIsVisitor);
+            mRepository = BDRepository.getInstance(this);
             //
             if (mIsVisitor) {
                 Logger.i("访客会话");
@@ -159,11 +165,14 @@ public class ChatActivity extends AppCompatActivity
             //
             mUid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
             mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
+            //
+            String custom = getIntent().getStringExtra(BDUiConstant.EXTRA_CUSTOM);
+            if (custom != null && custom.trim().length() > 0) {
+//                mJsonCustom = new Gson().fromJson(custom, JsonCustom.class);
+//                Logger.i("custom type: " + mJsonCustom.getType());
+                sendCommodityMessage(custom);
+            }
         }
-        //
-        mPreferenceManager = BDPreferenceManager.getInstance(this);
-        mPreferenceManager.setVisitor(mIsVisitor);
-        mRepository = BDRepository.getInstance(this);
 
         //
         initTopBar();
@@ -1370,6 +1379,32 @@ public class ChatActivity extends AppCompatActivity
         }
     };
 
+
+    /**
+     * 发送商品消息等
+     * @param custom
+     */
+    private void sendCommodityMessage(String custom) {
+
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertCommodityMessageLocal(mThreadTid, mWorkGroupWid, custom, localId, mThreadType);
+
+        // 发送商品
+        BDCoreApi.sendCommodityMessage(this, mThreadTid, custom, localId, mThreadType, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+            }
+        });
+    }
 }
 
 

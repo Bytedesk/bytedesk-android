@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
+    <!--红包布局-->
     <LinearLayout
         android:id="@+id/bytedesk_message_item_timestamp_layout"
         android:layout_width="fill_parent"
@@ -29,6 +30,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginBottom="15px">
 
+
         <com.qmuiteam.qmui.widget.QMUIRadiusImageView
             android:id="@+id/bytedesk_message_item_header"
             android:clickable="true"
@@ -38,18 +40,14 @@
             android:layout_alignParentTop="true"
             android:src="@drawable/bytedesk_sex_male"/>
 
-        <com.qmuiteam.qmui.widget.textview.QMUILinkTextView
-            android:id="@+id/bytedesk_message_item_content"
+        <ImageView
+            android:id="@+id/bytedesk_message_item_image"
             style="@style/bytedesk_chat_content_date_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="200sp"
+            android:layout_height="200sp"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="5dp"
             android:layout_toLeftOf="@+id/bytedesk_message_item_header"
-            android:autoLink="phone|email"
-            android:background="@drawable/bytedesk_message_item_background_self"
-            android:textColorLink="#0082CB"
-            android:textAlignment="center" />
+            android:background="@drawable/bytedesk_message_item_background_self" />
 
         <ProgressBar
             android:id="@+id/bytedesk_message_item_loading"
@@ -59,8 +57,8 @@
             android:layout_marginTop="20dp"
             android:indeterminateBehavior="repeat"
             android:indeterminateDrawable="@drawable/bytedesk_animation"
-            android:layout_toLeftOf="@+id/bytedesk_message_item_content"
-            android:layout_alignBottom="@+id/bytedesk_message_item_content"
+            android:layout_toLeftOf="@+id/bytedesk_message_item_image"
+            android:layout_alignBottom="@+id/bytedesk_message_item_image"
             android:visibility="gone"/>
 
         <ImageButton
@@ -71,8 +69,8 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:src="@drawable/appkefu_error"
-            android:layout_toLeftOf="@+id/bytedesk_message_item_content"
-            android:layout_alignBottom="@+id/bytedesk_message_item_content"
+            android:layout_toLeftOf="@+id/bytedesk_message_item_image"
+            android:layout_alignBottom="@+id/bytedesk_message_item_image"
             android:visibility="gone"/>
 
 

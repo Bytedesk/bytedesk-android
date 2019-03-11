@@ -15,7 +15,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="4dp"
-        android:background="@drawable/bytedesk_inputbar_plus"
+        android:background="@drawable/bytedesk_input_plus_button"
         />
 
     <EditText
@@ -37,7 +37,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="7dp"
-        android:background="@drawable/bytedesk_inputbar_sendbtn"
+        android:background="@drawable/bytedesk_input_send_button"
         android:text="发送"
         />
 

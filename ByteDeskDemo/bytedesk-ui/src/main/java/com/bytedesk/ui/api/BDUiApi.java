@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.ui.activity.BrowserActivity;
 import com.bytedesk.ui.activity.ChatActivity;
+import com.bytedesk.ui.activity.ChatWxActivity;
 import com.bytedesk.ui.util.BDUiConstant;
 import com.bytedesk.ui.util.MediaLoader;
 import com.yanzhenjie.album.Album;
@@ -18,7 +19,6 @@ import java.util.Locale;
  *
  * @author bytedesk.com
  */
-
 public class BDUiApi {
 
     /**
@@ -27,7 +27,6 @@ public class BDUiApi {
      * @param context
      */
     public static void init(Context context) {
-
 
         // 初始化相册
         Album.initialize(AlbumConfig.newBuilder(context)
@@ -41,9 +40,9 @@ public class BDUiApi {
      * 访客端接口：开启原生会话页面Activity
      * 默认工作组会话
      *
-     * @param context
-     * @param wId
-     * @param title
+     * @param context 上下文
+     * @param wId 工作组wid
+     * @param title 标题
      */
     public static void startWorkGroupChatActivity(Context context, String wId, String title) {
         Intent intent = new Intent(context, ChatActivity.class);
@@ -56,15 +55,26 @@ public class BDUiApi {
         context.startActivity(intent);
     }
 
+    public static void startWorkGroupChatActivity(Context context, String wId, String title, String custom) {
+        Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
+        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+        intent.putExtra(BDUiConstant.EXTRA_WID, wId);
+        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+        intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_WORK_GROUP);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
+        context.startActivity(intent);
+    }
+
     /**
      * 访客端接口：开启原生会话页面Activity
      * 指定客服会话
      *
      * TODO: 后台开放获取所有客服uid接口
      *
-     * @param context
-
-     * @param title
+     * @param context 上下文
+     * @param title 标题
      */
     public static void startAppointChatActivity(Context context, String aId, String title) {
         Intent intent = new Intent(context, ChatActivity.class);
@@ -78,12 +88,25 @@ public class BDUiApi {
         context.startActivity(intent);
     }
 
+    public static void startAppointChatActivity(Context context, String aId, String title, String custom) {
+        Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
+        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+        intent.putExtra(BDUiConstant.EXTRA_WID, "");
+        intent.putExtra(BDUiConstant.EXTRA_AID, aId);
+        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+        intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
+        context.startActivity(intent);
+    }
+
 
     /**
      * 访客端接口：开启h5会话页面
      *
-     * @param context
-     * @param url
+     * @param context 上下文
+     * @param url url
      */
     public static void startHtml5Chat(Context context, String url) {
         Intent intent = new Intent(context, BrowserActivity.class);
@@ -95,9 +118,9 @@ public class BDUiApi {
      * 客服端接口，开启原生会话页面Activity
      * 访客会话
      *
-     * @param context
-     * @param tId
-     * @param title
+     * @param context 上下文
+     * @param tId 会话tid
+     * @param title 标题
      */
     public static void startThreadChatActivity(Context context, String tId, String uId, String title) {
         Intent intent = new Intent(context, ChatActivity.class);
@@ -109,37 +132,69 @@ public class BDUiApi {
         context.startActivity(intent);
     }
 
-    /**
-     * 客服端接口，开启原生会话页面Activity
-     * 同事会话
-     *
-     * @param context
-     * @param cId
-     * @param title
-     */
-    public static void startContactChatActivity(Context context, String cId, String title) {
+    public static void startThreadChatActivity(Context context, String tId, String uId, String title, String custom) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_UID, cId);
+        intent.putExtra(BDUiConstant.EXTRA_TID, tId);
+        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_CONTACT);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
         context.startActivity(intent);
     }
 
     /**
      * 客服端接口，开启原生会话页面Activity
+     * 同事会话
+     *
+     * @param context 上下文
+     * @param uId 对方uid
+     * @param title 标题
+     */
+    public static void startContactChatActivity(Context context, String uId, String title) {
+        Intent intent = new Intent(context, ChatWxActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
+        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_CONTACT);
+        context.startActivity(intent);
+    }
+
+    public static void startContactChatActivity(Context context, String uId, String title, String custom) {
+        Intent intent = new Intent(context, ChatWxActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
+        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_CONTACT);
+        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
+        context.startActivity(intent);
+    }
+
+
+    /**
+     * 客服端接口，开启原生会话页面Activity
      * 群聊
      *
-     * @param context
-     * @param gId
-     * @param title
+     * @param context 上下文
+     * @param gId 群组gid
+     * @param title 标题
      */
     public static void startGroupChatActivity(Context context, String gId, String title) {
-        Intent intent = new Intent(context, ChatActivity.class);
+        Intent intent = new Intent(context, ChatWxActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, gId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
+        context.startActivity(intent);
+    }
+
+    public static void startGroupChatActivity(Context context, String gId, String title, String custom) {
+        Intent intent = new Intent(context, ChatWxActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
+        intent.putExtra(BDUiConstant.EXTRA_UID, gId);
+        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
+        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
         context.startActivity(intent);
     }
 

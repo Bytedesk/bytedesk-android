@@ -69,8 +69,8 @@
 
     <string name="kfds_pick_picture_label">照片</string>
     <string name="kfds_take_picture_label">拍照</string>
-    <string name="kfds_show_faq_label">常见问题</string>
-    <string name="kfds_rate_label">满意度</string>
+    <string name="kfds_show_red_packet_label">红包</string>
+    <string name="kfds_file_label">文件</string>
     <string name="kfds_inputbar_send">发送</string>
     <string name="kfds_press_to_speak">按住 说话</string>
     <string name="kfds_lose_to_cancel">松开 取消</string>
@@ -80,6 +80,9 @@
     <string name="kfds_record_voice_too_long">录音时间太长</string>
     <string name="kfds_record_permission_tip">您需要授权才能够发送语音</string>
     <string name="kfds_camera_permission_tip">您需要授权才能够拍照</string>
+    <string name="bytedesk_read_destroy_label">阅后即焚</string>
+    <string name="bytedesk_shop_label">商品</string>
+
 
     <string name="kfds_notification_recording">正在录音</string>
     <string name="kfds_notification_record_stopped">录音停止</string>
@@ -184,6 +187,7 @@
     <string name="kfds_product_info_price">￥</string>
     <string name="kfds_product_info_sendlinkbtn">发送宝贝链接</string>
     <string name="kfds_imageview_contentdescription"></string>
+    <string name="appkefu_imageview_content_description"></string>
 
     <string name="kfds_already_rated">已经评价过此次会话</string>
     <string name="kfds_mobileformat_wrong">手机号码格式错误</string>

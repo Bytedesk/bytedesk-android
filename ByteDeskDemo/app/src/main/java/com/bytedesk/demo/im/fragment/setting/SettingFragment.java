@@ -95,7 +95,7 @@ public class SettingFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 Logger.d("profile item clicked");
-
+                showProfileSheet();
             }
         }).addTo(mGroupListView);
 
@@ -121,6 +121,26 @@ public class SettingFragment extends BaseFragment {
                 showAcceptStatusSheet();
             }
         }).addTo(mGroupListView);
+    }
+
+    /**
+     *
+     */
+    private void showProfileSheet() {
+
+        new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
+                .addItem("修改头像TODO")
+                .addItem("修改昵称TODO")
+                .addItem("修改签名TODO")
+                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
+                    @Override
+                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
+                        dialog.dismiss();
+
+                    }
+                })
+                .build()
+                .show();
     }
 
     /**

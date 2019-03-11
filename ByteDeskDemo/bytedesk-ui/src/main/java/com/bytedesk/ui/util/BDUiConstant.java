@@ -18,6 +18,7 @@ public class BDUiConstant {
     public static final String EXTRA_VISITOR = "visitor";
     public static final String EXTRA_THREAD_TYPE = "thread_type";
     public static final String EXTRA_REQUEST_TYPE = "request_type";
+    public static final String EXTRA_CUSTOM = "custom";
 
 
     //

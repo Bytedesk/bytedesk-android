@@ -1,27 +1,47 @@
 package com.bytedesk.ui.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.AudioManager;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.ImageSpan;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bytedesk.core.api.BDCoreApi;
@@ -34,13 +54,21 @@ import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.room.entity.MessageEntity;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDCoreUtils;
+import com.bytedesk.core.util.BDFileUtils;
 import com.bytedesk.core.util.BDPreferenceManager;
 import com.bytedesk.core.viewmodel.MessageViewModel;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.adapter.ChatAdapter;
+import com.bytedesk.ui.adapter.EmotionViewPagerAdapter;
 import com.bytedesk.ui.listener.ChatItemClickListener;
+import com.bytedesk.ui.recorder.KFRecorder;
+import com.bytedesk.ui.recorder.KFRecorderService;
+import com.bytedesk.ui.recorder.KFRemainingTimeCalculator;
 import com.bytedesk.ui.util.BDPermissionUtils;
 import com.bytedesk.ui.util.BDUiConstant;
+import com.bytedesk.ui.util.BDUiUtils;
+import com.bytedesk.ui.util.EmotionMaps;
+import com.bytedesk.ui.util.ExpressionUtil;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.util.QMUIViewHelper;
@@ -60,6 +88,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,17 +106,79 @@ import java.util.Map;
  * @author bytedesk.com
  */
 public class ChatWxActivity extends AppCompatActivity
-        implements ChatItemClickListener, View.OnClickListener {
+        implements ChatItemClickListener,
+        View.OnClickListener,
+        View.OnTouchListener,
+        ViewPager.OnPageChangeListener,
+        AdapterView.OnItemClickListener,
+        View.OnFocusChangeListener, KFRecorder.OnStateChangedListener {
 
     private QMUITopBarLayout mTopBar;
     private QMUIPullRefreshLayout mPullRefreshLayout;
     private RecyclerView mRecyclerView;
     private ChatAdapter mChatAdapter;
 
+    // 是否是机器人会话
+    private boolean mIsRobot = false;
+    // 切换文字、录音按钮
+    private Button mVoiceButton;
+    // 按住说话
+    private Button mRecordVoiceButton;
+    // 显示表情
+    private Button mEmotionButton;
+    // 显示扩展按钮
     private Button mPlusButton;
+    // 发送文本消息按钮
     private Button mSendButton;
+    // 输入框
     private EditText mInputEditText;
 
+    private boolean mIsRecording = false;
+    // 录音整体UI
+    private LinearLayout mRecordVoiceLayout;
+    // 正在录音
+    private LinearLayout mRecordVoiceHintLayout;
+    private LinearLayout mRecordVoiceCancelHintLayout;
+    // 取消录音
+    private LinearLayout mRecordVoiceTextLayout;
+    private LinearLayout mRecordVoiceCancelTextLayout;
+    // 音量
+    private ImageView mRecordVoiceHintAMPImageView;
+    // ////////////////////录音机////////////////////////
+    private boolean m_voiceRecordRequestCanBeChanged = false;
+    private KFRecorder m_voiceRecorder;
+    private RecorderReceiver m_voiceRecordReceiver;
+    private boolean m_voiceRecordShowFinishButton = false;
+    // 设置为-1，表示大小无限制
+    private long m_voiceRecordMaxFileSize = -1;
+    private KFRemainingTimeCalculator m_voiceRecordRemainingTimeCalculator;
+    private String m_voiceRecordingVoiceFileName;
+    private String m_imageCaptureFileName;
+    // 录音开始和结束时间戳
+    private long m_startRecordingTimestamp, m_endRecordingTimestamp;
+    private int m_recordedVoiceLength;
+    private Handler m_voiceRecordHandler = new Handler();
+    private static final int VOICE_RECORDING_REFRESH_AMP_INTERVAL = 100;
+    private static final int CHECK_RECORD_AUDIO_PERMISSION = 5;
+
+    // 表情
+    public RelativeLayout mEmotionLayout;
+    private ViewPager mEmotionViewPager;
+    private EmotionViewPagerAdapter mEmotionViewPagerAdapter;
+    private EmotionMaps mEmotionMaps;
+
+    // 表情pager indicator
+    private int mCurrentEmotionViewPagerIndex;
+    private ImageView mEmotionViewPagerIndicator1;
+    private ImageView mEmotionViewPagerIndicator2;
+    private ImageView mEmotionViewPagerIndicator3;
+    private ImageView mEmotionViewPagerIndicator4;
+    private ImageView mEmotionViewPagerIndicator5;
+
+    // 扩展
+    public LinearLayout mExtensionLayout;
+
+    // Model
     private MessageViewModel mMessageViewModel;
 
 //    private String mImageCaptureFileName;
@@ -118,6 +209,8 @@ public class ChatWxActivity extends AppCompatActivity
     private BDPreferenceManager mPreferenceManager;
     private BDRepository mRepository;
     private final Handler mHandler = new Handler();
+    //
+//    private JsonCustom mJsonCustom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +222,10 @@ public class ChatWxActivity extends AppCompatActivity
             //
             mIsVisitor = getIntent().getBooleanExtra(BDUiConstant.EXTRA_VISITOR, true);
             mThreadType = getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TYPE);
+            //
+            mPreferenceManager = BDPreferenceManager.getInstance(this);
+            mPreferenceManager.setVisitor(mIsVisitor);
+            mRepository = BDRepository.getInstance(this);
             //
             if (mIsVisitor) {
                 Logger.i("访客会话");
@@ -159,16 +256,20 @@ public class ChatWxActivity extends AppCompatActivity
             //
             mUid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
             mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
+            //
+            String custom = getIntent().getStringExtra(BDUiConstant.EXTRA_CUSTOM);
+            if (custom != null && custom.trim().length() > 0) {
+//                mJsonCustom = new Gson().fromJson(custom, JsonCustom.class);
+//                Logger.i("custom type: " + mJsonCustom.getType());
+                sendCommodityMessage(custom);
+            }
         }
-        //
-        mPreferenceManager = BDPreferenceManager.getInstance(this);
-        mPreferenceManager.setVisitor(mIsVisitor);
-        mRepository = BDRepository.getInstance(this);
 
         //
         initTopBar();
         initView();
         initModel();
+        initRecorder(savedInstanceState);
 
         // 访客端请求会话
         if (mIsVisitor) {
@@ -181,8 +282,83 @@ public class ChatWxActivity extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
+
+        //
+        IntentFilter iFilter = new IntentFilter();
+        iFilter.addAction(Intent.ACTION_MEDIA_EJECT);
+        iFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+        iFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+        iFilter.addDataScheme("file");
+        registerReceiver(m_voiceRecordSDCardMountEventReceiver, iFilter);
+
         // 注册监听
         EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // ///////////////////////////////////////////////////
+        if (m_voiceRecordRequestCanBeChanged) {
+            m_voiceRecorder.reset();
+        }
+
+        m_voiceRecordRequestCanBeChanged = false;
+        if (!m_voiceRecorder.syncStateWithService()) {
+            m_voiceRecorder.reset();
+        }
+
+        if (m_voiceRecorder.state() == KFRecorder.RECORDING_STATE) {
+            if (!m_voiceRecorder.sampleFile().getName()
+                    .endsWith(BDCoreConstant.EXT_AMR)) {
+                m_voiceRecorder.reset();
+            } else {
+                m_voiceRecordRemainingTimeCalculator
+                        .setBitRate(BDCoreConstant.BITRATE_AMR);
+            }
+        } else {
+            File file = m_voiceRecorder.sampleFile();
+            if (file != null && !file.exists()) {
+                m_voiceRecorder.reset();
+            }
+        }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(KFRecorderService.RECORDER_SERVICE_BROADCAST_NAME);
+        registerReceiver(m_voiceRecordReceiver, filter);
+
+        if (KFRecorderService.isRecording()) {
+            Intent intent = new Intent(this, KFRecorderService.class);
+            intent.putExtra(KFRecorderService.ACTION_NAME,
+                    KFRecorderService.ACTION_DISABLE_MONITOR_REMAIN_TIME);
+            startService(intent);
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (m_voiceRecorder.state() != KFRecorder.RECORDING_STATE
+                || m_voiceRecordShowFinishButton
+                || m_voiceRecordMaxFileSize != -1) {
+            m_voiceRecorder.stop();
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+                    .cancel(KFRecorderService.NOTIFICATION_ID);
+        }
+
+        if (m_voiceRecordReceiver != null) {
+            unregisterReceiver(m_voiceRecordReceiver);
+        }
+
+        m_voiceRecordRequestCanBeChanged = true;
+        if (KFRecorderService.isRecording()) {
+            Intent intent = new Intent(this, KFRecorderService.class);
+            intent.putExtra(KFRecorderService.ACTION_NAME, KFRecorderService.ACTION_ENABLE_MONITOR_REMAIN_TIME);
+            startService(intent);
+        }
     }
 
     @Override
@@ -197,11 +373,16 @@ public class ChatWxActivity extends AppCompatActivity
         super.onDestroy();
 
         // TODO: 清理
+        if (m_voiceRecordSDCardMountEventReceiver != null) {
+            unregisterReceiver(m_voiceRecordSDCardMountEventReceiver);
+            m_voiceRecordSDCardMountEventReceiver = null;
+        }
+        //主动回收
+        Runtime.getRuntime().gc();
     }
 
     /**
      * TODO: 客服端输入框显示常用回复按钮
-     *
      * @param view
      */
     @Override
@@ -211,6 +392,8 @@ public class ChatWxActivity extends AppCompatActivity
             //
             final String content = mInputEditText.getText().toString();
             if (content.trim().length() > 0) {
+                String textContent = ExpressionUtil.faceToCN(this, content);
+                Logger.i("faceToCn: " + textContent);
 
                 // TODO: 访客端客服会话：无客服在线时，发送消息会返回机器人答案
 
@@ -220,14 +403,14 @@ public class ChatWxActivity extends AppCompatActivity
                 final String localId = BDCoreUtils.uuid();
 
                 // 插入本地消息
-                mRepository.insertTextMessageLocal(mThreadTid, mWorkGroupWid, content, localId, mThreadType);
+                mRepository.insertTextMessageLocal(mThreadTid, mWorkGroupWid, textContent, localId, mThreadType);
 
                 // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
                 // 1. 异步发送文字消息
                 // BDMqttApi.sendTextMessage(this, mThreadTid, content, localId, mThreadType);
 
                 // 2. 同步发送消息(推荐)
-                BDCoreApi.sendTextMessage(this, mThreadTid, content, localId, mThreadType, new BaseCallback() {
+                BDCoreApi.sendTextMessage(this, mThreadTid, textContent, localId, mThreadType, new BaseCallback() {
 
                     @Override
                     public void onSuccess(JSONObject object) {
@@ -267,32 +450,155 @@ public class ChatWxActivity extends AppCompatActivity
             }
         }
         else if (view.getId() == R.id.bytedesk_chat_input_plus_button) {
+            BDUiUtils.showSysSoftKeybord(this, false);
+            if (mExtensionLayout.getVisibility() == View.VISIBLE) {
+                mExtensionLayout.setVisibility(View.GONE);
+            } else {
+                mExtensionLayout.setVisibility(View.VISIBLE);
+                mEmotionLayout.setVisibility(View.GONE);
+            }
+
+        } else if (view.getId() == R.id.bytedesk_chat_input_emotion_button) {
+            BDUiUtils.showSysSoftKeybord(this, false);
+            if (mEmotionLayout.getVisibility() == View.VISIBLE) {
+                mEmotionLayout.setVisibility(View.GONE);
+            } else {
+                mEmotionLayout.setVisibility(View.VISIBLE);
+                mExtensionLayout.setVisibility(View.GONE);
+                mRecordVoiceButton.setVisibility(View.GONE);
+                mInputEditText.setVisibility(View.VISIBLE);
+            }
+
+        } else if (view.getId() == R.id.bytedesk_chat_input_voice_button) {
+            BDUiUtils.showSysSoftKeybord(this, false);
+            if (mRecordVoiceButton.getVisibility() == View.VISIBLE) {
+                mRecordVoiceButton.setVisibility(View.GONE);
+                mInputEditText.setVisibility(View.VISIBLE);
+            } else {
+                mRecordVoiceButton.setVisibility(View.VISIBLE);
+                mInputEditText.setVisibility(View.GONE);
+            }
+            mEmotionLayout.setVisibility(View.GONE);
+            mExtensionLayout.setVisibility(View.GONE);
+
+        } else if (view.getId() == R.id.appkefu_plus_pick_picture_btn) {
 
             // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
-            new QMUIBottomSheet.BottomListSheetBuilder(this)
-                    .addItem("相册")
-                    .addItem("拍照")
-                    .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                        @Override
-                        public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                            switch (position) {
-                                case 0:
-                                    Logger.d("album");
-                                    requestAlbumPermission();
-                                    break;
-                                case 1:
-                                    Logger.d("camera");
-                                    requestCameraPermission();
-                                    break;
-                            }
-                            dialog.dismiss();
+            pickImageFromAlbum();
+
+        } else if (view.getId() == R.id.appkefu_plus_take_picture_btn) {
+
+            // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
+
+            takeCameraImage();
+
+        } else if (view.getId() == R.id.appkefu_plus_show_red_packet_btn) {
+
+            Toast.makeText(this, "红包", Toast.LENGTH_LONG).show();
+
+        } else if (view.getId() == R.id.appkefu_plus_file_btn) {
+
+            Toast.makeText(this, "文件", Toast.LENGTH_LONG).show();
+
+        } else if (view.getId() == R.id.appkefu_read_destroy_btn) {
+
+            Toast.makeText(this, "阅后即焚", Toast.LENGTH_LONG).show();
+
+        } else if (view.getId() == R.id.appkefu_plus_shop_btn) {
+
+            Toast.makeText(this, "商品", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+        if (view.getId() == R.id.bytedesk_chat_input_record_voice_button) {
+            //
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                if (!mIsRecording)
+                    return false;
+
+                mRecordVoiceHintLayout.setVisibility(View.GONE);
+                m_endRecordingTimestamp = System.currentTimeMillis();
+                stopVoiceRecording();
+
+                // 发送录音
+                if (motionEvent.getY() >= 0) {
+
+                    m_recordedVoiceLength = (int) (m_endRecordingTimestamp - m_startRecordingTimestamp) / 1000;
+                    if (m_recordedVoiceLength < 1) {
+                        Toast.makeText(ChatWxActivity.this, R.string.kfds_record_voice_too_short, Toast.LENGTH_LONG).show();
+                    } else if (m_recordedVoiceLength > 60) {
+                        Toast.makeText(ChatWxActivity.this, R.string.kfds_record_voice_too_long, Toast.LENGTH_LONG).show();
+                    } else {
+                        //
+                        if (mIsRobot) {
+                            Toast.makeText(ChatWxActivity.this, R.string.kfds_robot_cannot_send_voice, Toast.LENGTH_LONG).show();
+                            return false;
                         }
-                    })
-                    .build().show();
+                        //
+                        String filePath = BDFileUtils.getVoiceWritePath(m_voiceRecordingVoiceFileName + BDCoreConstant.EXT_AMR);
+                        String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
+                        Logger.i("filePath:" + filePath + " fileName: " + fileName);
+
+                        // TODO: 上传语音
+                        uploadVoice(filePath, fileName, m_recordedVoiceLength);
+                    }
+
+                }
+
+            } else if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+
+                // android 6.0动态授权机制
+                // http://jijiaxin89.com/2015/08/30/Android-s-Runtime-Permission/
+                // http://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
+                if (Build.VERSION.SDK_INT >= 23) {
+//					int checkRecordAudioPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+//					int checkRecordAudioPermission = checkSelfPermission(Manifest.permission.RECORD_AUDIO);
+                    if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
+                            checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        new AlertDialog.Builder(ChatWxActivity.this)
+                                .setMessage(getString(R.string.kfds_record_permission_tip))
+                                .setPositiveButton(
+                                        getString(R.string.kfds_ok),
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                ActivityCompat.requestPermissions(ChatWxActivity.this,
+                                                        new String[] { Manifest.permission.RECORD_AUDIO,
+                                                                Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                                                        CHECK_RECORD_AUDIO_PERMISSION);
+                                            }
+                                        })
+                                .setNegativeButton(getString(R.string.kfds_cancel), null)
+                                .create().show();
+                    } else {
+                        startVoiceRecording();
+                    }
+                } else {
+                    startVoiceRecording();
+                }
+            }
         }
 
+        // 切换效果：按住录音按钮，然后上滑出按钮，然后退回按住录音按钮
+        if (motionEvent.getY() < 0) {
+            mRecordVoiceHintLayout.setVisibility(View.GONE);
+            mRecordVoiceCancelHintLayout.setVisibility(View.VISIBLE);
+            mRecordVoiceTextLayout.setVisibility(View.GONE);
+            mRecordVoiceCancelTextLayout.setVisibility(View.VISIBLE);
+        } else {
+            mRecordVoiceHintLayout.setVisibility(View.VISIBLE);
+            mRecordVoiceCancelHintLayout.setVisibility(View.GONE);
+            mRecordVoiceTextLayout.setVisibility(View.VISIBLE);
+            mRecordVoiceCancelTextLayout.setVisibility(View.GONE);
+        }
+
+        return false;
     }
+
 
     /**
      * 顶部topbar初始化
@@ -361,6 +667,26 @@ public class ChatWxActivity extends AppCompatActivity
         mChatAdapter = new ChatAdapter(this, this);
         mRecyclerView.setAdapter(mChatAdapter);
 
+        // 录音HUD
+        mRecordVoiceLayout = findViewById(R.id.bytedesk_chat_wx_voice_record);
+        mRecordVoiceHintLayout = findViewById(R.id.appkefu_voice_record_hint_layout);
+        mRecordVoiceCancelHintLayout = findViewById(R.id.appkefu_voice_record_hint_cancel_layout);
+        mRecordVoiceTextLayout = findViewById(R.id.appkefu_voice_record_hint_text_record_layout);
+        mRecordVoiceCancelTextLayout = findViewById(R.id.appkefu_voice_record_hint_text_cancel_layout);
+        mRecordVoiceHintAMPImageView = findViewById(R.id.appkefu_voice_record_hint_amp);
+
+        // 语音
+        mVoiceButton = findViewById(R.id.bytedesk_chat_input_voice_button);
+        mVoiceButton.setOnClickListener(this);
+
+        // 按住录音
+        mRecordVoiceButton = findViewById(R.id.bytedesk_chat_input_record_voice_button);
+        mRecordVoiceButton.setOnTouchListener(this);
+
+        // 表情
+        mEmotionButton = findViewById(R.id.bytedesk_chat_input_emotion_button);
+        mEmotionButton.setOnClickListener(this);
+
         // 选择图片、拍照
         mPlusButton = findViewById(R.id.bytedesk_chat_input_plus_button);
         mPlusButton.setOnClickListener(this);
@@ -368,14 +694,47 @@ public class ChatWxActivity extends AppCompatActivity
         // 发送文本消息
         mSendButton = findViewById(R.id.bytedesk_chat_input_send_button);
         mSendButton.setOnClickListener(this);
+
+        // 输入框
         mInputEditText = findViewById(R.id.bytedesk_chat_fragment_input);
         mInputEditText.addTextChangedListener(inputTextWatcher);
+        mInputEditText.setOnFocusChangeListener(this);
 
         // 图片大图预览
 //        imagePreview = findViewById(R.id.bytedesk_image_preivew);
 //        mScreenSize = ImageViewerUtil.getScreenSize(this);
 //        imagePreview.setDefSize(mScreenSize.x, mScreenSize.y);
 //        imagePreview.setImageDraggerType(ImageDraggerType.DRAG_TYPE_WX);
+
+        // 表情
+        mEmotionLayout = findViewById(R.id.bytedesk_chat_emotion);
+        mEmotionMaps = new EmotionMaps(this);
+        mEmotionViewPagerAdapter = new EmotionViewPagerAdapter(mEmotionMaps.getGridViewArrayList());
+        mEmotionViewPager = findViewById(R.id.appkefu_emotion_viewpager);
+        mEmotionViewPager.setAdapter(mEmotionViewPagerAdapter);
+        mEmotionViewPager.addOnPageChangeListener(this);
+        
+        // 
+        mEmotionViewPagerIndicator1 = findViewById(R.id.appkefu_emotionview_pageindicator_imageview_1);
+        mEmotionViewPagerIndicator2 = findViewById(R.id.appkefu_emotionview_pageindicator_imageview_2);
+        mEmotionViewPagerIndicator3 = findViewById(R.id.appkefu_emotionview_pageindicator_imageview_3);
+        mEmotionViewPagerIndicator4 = findViewById(R.id.appkefu_emotionview_pageindicator_imageview_4);
+        mEmotionViewPagerIndicator5 = findViewById(R.id.appkefu_emotionview_pageindicator_imageview_5);
+
+        // 扩展
+        mExtensionLayout = findViewById(R.id.bytedesk_chat_extension);
+        // 照片相册
+        findViewById(R.id.appkefu_plus_pick_picture_btn).setOnClickListener(this);
+        // 拍照
+        findViewById(R.id.appkefu_plus_take_picture_btn).setOnClickListener(this);
+        // 红包
+        findViewById(R.id.appkefu_plus_show_red_packet_btn).setOnClickListener(this);
+        // 文件
+        findViewById(R.id.appkefu_plus_file_btn).setOnClickListener(this);
+        // 阅后即焚
+        findViewById(R.id.appkefu_read_destroy_btn).setOnClickListener(this);
+        // 商品
+        findViewById(R.id.appkefu_plus_shop_btn).setOnClickListener(this);
     }
 
     /**
@@ -1256,12 +1615,14 @@ public class ChatWxActivity extends AppCompatActivity
 
     /**
      * 监听 EventBus 广播消息
+     * TODO: 收到消息之后，如果消息属于当前页面，可处理阅后即焚消息
      *
      * @param messageEvent
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent messageEvent) {
-        Logger.i("MessageEvent");
+        Logger.i("会话页面 MessageEvent");
+
 
     }
 
@@ -1366,6 +1727,388 @@ public class ChatWxActivity extends AppCompatActivity
 
         }
     };
+
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        mCurrentEmotionViewPagerIndex = position;
+        switch (position) {
+            case 0:
+                mEmotionViewPagerIndicator1.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_active));
+                mEmotionViewPagerIndicator2.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator3.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator4.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator5.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                break;
+            case 1:
+                mEmotionViewPagerIndicator1.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator2.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_active));
+                mEmotionViewPagerIndicator3.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator4.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator5.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                break;
+            case 2:
+                mEmotionViewPagerIndicator1.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator2.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator3.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_active));
+                mEmotionViewPagerIndicator4.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator5.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                break;
+            case 3:
+                mEmotionViewPagerIndicator1.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator2.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator3.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator4.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_active));
+                mEmotionViewPagerIndicator5.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                break;
+            case 4:
+                mEmotionViewPagerIndicator1.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator2.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator3.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator4.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator5.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_active));
+                break;
+            default:
+                mEmotionViewPagerIndicator1.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_active));
+                mEmotionViewPagerIndicator2.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator3.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator4.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                mEmotionViewPagerIndicator5.setImageDrawable(getResources().getDrawable(R.drawable.appkefu_page_normal));
+                break;
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int arg2, long arg3) {
+        Logger.i("on item clicked:" + arg2);
+
+        int emotionIndex = mCurrentEmotionViewPagerIndex * 21 + arg2;
+        if ((emotionIndex + 1) % 21 == 0) {
+            int index = mInputEditText.getSelectionStart();
+            Editable editable = mInputEditText.getText();
+
+            if (index >= 0 && (index - 12) >= 0) {
+                char[] dest = new char[12];
+                editable.getChars(index - 12, index, dest, 0);
+                if (String.valueOf(dest).startsWith("appkefu_")) {
+                    editable.delete(index - 12, index);
+                } else {
+                    editable.delete(index - 1, index);
+                }
+            } else if (index > 0) {
+                editable.delete(index - 1, index);
+            }
+        } else {
+
+            String emotionName;
+            if (emotionIndex < 9) {
+                emotionName = "appkefu_f00" + (emotionIndex + 1);
+            } else if (emotionIndex < 99) {
+                emotionName = "appkefu_f0" + (emotionIndex + 1);
+            } else {
+                emotionName = "appkefu_f" + (emotionIndex + 1);
+            }
+
+            int emotionImageResId = mEmotionMaps.kfEmotionIdsForGridView[emotionIndex];
+            Bitmap emotionBitmap = BitmapFactory.decodeResource(getResources(), emotionImageResId);
+            ImageSpan imageSpan = new ImageSpan(getApplicationContext(), emotionBitmap);
+            SpannableString spannableString = new SpannableString(emotionName);
+            spannableString.setSpan(imageSpan, 0, emotionName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mInputEditText.append(spannableString);
+        }
+    }
+
+    /**
+     * 仅监听输入框mInputEditText焦点事件
+     *
+     * @param view
+     * @param hasFocus
+     */
+    @Override
+    public void onFocusChange(View view, boolean hasFocus) {
+
+        // 隐藏表情和类型扩展
+        if (hasFocus) {
+            mEmotionLayout.setVisibility(View.GONE);
+            mExtensionLayout.setVisibility(View.GONE);
+        }
+    }
+    
+
+    /**
+     * 录音相关
+     */
+    private void initRecorder(Bundle savedInstanceState) {
+        // /////////////////////////////////////////////////////////////////////////
+        m_voiceRecorder = new KFRecorder(this);
+        m_voiceRecorder.setOnStateChangedListener(this);
+        m_voiceRecordReceiver = new RecorderReceiver();
+        m_voiceRecordRemainingTimeCalculator = new KFRemainingTimeCalculator();
+
+        if (savedInstanceState != null) {
+            Bundle recorderState = savedInstanceState.getBundle(BDCoreConstant.RECORDER_STATE_KEY);
+            if (recorderState != null) {
+                m_voiceRecorder.restoreState(recorderState);
+                m_voiceRecordMaxFileSize = recorderState.getLong(BDCoreConstant.MAX_FILE_SIZE_KEY, -1);
+            }
+        }
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        // //////////////////////////////////////////////////////////////////////////
+    }
+
+
+    private BroadcastReceiver m_voiceRecordSDCardMountEventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            m_voiceRecorder.reset();
+        }
+    };
+
+    private class RecorderReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra(KFRecorderService.RECORDER_SERVICE_BROADCAST_STATE)) {
+                boolean isRecording = intent.getBooleanExtra(KFRecorderService.RECORDER_SERVICE_BROADCAST_STATE, false);
+                m_voiceRecorder.setState(isRecording ? KFRecorder.RECORDING_STATE : KFRecorder.IDLE_STATE);
+
+            } else if (intent.hasExtra(KFRecorderService.RECORDER_SERVICE_BROADCAST_ERROR)) {
+                int error = intent.getIntExtra(KFRecorderService.RECORDER_SERVICE_BROADCAST_ERROR, 0);
+                m_voiceRecorder.setError(error);
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (m_voiceRecorder.sampleLength() == 0)
+            return;
+
+        Bundle recorderState = new Bundle();
+        if (m_voiceRecorder.state() != KFRecorder.RECORDING_STATE) {
+            m_voiceRecorder.saveState(recorderState);
+        }
+
+        recorderState.putLong(BDCoreConstant.MAX_FILE_SIZE_KEY, m_voiceRecordMaxFileSize);
+        outState.putBundle(BDCoreConstant.RECORDER_STATE_KEY, recorderState);
+    }
+
+    private void stopAudioPlayback() {
+        Intent i = new Intent("com.android.music.musicservicecommand");
+        i.putExtra("command", "pause");
+        sendBroadcast(i);
+    }
+
+    @SuppressLint("InlinedApi")
+    private void startRecording(String voiceName) {
+
+        m_voiceRecordRemainingTimeCalculator.reset();
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            Logger.i("appkefu_record_voice_insert_sdcard");
+            
+        } else if (!m_voiceRecordRemainingTimeCalculator.diskSpaceAvailable()) {
+            Logger.i("appkefu_record_voice_sdcard_full");
+            
+        } else {
+            stopAudioPlayback();
+            m_voiceRecordRemainingTimeCalculator.setBitRate(BDCoreConstant.BITRATE_AMR);
+            m_voiceRecorder.startRecording(MediaRecorder.OutputFormat.AMR_NB, voiceName,
+                    BDCoreConstant.EXT_AMR, false, m_voiceRecordMaxFileSize);
+
+            if (m_voiceRecordMaxFileSize != -1) {
+                m_voiceRecordRemainingTimeCalculator.setFileSizeLimit(
+                        m_voiceRecorder.sampleFile(), m_voiceRecordMaxFileSize);
+            }
+        }
+
+    }
+
+    private Runnable voiceRecordingRefreshAMPTaskThread = new Runnable() {
+        public void run() {
+            updateRecordVoiceAMP();
+            m_voiceRecordHandler.postDelayed(
+                    voiceRecordingRefreshAMPTaskThread,
+                    VOICE_RECORDING_REFRESH_AMP_INTERVAL);
+        }
+    };
+
+    private void startVoiceRecording() {
+        mIsRecording = true;
+        mRecordVoiceLayout.setVisibility(View.VISIBLE);
+        m_startRecordingTimestamp = System.currentTimeMillis();
+        m_voiceRecordingVoiceFileName = BDCoreUtils.uuid();
+
+        startRecording(m_voiceRecordingVoiceFileName);
+        m_voiceRecordHandler.postDelayed(voiceRecordingRefreshAMPTaskThread, VOICE_RECORDING_REFRESH_AMP_INTERVAL);
+    }
+
+    private void stopVoiceRecording() {
+        mIsRecording = false;
+        mRecordVoiceLayout.setVisibility(View.GONE);
+        m_voiceRecordHandler.removeCallbacks(voiceRecordingRefreshAMPTaskThread);
+        m_voiceRecorder.stop();
+        m_voiceRecorder.reset();
+        mRecordVoiceHintAMPImageView.setImageResource(R.drawable.appkefu_voice_rcd_hint_amp1);
+    }
+
+    private void updateRecordVoiceAMP() {
+        double amp = m_voiceRecorder.getAmplitude();
+        switch ((int) amp) {
+            case 0:
+                mRecordVoiceHintAMPImageView.setImageResource(R.drawable.appkefu_voice_rcd_hint_amp1);
+                break;
+            case 1:
+                mRecordVoiceHintAMPImageView.setImageResource(R.drawable.appkefu_voice_rcd_hint_amp2);
+                break;
+            case 2:
+                mRecordVoiceHintAMPImageView.setImageResource(R.drawable.appkefu_voice_rcd_hint_amp3);
+                break;
+            case 3:
+                mRecordVoiceHintAMPImageView.setImageResource(R.drawable.appkefu_voice_rcd_hint_amp4);
+                break;
+            case 4:
+                mRecordVoiceHintAMPImageView.setImageResource(R.drawable.appkefu_voice_rcd_hint_amp5);
+                break;
+            case 5:
+                mRecordVoiceHintAMPImageView.setImageResource(R.drawable.appkefu_voice_rcd_hint_amp6);
+                break;
+            case 6:
+                mRecordVoiceHintAMPImageView.setImageResource(R.drawable.appkefu_voice_rcd_hint_amp7);
+                break;
+            default:
+                mRecordVoiceHintAMPImageView.setImageResource(R.drawable.appkefu_voice_rcd_hint_amp7);
+                break;
+        }
+    }
+
+    /**
+     * KFRecorder.OnStateChangedListener
+     */
+    @Override
+    public void onStateChanged(int state) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void onError(int error) {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * 上传语音
+     *
+     * @param filePath 路径
+     * @param fileName 文件名
+     */
+    private void uploadVoice(String filePath, String fileName, final int voiceLength) {
+
+        BDCoreApi.uploadVoice(this, filePath, fileName, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    // TODO: 无客服在线时，禁止发送语音
+
+                    // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
+
+                    // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
+                    final String localId = BDCoreUtils.uuid();
+                    String voiceUrl = object.getString("data");
+
+                    // 插入本地消息
+                    mRepository.insertVoiceMessageLocal(mThreadTid, mWorkGroupWid, voiceUrl, localId, mThreadType, voiceLength);
+
+                    // TODO: 2. 同步发送消息(推荐)
+                    BDCoreApi.sendVoiceMessage(ChatWxActivity.this, mThreadTid, voiceUrl, localId, mThreadType, voiceLength, new BaseCallback() {
+
+                        @Override
+                        public void onSuccess(JSONObject object) {
+                            //
+                            try {
+
+                                int status_code = object.getInt("status_code");
+                                if (status_code == 200) {
+
+                                    String localId = object.getJSONObject("data").getString("localId");
+                                    Logger.i("callback localId: " + localId);
+
+                                    // 发送成功
+                                } else {
+
+                                    // 修改本地消息发送状态为error
+                                    mRepository.updateMessageStatusError(localId);
+
+                                    // 发送消息失败
+                                    String message = object.getString("message");
+                                    Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+                            // 发送消息失败
+                            Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+                Toast.makeText(ChatWxActivity.this, "上传语音失败", Toast.LENGTH_LONG).show();
+            }
+
+        });
+    }
+
+    /**
+     * 发送商品消息等
+     * @param custom
+     */
+    private void sendCommodityMessage(String custom) {
+
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertCommodityMessageLocal(mThreadTid, mWorkGroupWid, custom, localId, mThreadType);
+
+        // 发送商品
+        BDCoreApi.sendCommodityMessage(this, mThreadTid, custom, localId, mThreadType, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+            }
+        });
+    }
+
+
 
 }
 

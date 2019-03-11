@@ -1,9 +1,10 @@
 package com.bytedesk.ui.adapter;
 
-
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bytedesk.core.room.entity.MessageEntity;
 import com.bytedesk.core.util.BDCoreConstant;
+import com.bytedesk.core.util.BDFileUtils;
+import com.bytedesk.core.util.JsonCustom;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.listener.ChatItemClickListener;
 import com.bytedesk.ui.util.BDUiUtils;
+import com.bytedesk.ui.util.ExpressionUtil;
+import com.bytedesk.ui.util.KFResUtil;
+import com.google.gson.Gson;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.QMUIRadiusImageView;
@@ -26,21 +32,26 @@ import com.qmuiteam.qmui.widget.textview.QMUILinkTextView;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
+ *
  * @author bytedesk.com on 2017/8/23.
  */
-
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
+public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> implements MediaPlayer.OnErrorListener {
 
     private Context mContext;
     private List<MessageEntity> mMessages;
     private ChatItemClickListener mChatItemClickListener;
 
+    private MediaPlayer m_mediaPlayer;
+    private ChangeImage m_changeVoiceImage;
+
     public ChatAdapter(Context context, ChatItemClickListener chatItemClickListener) {
         mContext = context;
         mMessages = new ArrayList<>();
         mChatItemClickListener = chatItemClickListener;
+
+        m_mediaPlayer = new MediaPlayer();
+        m_mediaPlayer.setOnErrorListener(this);
     }
 
     public void setMessages(final List<MessageEntity> messageEntities) {
@@ -83,6 +94,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             case MessageEntity.TYPE_NOTIFICATION_ID:
                 layout = R.layout.bytedesk_message_item_notification;
                 break;
+            case MessageEntity.TYPE_COMMODITY_ID:
+                layout = R.layout.bytedesk_message_item_commodity;
+                break;
+            case MessageEntity.TYPE_RED_PACKET_ID:
+                layout = R.layout.bytedesk_message_item_red_packet;
+                break;
+            case MessageEntity.TYPE_RED_PACKET_SELF_ID:
+                layout = R.layout.bytedesk_message_item_red_packet_self;
+                break;
             default:
                 layout = R.layout.bytedesk_message_item_text;
         }
@@ -122,8 +142,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         private QMUILinkTextView contentTextView;
         // 图片消息
         private ImageView imageImageView;
+        // 语音消息
+        public TextView voiceTextView;
+        public TextView voiceLengthTextView;
+        public View voiceUnplayedView;
         // 通知消息
         private TextView notificationTextView;
+        // 商品消息
+        private TextView commodityTitleTextView;
         //
         private ProgressBar progressBar;
         private ImageView errorImageView;
@@ -150,6 +176,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 initAvatar();
                 imageImageView = itemView.findViewById(R.id.bytedesk_message_item_image);
             }
+            // TODO: 语音消息
+            else if (messageViewType == MessageEntity.TYPE_VOICE_ID
+                    || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID) {
+                initAvatar();
+                voiceTextView = itemView.findViewById(R.id.bytedesk_message_item_content_voice);
+                voiceLengthTextView = itemView.findViewById(R.id.bytedesk_message_item_voice_length);
+
+                if (messageViewType == MessageEntity.TYPE_VOICE_ID) {
+                    voiceUnplayedView = itemView.findViewById(R.id.bytedesk_message_item_voice_unplayed);
+                }
+            }
             // 问卷消息
             else if (messageViewType == MessageEntity.TYPE_QUESTIONNAIRE_ID) {
                 initAvatar();
@@ -159,17 +196,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             else if (messageViewType == MessageEntity.TYPE_NOTIFICATION_ID) {
                 notificationTextView = itemView.findViewById(R.id.bytedesk_message_item_notification_textview);
             }
+            // 商品消息
+            else if (messageViewType == MessageEntity.TYPE_COMMODITY_ID) {
+                commodityTitleTextView = itemView.findViewById(R.id.bytedesk_message_item_commodity_title_textview);
+            }
 
             // 收到的消息
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_ID
-                    || messageViewType == MessageEntity.TYPE_VOICE_ID) {
+                    || messageViewType == MessageEntity.TYPE_VOICE_ID
+                    || messageViewType == MessageEntity.TYPE_VIDEO_ID) {
                 nicknameTextView = itemView.findViewById(R.id.bytedesk_message_item_nickname);
             }
 
             // 发送的消息
             if (messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID
                     || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID) {
                 progressBar = itemView.findViewById(R.id.bytedesk_message_item_loading);
                 errorImageView = itemView.findViewById(R.id.bytedesk_message_item_error);
@@ -197,7 +240,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 });
 
                 //
-                contentTextView.setText(msgEntity.getContent());
+                String emotionText = ExpressionUtil.CNtoFace(mContext, msgEntity.getContent());
+                String emotionRegex = "appkefu_f0[0-9]{2}|appkefu_f10[0-5]";
+                try {
+                    SpannableString spannableString = ExpressionUtil.getExpressionString(mContext, emotionText, emotionRegex);
+                    contentTextView.setText(spannableString);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+//                contentTextView.setText(msgEntity.getContent());
                 contentTextView.setOnLinkClickListener(new QMUILinkTextView.OnLinkClickListener() {
 
                     @Override
@@ -252,6 +304,41 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     }
                 });
             }
+            // TODO: 语音消息
+            else if (messageViewType == MessageEntity.TYPE_VOICE_ID
+                    || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID) {
+                //
+                Glide.with(mContext).load(msgEntity.getAvatar()).into(avatarImageView);
+                avatarImageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Logger.d("avatar clicked:" + msgEntity.getAvatar());
+                    }
+                });
+                //
+                if (messageViewType == MessageEntity.TYPE_VOICE_ID) {
+                    voiceTextView.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.appkefu_chatfrom_voice_playing, 0);
+                    if (msgEntity.isPlayed()) {
+                        voiceUnplayedView.setVisibility(View.GONE);
+                    }
+                } else {
+                    voiceTextView.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.appkefu_chatto_voice_playing, 0);
+                }
+                int width = 40* msgEntity.getLength() > 300 ? 300 : 40*msgEntity.getLength();
+                voiceTextView.setWidth(width);
+                voiceLengthTextView.setText(msgEntity.getLength()+"\"");
+                // TODO: 点击播放语音
+                voiceTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(mContext,"点击播放语音：" + msgEntity.getVoiceUrl() + " length:" + msgEntity.getLength(), Toast.LENGTH_LONG).show();
+                        // TODO: 本地播放语音
+                        boolean isSend = (messageViewType == MessageEntity.TYPE_VOICE_SELF_ID);
+                        onVoiceMessageClicked((TextView)view, isSend, msgEntity.getVoiceUrl());
+                        // TODO: 调用接口通知服务器语音已经播放
+                    }
+                });
+            }
             // TODO: 问卷消息
             else if (messageViewType == MessageEntity.TYPE_QUESTIONNAIRE_ID) {
                 contentTextView.setText(msgEntity.getContent());
@@ -260,17 +347,24 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             else if (messageViewType == MessageEntity.TYPE_NOTIFICATION_ID) {
                 notificationTextView.setText(msgEntity.getContent());
             }
+            // 商品消息
+            else if (messageViewType == MessageEntity.TYPE_COMMODITY_ID) {
+                JsonCustom jsonCustom = new Gson().fromJson(msgEntity.getContent(), JsonCustom.class);
+                commodityTitleTextView.setText(jsonCustom.getTitle());
+            }
 
             // 收到的消息
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_ID
-                    || messageViewType == MessageEntity.TYPE_VOICE_ID) {
+                    || messageViewType == MessageEntity.TYPE_VOICE_ID
+                    || messageViewType == MessageEntity.TYPE_VIDEO_ID) {
                 nicknameTextView.setText(msgEntity.getNickname());
             }
 
             // 发送的消息
             if (messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID
                     || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID) {
                 //
                 if (msgEntity.getStatus() == null) {
@@ -291,7 +385,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     errorImageView.setVisibility(View.GONE);
                 }
             }
-
         }
 
         @Override
@@ -314,7 +407,130 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             avatarImageView.setTouchSelectModeEnabled(true);
             avatarImageView.setCircle(true);
         }
+    }
 
+    /**
+     * 响应用户点击语音，播放语音
+     *
+     * @param textView
+     * @param isSend
+     * @param voiceUrl
+     */
+    private void onVoiceMessageClicked(TextView textView, boolean isSend, String voiceUrl) {
+
+        if(m_changeVoiceImage==null) {
+            m_changeVoiceImage = new ChangeImage(textView, isSend, 1);
+            textView.postDelayed(m_changeVoiceImage, 500);
+        }
+        else {
+            if(m_changeVoiceImage.getView().equals(textView)){
+                m_changeVoiceImage.stop();
+                m_mediaPlayer.stop();
+                m_changeVoiceImage=null;
+                return;
+            }else{
+                m_changeVoiceImage.stop();
+                m_changeVoiceImage = new ChangeImage(textView, isSend, 1);
+                textView.postDelayed(m_changeVoiceImage, 500);
+            }
+        }
+        playMusic(voiceUrl);
+        // 隐藏键盘
+        BDUiUtils.showSysSoftKeybord(mContext, false);
+//        ((ChatWxActivity) mContext).mEmotionLayout.setVisibility(View.GONE);
+//        ((ChatWxActivity) mContext).mExtensionLayout.setVisibility(View.GONE);
+    }
+
+
+    private final class ChangeImage implements Runnable {
+
+        private TextView mTextView;
+        private Boolean isSend;
+        private int currentImg;
+
+        ChangeImage(TextView tv, Boolean isTo, int currentImg) {
+            this.mTextView = tv;
+            this.isSend = isTo;
+            this.currentImg = currentImg;
+        }
+
+        public TextView getView() {
+            return mTextView;
+        }
+
+        @Override
+        public void run() {
+            if (!isSend) {
+                mTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        KFResUtil.getResofR(mContext).getDrawable(
+                                "appkefu_chatfrom_voice_playing_f" + (currentImg++ %3 + 1)),
+                        0,0,0);
+            } else {
+                mTextView.setCompoundDrawablesWithIntrinsicBounds(0,0,
+                        KFResUtil.getResofR(mContext).getDrawable(
+                                "appkefu_chatto_voice_playing_f" + (currentImg++ % 3 + 1)), 0);
+            }
+            mTextView.postDelayed(this, 1000);
+        }
+
+        public void stop() {
+            mTextView.removeCallbacks(this);
+            if (!isSend) {
+                mTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        KFResUtil.getResofR(mContext).getDrawable("appkefu_chatfrom_voice_playing"), 0, 0, 0);
+            } else {
+                mTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                        KFResUtil.getResofR(mContext).getDrawable("appkefu_chatto_voice_playing"), 0);
+            }
+        }
+    }
+
+    private void playMusic(String voiceUrl) {
+
+        // 将voiceUrl转为本地filePath
+        String voiceFilePath = BDFileUtils.getVoiceFilePathFromUrl(voiceUrl);
+
+        try {
+
+            if (m_mediaPlayer == null) {
+                m_mediaPlayer = new MediaPlayer();
+                m_mediaPlayer.setOnErrorListener(this);
+            }
+
+            if (m_mediaPlayer.isPlaying()) {
+                m_mediaPlayer.stop();
+            }
+
+            m_mediaPlayer.reset();
+            m_mediaPlayer.setDataSource(voiceFilePath);
+            m_mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer player) {
+                    // TODO Auto-generated method stub
+                    player.start();
+                    player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        public void onCompletion(MediaPlayer mp) {
+                            // mp.release();
+                            if(null != m_changeVoiceImage)
+                                m_changeVoiceImage.stop();
+                        }
+                    });
+                }
+            });
+
+            m_mediaPlayer.prepareAsync();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public boolean onError(MediaPlayer player, int what, int extra) {
+        // TODO Auto-generated method stub
+        Logger.d("mediaplayer error what:" + what + " extra:" + extra);
+        m_mediaPlayer.reset();
+        return false;
     }
 
 }

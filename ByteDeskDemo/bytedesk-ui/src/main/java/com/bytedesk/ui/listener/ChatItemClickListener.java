@@ -7,7 +7,9 @@ package com.bytedesk.ui.listener;
 public interface ChatItemClickListener {
 
 //    void onMessageTextItemClick(int position);
+
     void onMessageImageItemClick(String imageUrl);
+
 //    void onMessageVoiceItemClick(int position);
 
 }

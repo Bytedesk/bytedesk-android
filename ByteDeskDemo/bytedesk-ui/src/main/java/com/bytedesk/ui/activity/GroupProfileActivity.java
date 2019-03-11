@@ -58,6 +58,7 @@ public class GroupProfileActivity extends AppCompatActivity {
     private QMUICommonListItemView dismissItem;
     private QMUICommonListItemView clearMessageItem;
     private QMUICommonListItemView makeTopItem;
+    private QMUICommonListItemView unDisturbItem;
 
     private BDPreferenceManager mPreferenceManager;
 
@@ -327,6 +328,9 @@ public class GroupProfileActivity extends AppCompatActivity {
                     // 会话是否被置顶
                     boolean isTopThread = dataObject.getBoolean("isTopThread");
                     makeTopItem.getSwitch().setChecked(isTopThread);
+                    // 会话是否设置免打扰
+                    boolean isNoDisturb = dataObject.getBoolean("isNoDisturb");
+                    unDisturbItem.getSwitch().setChecked(isNoDisturb);
                     //
                     String groupNickname = groupObject.getString("nickname");
                     nicknameItem.setDetailText(groupNickname);
@@ -484,24 +488,12 @@ public class GroupProfileActivity extends AppCompatActivity {
         makeTopItem.getSwitch().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                //
                 if (isChecked) {
-
                     BDCoreApi.markTopThread(GroupProfileActivity.this, mTid, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
-
-                            try {
-
-                                JSONObject dataObject = object.getJSONObject("data");
-                                String message = dataObject.getString("message");
-
-                                Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
 
                         }
 
@@ -510,23 +502,46 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                         }
                     });
-
                 } else {
-
                     BDCoreApi.unmarkTopThread(GroupProfileActivity.this, mTid, new BaseCallback() {
                         @Override
                         public void onSuccess(JSONObject object) {
 
-                            try {
+                        }
 
-                                JSONObject dataObject = object.getJSONObject("data");
-                                String message = dataObject.getString("message");
+                        @Override
+                        public void onError(JSONObject object) {
 
-                                Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        });
 
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+        unDisturbItem = mGroupListView.createItemView("消息免打扰");
+        unDisturbItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_SWITCH);
+        unDisturbItem.getSwitch().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                //
+                if (isChecked) {
+                    //
+                    BDCoreApi.markNoDisturbThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+                        @Override
+                        public void onSuccess(JSONObject object) {
+
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+
+                        }
+                    });
+                } else {
+                    //
+                    BDCoreApi.unmarkNoDisturbThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+                        @Override
+                        public void onSuccess(JSONObject object) {
 
                         }
 
@@ -540,7 +555,14 @@ public class GroupProfileActivity extends AppCompatActivity {
         });
 
         final Context context = this;
-        QMUIGroupListView.newSection(this).addItemView(clearMessageItem, new View.OnClickListener() {
+        QMUIGroupListView.newSection(this).addItemView(unDisturbItem, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Logger.i("消息免打扰");
+
+            }
+        }).addItemView(clearMessageItem, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Logger.d("清空聊天记录");
@@ -563,17 +585,6 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                             @Override
                             public void onSuccess(JSONObject object) {
-
-                                try {
-
-                                    JSONObject dataObject = object.getJSONObject("data");
-                                    String message = dataObject.getString("message");
-
-                                    Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
 
                             }
 
@@ -598,17 +609,6 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                 @Override
                 public void onSuccess(JSONObject object) {
-
-                    try {
-
-                        JSONObject dataObject = object.getJSONObject("data");
-                        String message = dataObject.getString("message");
-
-                        Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
 
                 }
 
@@ -656,58 +656,72 @@ public class GroupProfileActivity extends AppCompatActivity {
                                 // 转交群
                                 Logger.d("转交群");
 
-                                BDCoreApi.transferGroup(GroupProfileActivity.this, uid, mGid, new BaseCallback() {
+                                new QMUIDialog.CheckBoxMessageDialogBuilder(GroupProfileActivity.this)
+                                    .setTitle("提示")
+                                    .setMessage("确定要转接群？")
+                                    .setChecked(true)
+                                    .addAction("取消", new QMUIDialogAction.ActionListener() {
+                                        @Override
+                                        public void onClick(QMUIDialog dialog, int index) {
 
-                                    @Override
-                                    public void onSuccess(JSONObject object) {
+                                            BDCoreApi.transferGroup(GroupProfileActivity.this, uid, mGid, new BaseCallback() {
 
-                                        try {
+                                                @Override
+                                                public void onSuccess(JSONObject object) {
 
-                                            JSONObject dataObject = object.getJSONObject("data");
-                                            String message = dataObject.getString("message");
+                                                }
 
-                                            Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                                                @Override
+                                                public void onError(JSONObject object) {
 
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
+                                                }
+                                            });
+
+                                            dialog.dismiss();
                                         }
-
-                                    }
-
-                                    @Override
-                                    public void onError(JSONObject object) {
-
-                                    }
-                                });
+                                    })
+                                    .addAction("退出", new QMUIDialogAction.ActionListener() {
+                                        @Override
+                                        public void onClick(QMUIDialog dialog, int index) {
+                                            dialog.dismiss();
+                                        }
+                                    }).show();
 
                             } else if (index == 1) {
                                 // 踢出群
                                 Logger.d("踢出群");
 
-                                BDCoreApi.kickGroupMember(GroupProfileActivity.this, uid, mGid, new BaseCallback() {
-                                    @Override
-                                    public void onSuccess(JSONObject object) {
+                                new QMUIDialog.CheckBoxMessageDialogBuilder(GroupProfileActivity.this)
+                                    .setTitle("提示")
+                                    .setMessage("确定要踢出群？")
+                                    .setChecked(true)
+                                    .addAction("取消", new QMUIDialogAction.ActionListener() {
+                                        @Override
+                                        public void onClick(QMUIDialog dialog, int index) {
 
-                                        // TODO: 从本地删除，更新UI
+                                            BDCoreApi.kickGroupMember(GroupProfileActivity.this, uid, mGid, new BaseCallback() {
+                                                @Override
+                                                public void onSuccess(JSONObject object) {
 
-                                        try {
+                                                    // TODO: 从本地删除，更新UI
 
-                                            JSONObject dataObject = object.getJSONObject("data");
-                                            String message = dataObject.getString("message");
+                                                }
 
-                                            Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                                                @Override
+                                                public void onError(JSONObject object) {
 
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
+                                                }
+                                            });
+
+                                            dialog.dismiss();
                                         }
-
-                                    }
-
-                                    @Override
-                                    public void onError(JSONObject object) {
-
-                                    }
-                                });
+                                    })
+                                    .addAction("退出", new QMUIDialogAction.ActionListener() {
+                                        @Override
+                                        public void onClick(QMUIDialog dialog, int index) {
+                                            dialog.dismiss();
+                                        }
+                                    }).show();
 
                             }
 
@@ -732,6 +746,7 @@ public class GroupProfileActivity extends AppCompatActivity {
 
 //        mMembersFloatLayout.addView(avatarImageView, lp);
 //        mMembersFloatLayout.addView(linearLayout, lp);
+
         mMembersFloatLayout.addView(linearLayout);
     }
 
