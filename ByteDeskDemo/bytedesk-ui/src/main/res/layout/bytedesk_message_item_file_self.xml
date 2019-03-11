@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <!--红包布局-->
     <LinearLayout
         android:id="@+id/bytedesk_message_item_timestamp_layout"
         android:layout_width="fill_parent"
@@ -41,10 +40,10 @@
             android:src="@drawable/bytedesk_sex_male"/>
 
         <ImageView
-            android:id="@+id/bytedesk_message_item_image"
+            android:id="@+id/bytedesk_message_item_file"
             style="@style/bytedesk_chat_content_date_style"
             android:layout_width="150sp"
-            android:layout_height="200sp"
+            android:layout_height="80sp"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/bytedesk_message_item_header"
             android:background="@drawable/bytedesk_message_item_background_self" />

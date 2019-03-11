@@ -1,6 +1,7 @@
 package com.bytedesk.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,7 @@ import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,6 +21,7 @@ import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDFileUtils;
 import com.bytedesk.core.util.JsonCustom;
 import com.bytedesk.ui.R;
+import com.bytedesk.ui.activity.BigImageViewActivity;
 import com.bytedesk.ui.listener.ChatItemClickListener;
 import com.bytedesk.ui.util.BDUiUtils;
 import com.bytedesk.ui.util.ExpressionUtil;
@@ -103,6 +106,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             case MessageEntity.TYPE_RED_PACKET_SELF_ID:
                 layout = R.layout.bytedesk_message_item_red_packet_self;
                 break;
+            case MessageEntity.TYPE_FILE_ID:
+                layout = R.layout.bytedesk_message_item_file;
+                break;
+            case MessageEntity.TYPE_FILE_SELF_ID:
+                layout = R.layout.bytedesk_message_item_file_self;
+                break;
             default:
                 layout = R.layout.bytedesk_message_item_text;
         }
@@ -150,6 +159,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         private TextView notificationTextView;
         // 商品消息
         private TextView commodityTitleTextView;
+        private TextView commodityPriceTextView;
+        private ImageView commodityImageView;
+        private Button commoditySendButton;
+        // 文件消息
+        private ImageView fileImageView;
+
         //
         private ProgressBar progressBar;
         private ImageView errorImageView;
@@ -198,14 +213,32 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             }
             // 商品消息
             else if (messageViewType == MessageEntity.TYPE_COMMODITY_ID) {
-                commodityTitleTextView = itemView.findViewById(R.id.bytedesk_message_item_commodity_title_textview);
+                commodityTitleTextView = itemView.findViewById(R.id.bytedesk_commodity_title_textview);
+                commodityPriceTextView = itemView.findViewById(R.id.bytedesk_commodity_price_textview);
+                commodityImageView = itemView.findViewById(R.id.bytedesk_commodity_imageview);
+                commoditySendButton = itemView.findViewById(R.id.bytedesk_commodity_send_button);
+            }
+            // 红包消息
+            else if (messageViewType == MessageEntity.TYPE_RED_PACKET_ID
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_SELF_ID) {
+                initAvatar();
+                // TODO
+            }
+            // 文件消息
+            else if (messageViewType == MessageEntity.TYPE_FILE_ID
+                    || messageViewType == MessageEntity.TYPE_FILE_SELF_ID) {
+                initAvatar();
+                fileImageView = itemView.findViewById(R.id.bytedesk_message_item_file);
+                // TODO
             }
 
             // 收到的消息
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_ID
                     || messageViewType == MessageEntity.TYPE_VOICE_ID
-                    || messageViewType == MessageEntity.TYPE_VIDEO_ID) {
+                    || messageViewType == MessageEntity.TYPE_VIDEO_ID
+                    || messageViewType == MessageEntity.TYPE_FILE_ID
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_ID) {
                 nicknameTextView = itemView.findViewById(R.id.bytedesk_message_item_nickname);
             }
 
@@ -213,7 +246,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             if (messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID
                     || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID
-                    || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID) {
+                    || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_FILE_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_SELF_ID) {
                 progressBar = itemView.findViewById(R.id.bytedesk_message_item_loading);
                 errorImageView = itemView.findViewById(R.id.bytedesk_message_item_error);
             }
@@ -349,15 +384,64 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             }
             // 商品消息
             else if (messageViewType == MessageEntity.TYPE_COMMODITY_ID) {
-                JsonCustom jsonCustom = new Gson().fromJson(msgEntity.getContent(), JsonCustom.class);
+                final JsonCustom jsonCustom = new Gson().fromJson(msgEntity.getContent(), JsonCustom.class);
                 commodityTitleTextView.setText(jsonCustom.getTitle());
+                commodityPriceTextView.setText("¥" + jsonCustom.getPrice());
+                //
+                Glide.with(mContext).load(jsonCustom.getImageUrl()).into(commodityImageView);
+                commodityImageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Logger.d("点击商品图片: "+ jsonCustom.getUrl());
+                        Intent intent = new Intent(mContext, BigImageViewActivity.class);
+                        intent.putExtra("image_url", jsonCustom.getUrl());
+                        mContext.startActivity(intent);
+                    }
+                });
+                //
+                commoditySendButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Logger.i("发送商品信息");
+                        // TODO
+                    }
+                });
+            }
+            // 红包消息
+            else if (messageViewType == MessageEntity.TYPE_RED_PACKET_ID
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_SELF_ID) {
+                //
+                Glide.with(mContext).load(msgEntity.getAvatar()).into(avatarImageView);
+                avatarImageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Logger.d("avatar clicked:" + msgEntity.getAvatar());
+                    }
+                });
+                // TODO: 红包xml layout初始化
+
+            }
+            // 文件消息
+            else if (messageViewType == MessageEntity.TYPE_FILE_ID
+                    || messageViewType == MessageEntity.TYPE_FILE_SELF_ID) {
+                //
+                Glide.with(mContext).load(msgEntity.getAvatar()).into(avatarImageView);
+                avatarImageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Logger.d("avatar clicked:" + msgEntity.getAvatar());
+                    }
+                });
+                //
             }
 
             // 收到的消息
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_ID
                     || messageViewType == MessageEntity.TYPE_VOICE_ID
-                    || messageViewType == MessageEntity.TYPE_VIDEO_ID) {
+                    || messageViewType == MessageEntity.TYPE_VIDEO_ID
+                    || messageViewType == MessageEntity.TYPE_FILE_ID
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_ID) {
                 nicknameTextView.setText(msgEntity.getNickname());
             }
 
@@ -365,7 +449,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             if (messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID
                     || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID
-                    || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID) {
+                    || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_FILE_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_SELF_ID) {
                 //
                 if (msgEntity.getStatus() == null) {
                     return;

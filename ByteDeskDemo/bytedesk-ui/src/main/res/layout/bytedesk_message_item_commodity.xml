@@ -22,20 +22,61 @@
 
     </LinearLayout>
 
+    <!-- 商品信息 -->
     <LinearLayout
-        android:id="@+id/bytedesk_message_item_commodity_layout"
-        android:layout_width="fill_parent"
+        android:id="@+id/bytedesk_commodity_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical" >
+        android:layout_margin="5dp"
+        android:background="@drawable/bytedesk_commodity_layout_background">
 
-        <TextView
-            android:id="@+id/bytedesk_message_item_commodity_title_textview"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/bytedesk_commodity_imageview"
+            android:layout_width="70dp"
+            android:layout_height="70dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/bytedesk_timestamp_margin_top"
-            android:textSize="10dp"
-            android:text="商品"/>
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/bytedesk_commodity_imageview" >
+
+            <TextView
+                android:id="@+id/bytedesk_commodity_title_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="这里是上面简介"
+                android:textColor="#555555"
+                android:textSize="14dp" />
+
+            <LinearLayout
+                android:id="@+id/bytedesk_commodity_price_btn_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/bytedesk_commodity_title_textview">
+
+                <TextView
+                    android:id="@+id/bytedesk_commodity_price_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="价格"
+                    android:textColor="#ff679a"
+                    android:textSize="12dp"/>
+
+                <Button
+                    android:id="@+id/bytedesk_commodity_send_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="20dp"
+                    android:background="@drawable/bytedesk_chat_input_background"
+                    android:text="发送链接"
+                    android:textColor="#555555"
+                    android:textSize="12dp"/>
+            </LinearLayout>
+
+        </RelativeLayout>
 
     </LinearLayout>
 

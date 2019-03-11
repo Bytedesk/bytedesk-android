@@ -28,6 +28,7 @@ public class BDUiConstant {
     //
     public static final int  SELECT_PIC_BY_TAKE_PHOTO = 2;
     public static final int  SELECT_PIC_BY_PICK_PHOTO = 3;
+    public static final int SELECT_FILE = 4;
     //
 
 

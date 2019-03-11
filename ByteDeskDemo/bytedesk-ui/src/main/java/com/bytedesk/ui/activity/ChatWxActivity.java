@@ -2,6 +2,7 @@ package com.bytedesk.ui.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.arch.lifecycle.Observer;
@@ -16,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,6 +32,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
@@ -210,7 +213,7 @@ public class ChatWxActivity extends AppCompatActivity
     private BDRepository mRepository;
     private final Handler mHandler = new Handler();
     //
-//    private JsonCustom mJsonCustom;
+    private String mCustom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,11 +260,9 @@ public class ChatWxActivity extends AppCompatActivity
             mUid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
             mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
             //
-            String custom = getIntent().getStringExtra(BDUiConstant.EXTRA_CUSTOM);
-            if (custom != null && custom.trim().length() > 0) {
-//                mJsonCustom = new Gson().fromJson(custom, JsonCustom.class);
-//                Logger.i("custom type: " + mJsonCustom.getType());
-                sendCommodityMessage(custom);
+            mCustom = getIntent().getStringExtra(BDUiConstant.EXTRA_CUSTOM);
+            if (mCustom != null && mCustom.trim().length() > 0) {
+                sendCommodityMessage(mCustom);
             }
         }
 
@@ -423,7 +424,6 @@ public class ChatWxActivity extends AppCompatActivity
                                 String localId = object.getJSONObject("data").getString("localId");
                                 Logger.i("callback localId: " + localId);
 
-                                // 发送成功
                             } else {
 
                                 // 修改本地消息发送状态为error
@@ -495,19 +495,52 @@ public class ChatWxActivity extends AppCompatActivity
 
         } else if (view.getId() == R.id.appkefu_plus_show_red_packet_btn) {
 
-            Toast.makeText(this, "红包", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, "红包", Toast.LENGTH_LONG).show();
+
+            final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatWxActivity.this);
+            builder.setTitle("发送红包")
+                    .setPlaceholder("在此输入金额")
+                    .setInputType(InputType.TYPE_CLASS_TEXT)
+                    .addAction("取消", new QMUIDialogAction.ActionListener() {
+                        @Override
+                        public void onClick(QMUIDialog dialog, int index) {dialog.dismiss();
+                        }
+                    })
+                    .addAction("确定", new QMUIDialogAction.ActionListener() {
+                        @Override
+                        public void onClick(QMUIDialog dialog, int index) {
+                            final CharSequence text = builder.getEditText().getText();
+                            if (text != null && text.length() > 0) {
+
+                                // TODO: 检查是否有效数字？
+                                sendRedPacketMessage(text.toString());
+
+                                dialog.dismiss();
+                            } else {
+                                Toast.makeText(ChatWxActivity.this, "请填入金额", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    })
+                    .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+
 
         } else if (view.getId() == R.id.appkefu_plus_file_btn) {
 
-            Toast.makeText(this, "文件", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            startActivityForResult(Intent.createChooser(intent, "选择文件"), BDUiConstant.SELECT_FILE);
 
         } else if (view.getId() == R.id.appkefu_read_destroy_btn) {
 
-            Toast.makeText(this, "阅后即焚", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "TODO:阅后即焚", Toast.LENGTH_LONG).show();
 
         } else if (view.getId() == R.id.appkefu_plus_shop_btn) {
 
-            Toast.makeText(this, "商品", Toast.LENGTH_LONG).show();
+            // TODO: 自定义跳转页面，选择商品，发送
+            if (mCustom != null && mCustom.trim().length() > 0) {
+                sendCommodityMessage(mCustom);
+            }
         }
     }
 
@@ -1530,90 +1563,6 @@ public class ChatWxActivity extends AppCompatActivity
 
 
     /**
-     * 上传并发送图片
-     *
-     *  {"message":"upload image",
-     *  "status_code":200,
-     *  "data":"http://chainsnow.oss-cn-shenzhen.aliyuncs.com/images/201808281417141_20180829105542.jpg"}
-     *
-     * @param filePath
-     * @param fileName
-     */
-    private void uploadImage(String filePath, String fileName) {
-
-        BDCoreApi.uploadImage(this, filePath, fileName, new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-
-                try {
-
-                    // TODO: 无客服在线时，禁止发送图片
-
-                    // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
-
-                    // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
-                    final String localId = BDCoreUtils.uuid();
-
-                    String imageUrl = object.getString("data");
-
-                    // 插入本地消息
-                    mRepository.insertImageMessageLocal(mThreadTid, mWorkGroupWid, imageUrl, localId, mThreadType);
-
-                    // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-                    // 1. 异步发送图片消息
-                    // BDMqttApi.sendImageMessage(ChatWxActivity.this, mThreadTid, image_url, localId, mThreadType);
-
-                    // 2. 同步发送图片消息(推荐)
-                    BDCoreApi.sendImageMessage(ChatWxActivity.this, mThreadTid, imageUrl, localId, mThreadType, new BaseCallback() {
-
-                        @Override
-                        public void onSuccess(JSONObject object) {
-                            //
-                            try {
-
-                                int status_code = object.getInt("status_code");
-                                if (status_code == 200) {
-
-                                    String localId = object.getJSONObject("data").getString("localId");
-                                    Logger.i("callback localId: " + localId);
-
-                                    // 发送成功
-                                } else {
-
-                                    // 修改本地消息发送状态为error
-                                    mRepository.updateMessageStatusError(localId);
-
-                                    // 发送消息失败
-                                    String message = object.getString("message");
-                                    Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onError(JSONObject object) {
-                            // 发送消息失败
-                            Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-                Toast.makeText(getApplicationContext(), "上传图片失败", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
      * 监听 EventBus 广播消息
      * TODO: 收到消息之后，如果消息属于当前页面，可处理阅后即焚消息
      *
@@ -2005,8 +1954,123 @@ public class ChatWxActivity extends AppCompatActivity
         // TODO Auto-generated method stub
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == BDUiConstant.SELECT_FILE) {
+            //
+            if (resultCode == Activity.RESULT_OK) {
+
+                String filePath;
+
+                Uri uri = data.getData();
+                if ("file".equalsIgnoreCase(uri.getScheme())){//使用第三方应用打开
+                    filePath = uri.getPath();
+                    Toast.makeText(this,filePath,Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
+                    filePath = BDFileUtils.getPath(ChatWxActivity.this, uri);
+                    Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
+                } else {//4.4以下下系统调用方法
+                    filePath = BDFileUtils.getRealPathFromURI(ChatWxActivity.this, uri);
+                    Toast.makeText(ChatWxActivity.this, filePath, Toast.LENGTH_SHORT).show();
+                }
+
+                Logger.i("filePath:" + filePath);
+
+                // TODO: 上传、发送图片
+                uploadFile(filePath, BDCoreUtils.uuid());
+            }
+        }
+    }
+
     /**
-     * 上传语音
+     * 上传并发送图片
+     *
+     *  {"message":"upload image",
+     *  "status_code":200,
+     *  "data":"http://chainsnow.oss-cn-shenzhen.aliyuncs.com/images/201808281417141_20180829105542.jpg"}
+     *
+     * @param filePath
+     * @param fileName
+     */
+    private void uploadImage(String filePath, String fileName) {
+
+        BDCoreApi.uploadImage(this, filePath, fileName, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    // TODO: 无客服在线时，禁止发送图片
+
+                    // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
+
+                    // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
+                    final String localId = BDCoreUtils.uuid();
+
+                    String imageUrl = object.getString("data");
+
+                    // 插入本地消息
+                    mRepository.insertImageMessageLocal(mThreadTid, mWorkGroupWid, imageUrl, localId, mThreadType);
+
+                    // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
+                    // 1. 异步发送图片消息
+                    // BDMqttApi.sendImageMessage(ChatWxActivity.this, mThreadTid, image_url, localId, mThreadType);
+
+                    // 2. 同步发送图片消息(推荐)
+                    BDCoreApi.sendImageMessage(ChatWxActivity.this, mThreadTid, imageUrl, localId, mThreadType, new BaseCallback() {
+
+                        @Override
+                        public void onSuccess(JSONObject object) {
+                            //
+                            try {
+
+                                int status_code = object.getInt("status_code");
+                                if (status_code == 200) {
+
+                                    String localId = object.getJSONObject("data").getString("localId");
+                                    Logger.i("callback localId: " + localId);
+
+                                    // 发送成功
+                                } else {
+
+                                    // 修改本地消息发送状态为error
+                                    mRepository.updateMessageStatusError(localId);
+
+                                    // 发送消息失败
+                                    String message = object.getString("message");
+                                    Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+                            // 发送消息失败
+                            Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                Toast.makeText(getApplicationContext(), "上传图片失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * 上传并发送语音
      *
      * @param filePath 路径
      * @param fileName 文件名
@@ -2083,6 +2147,103 @@ public class ChatWxActivity extends AppCompatActivity
     }
 
     /**
+     * 上传并发送文件
+     *
+     * @param filePath
+     * @param fileName
+     */
+    private void uploadFile(String filePath, String fileName) {
+
+        BDCoreApi.uploadFile(this, filePath, fileName, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+                    // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
+                    final String localId = BDCoreUtils.uuid();
+                    String fileUrl  = object.getString("data");
+
+                    // 插入本地消息
+                    mRepository.insertFileMessageLocal(mThreadTid, mWorkGroupWid, fileUrl, localId, mThreadType);
+
+                    // 同步发送文件消息
+                    BDCoreApi.sendFileMessage(ChatWxActivity.this, mThreadTid, fileUrl, localId, mThreadType, new BaseCallback() {
+
+                        @Override
+                        public void onSuccess(JSONObject object) {
+                            //
+                            try {
+
+                                int status_code = object.getInt("status_code");
+                                if (status_code == 200) {
+
+                                    String localId = object.getJSONObject("data").getString("localId");
+                                    Logger.i("callback localId: " + localId);
+
+                                } else {
+                                    // 修改本地消息发送状态为error
+                                    mRepository.updateMessageStatusError(localId);
+
+                                    // 发送消息失败
+                                    String message = object.getString("message");
+                                    Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+                            // 发送消息失败
+                            Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+            }
+        });
+    }
+
+    /**
+     * 发送红包消息
+     * @param money 金额
+     */
+    private void sendRedPacketMessage(String money) {
+
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertRedPacketMessageLocal(mThreadTid, mWorkGroupWid, money, localId, mThreadType);
+
+        //
+        BDCoreApi.sendRedPacketMessage(this, mThreadTid, money, localId, mThreadType, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+            }
+        });
+
+    }
+
+    /**
      * 发送商品消息等
      * @param custom
      */
@@ -2107,7 +2268,6 @@ public class ChatWxActivity extends AppCompatActivity
             }
         });
     }
-
 
 
 }
