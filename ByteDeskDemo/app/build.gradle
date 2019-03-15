@@ -8,8 +8,8 @@ android {
         applicationId "com.bytedesk.demo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 53
-        versionName "1.5.3"
+        versionCode 54
+        versionName "1.5.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         // Error:(28, 17) 警告: Schema export directory is not provided to the annotation processor
@@ -49,8 +49,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.bytedesk:core:1.5.3'
-    implementation 'com.bytedesk:ui:1.5.3'
+    implementation 'com.bytedesk:core:1.5.4'
+    implementation 'com.bytedesk:ui:1.5.4'
 
     // Butterknife
     // http://jakewharton.github.io/butterknife/

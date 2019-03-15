@@ -394,7 +394,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     public void onClick(View view) {
                         Logger.d("点击商品图片: "+ jsonCustom.getUrl());
                         Intent intent = new Intent(mContext, BigImageViewActivity.class);
-                        intent.putExtra("image_url", jsonCustom.getUrl());
+                        intent.putExtra("image_url", jsonCustom.getImageUrl());
                         mContext.startActivity(intent);
                     }
                 });

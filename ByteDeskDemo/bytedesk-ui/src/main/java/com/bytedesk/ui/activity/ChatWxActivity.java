@@ -2240,7 +2240,6 @@ public class ChatWxActivity extends AppCompatActivity
 
             }
         });
-
     }
 
     /**
