@@ -119,7 +119,7 @@ public class ChatActivity extends AppCompatActivity
     private BDRepository mRepository;
     private final Handler mHandler = new Handler();
     //
-//    private JsonCustom mJsonCustom;
+    private String mCustom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,10 +131,12 @@ public class ChatActivity extends AppCompatActivity
             //
             mIsVisitor = getIntent().getBooleanExtra(BDUiConstant.EXTRA_VISITOR, true);
             mThreadType = getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TYPE);
+            mCustom = getIntent().getStringExtra(BDUiConstant.EXTRA_CUSTOM);
             //
             mPreferenceManager = BDPreferenceManager.getInstance(this);
             mPreferenceManager.setVisitor(mIsVisitor);
             mRepository = BDRepository.getInstance(this);
+
             //
             if (mIsVisitor) {
                 Logger.i("访客会话");
@@ -157,21 +159,21 @@ public class ChatActivity extends AppCompatActivity
                 Logger.i("一对一会话");
 
                 mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+                if (mCustom != null && mCustom.trim().length() > 0) {
+                    sendCommodityMessage(mCustom);
+                }
             } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
                 Logger.i("群组会话");
 
                 mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+                if (mCustom != null && mCustom.trim().length() > 0) {
+                    sendCommodityMessage(mCustom);
+                }
             }
             //
             mUid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
             mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
-            //
-            String custom = getIntent().getStringExtra(BDUiConstant.EXTRA_CUSTOM);
-            if (custom != null && custom.trim().length() > 0) {
-//                mJsonCustom = new Gson().fromJson(custom, JsonCustom.class);
-//                Logger.i("custom type: " + mJsonCustom.getType());
-                sendCommodityMessage(custom);
-            }
+
         }
 
         //
@@ -784,6 +786,10 @@ public class ChatActivity extends AppCompatActivity
                 String threadTopic = "thread/" + mThreadTid;
                 BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
+                if (mCustom != null && mCustom.trim().length() > 0) {
+                    sendCommodityMessage(mCustom);
+                }
+
             } else if (status_code == 202) {
                 // 提示排队中
 
@@ -793,6 +799,10 @@ public class ChatActivity extends AppCompatActivity
                 mThreadTid = message.getJSONObject("thread").getString("tid");
                 String threadTopic = "thread/" + mThreadTid;
                 BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
+
+                if (mCustom != null && mCustom.trim().length() > 0) {
+                    sendCommodityMessage(mCustom);
+                }
 
             } else if (status_code == 203) {
                 // 当前非工作时间，请自助查询或留言
