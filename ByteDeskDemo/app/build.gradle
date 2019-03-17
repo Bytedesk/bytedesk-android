@@ -8,18 +8,11 @@ android {
         applicationId "com.bytedesk.demo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 54
-        versionName "1.5.4"
+        versionCode 55
+        versionName "1.5.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        // Error:(28, 17) 警告: Schema export directory is not provided to the annotation processor
-        // so we cannot export the schema. You can either provide `room.schemaLocation` annotation
-        // processor argument OR set exportSchema to false.
-//        javaCompileOptions {
-//            annotationProcessorOptions {
-//                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-//            }
-//        }
+        multiDexEnabled true
     }
     buildTypes {
 //        debug {
