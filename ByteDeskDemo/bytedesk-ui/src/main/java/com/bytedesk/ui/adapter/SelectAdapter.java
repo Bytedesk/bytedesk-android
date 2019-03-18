@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bytedesk.core.room.entity.ContactEntity;
 import com.bytedesk.ui.R;
+import com.orhanobut.logger.Logger;
 
 import java.util.List;
 
@@ -19,12 +20,12 @@ import java.util.List;
  *
  * @author bytedesk.com
  */
-public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
+public class SelectAdapter extends RecyclerView.Adapter<SelectAdapter.ViewHolder> {
 
     private Context mContext;
     private List<ContactEntity> mContactList;
 
-    public ContactAdapter(Context context) {
+    public SelectAdapter(Context context) {
         mContext = context;
     }
 
@@ -72,9 +73,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 @Override
                 public void onClick(View view) {
                     // 暂时禁用点击checkbox事件，否则需要添加listener
-                    mCheckBox.setChecked(false);
-//                    Logger.i(mCheckBox.isChecked() ? mContactEntity.getRealName() + "is checked"
-//                            : mContactEntity.getRealName() + "not checked");
+                    Logger.i(mCheckBox.isChecked() ? mContactEntity.getNickname() + "is checked"
+                            : mContactEntity.getNickname() + "not checked");
                 }
             });
             mNicknameTextView = itemView.findViewById(R.id.textview_firstitem_nickname);

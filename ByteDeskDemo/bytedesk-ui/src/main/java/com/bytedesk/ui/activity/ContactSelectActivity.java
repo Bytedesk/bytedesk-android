@@ -15,7 +15,7 @@ import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.room.entity.ContactEntity;
 import com.bytedesk.core.viewmodel.ContactViewModel;
 import com.bytedesk.ui.R;
-import com.bytedesk.ui.adapter.ContactAdapter;
+import com.bytedesk.ui.adapter.SelectAdapter;
 import com.bytedesk.ui.listener.ContactItemClickListener;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -34,9 +34,10 @@ public class ContactSelectActivity extends AppCompatActivity implements ContactI
     private QMUIPullRefreshLayout mPullRefreshLayout;
     private RecyclerView mRecyclerView;
 
-    private ContactAdapter mContactAdapter;
+    private SelectAdapter mSelectAdapter;
     private ContactViewModel mContactViewModel;
     private List<ContactEntity> mContactEntities;
+    private List<ContactEntity> mSelectedEntities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +78,8 @@ public class ContactSelectActivity extends AppCompatActivity implements ContactI
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         // 设置适配器adapter
-        mContactAdapter = new ContactAdapter(this);
-        mRecyclerView.setAdapter(mContactAdapter);
+        mSelectAdapter = new SelectAdapter(this);
+        mRecyclerView.setAdapter(mSelectAdapter);
     }
 
     /**
@@ -90,12 +91,9 @@ public class ContactSelectActivity extends AppCompatActivity implements ContactI
         mContactViewModel.getContacts().observe(this, new Observer<List<ContactEntity>>() {
             @Override
             public void onChanged(@Nullable List<ContactEntity> contactEntities) {
-
                 //
-
-
                 mContactEntities = contactEntities;
-                mContactAdapter.setContacts(mContactEntities);
+                mSelectAdapter.setContacts(mContactEntities);
             }
         });
     }

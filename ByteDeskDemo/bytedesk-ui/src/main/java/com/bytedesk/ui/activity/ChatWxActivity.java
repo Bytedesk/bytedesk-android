@@ -667,6 +667,16 @@ public class ChatWxActivity extends AppCompatActivity
                     });
         } else if (mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_CONTACT)) {
             // 一对一会话
+            mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
+                    .setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            //
+                            Intent intent = new Intent(ChatWxActivity.this, ContactProfileActivity.class);
+                            intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
+                            startActivity(intent);
+                        }
+                    });
 
         } else if (mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_GROUP)) {
             // 群组
@@ -677,7 +687,6 @@ public class ChatWxActivity extends AppCompatActivity
                             //
                             Intent intent = new Intent(ChatWxActivity.this, GroupProfileActivity.class);
                             intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
-                            intent.putExtra(BDUiConstant.EXTRA_TID, mThreadTid);
                             startActivity(intent);
                         }
                     });

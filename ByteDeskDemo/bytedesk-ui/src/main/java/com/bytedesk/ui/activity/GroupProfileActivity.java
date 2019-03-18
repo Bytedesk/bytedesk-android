@@ -63,7 +63,6 @@ public class GroupProfileActivity extends AppCompatActivity {
     private BDPreferenceManager mPreferenceManager;
 
     private Boolean mIsAdmin;
-//    private ThreadEntity mThreadEntity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +73,6 @@ public class GroupProfileActivity extends AppCompatActivity {
         //
         mGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
         mIsAdmin = false;
-//        mThreadEntity = BDRepository.getInstance(this).getThread(mTid);
         //
         initTopBar();
         initView();

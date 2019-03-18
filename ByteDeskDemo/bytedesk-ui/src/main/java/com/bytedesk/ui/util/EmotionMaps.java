@@ -481,19 +481,19 @@ public class EmotionMaps {
 
 		LayoutInflater inflater = LayoutInflater.from(m_context);
 
-		m_emotionViewPagerGridView1 = (GridView) inflater.inflate(R.layout.appkefu_emotion_gridview, null);
+		m_emotionViewPagerGridView1 = (GridView) inflater.inflate(R.layout.bytedesk_emotion_gridview, null);
 		m_emotionViewPagerGridView1.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
-		m_emotionViewPagerGridView2 = (GridView) inflater.inflate(R.layout.appkefu_emotion_gridview, null);
+		m_emotionViewPagerGridView2 = (GridView) inflater.inflate(R.layout.bytedesk_emotion_gridview, null);
 		m_emotionViewPagerGridView2.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
-		m_emotionViewPagerGridView3 = (GridView) inflater.inflate(R.layout.appkefu_emotion_gridview, null);
+		m_emotionViewPagerGridView3 = (GridView) inflater.inflate(R.layout.bytedesk_emotion_gridview, null);
 		m_emotionViewPagerGridView3.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
-		m_emotionViewPagerGridView4 = (GridView) inflater.inflate(R.layout.appkefu_emotion_gridview, null);
+		m_emotionViewPagerGridView4 = (GridView) inflater.inflate(R.layout.bytedesk_emotion_gridview, null);
 		m_emotionViewPagerGridView4.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
-		m_emotionViewPagerGridView5 = (GridView) inflater.inflate(R.layout.appkefu_emotion_gridview, null);
+		m_emotionViewPagerGridView5 = (GridView) inflater.inflate(R.layout.bytedesk_emotion_gridview, null);
 		m_emotionViewPagerGridView5.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
 		m_gridViewArrayList.add(m_emotionViewPagerGridView1);
@@ -509,27 +509,27 @@ public class EmotionMaps {
 		//////////////////////////////////////////////
 		SimpleAdapter m_emotionViewPagerGridView1Adapter = new SimpleAdapter(m_context,
 				getEmotionItemMapsForGridView1(),
-				R.layout.appkefu_emotion_singleview,
+				R.layout.bytedesk_emotion_singleview,
 				new String[] { "image" },
 				new int[] {R.id.appkefu_emotion_single_imageview });
 		SimpleAdapter m_emotionViewPagerGridView2Adapter = new SimpleAdapter(m_context,
 				getEmotionItemMapsForGridView2(),
-				R.layout.appkefu_emotion_singleview,
+				R.layout.bytedesk_emotion_singleview,
 				new String[] { "image" },
 				new int[] { R.id.appkefu_emotion_single_imageview });
 		SimpleAdapter m_emotionViewPagerGridView3Adapter = new SimpleAdapter(m_context,
 				getEmotionItemMapsForGridView3(),
-				R.layout.appkefu_emotion_singleview,
+				R.layout.bytedesk_emotion_singleview,
 				new String[] { "image" },
 				new int[] { R.id.appkefu_emotion_single_imageview });
 		SimpleAdapter m_emotionViewPagerGridView4Adapter = new SimpleAdapter(m_context,
 				getEmotionItemMapsForGridView4(),
-				R.layout.appkefu_emotion_singleview,
+				R.layout.bytedesk_emotion_singleview,
 				new String[] { "image" },
 				new int[] { R.id.appkefu_emotion_single_imageview });
 		SimpleAdapter m_emotionViewPagerGridView5Adapter = new SimpleAdapter(m_context,
 				getEmotionItemMapsForGridView5(),
-				R.layout.appkefu_emotion_singleview,
+				R.layout.bytedesk_emotion_singleview,
 				new String[] { "image" },
 				new int[] { R.id.appkefu_emotion_single_imageview });
 
