@@ -260,7 +260,7 @@ public class ContactProfileActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Logger.d("会话置顶");
 
-                // FIXME: 传递threadId or groupId
+                //
                 BDCoreApi.markTopThread(ContactProfileActivity.this, mTid, new BaseCallback() {
 
                     @Override
@@ -301,7 +301,18 @@ public class ContactProfileActivity extends AppCompatActivity {
                             @Override
                             public void onClick(QMUIDialog dialog, int index) {
 
-                                // FIXME: 传递threadId or groupId
+                                //
+                                BDCoreApi.markClearContactMessage(ContactProfileActivity.this, mUid, new BaseCallback() {
+                                    @Override
+                                    public void onSuccess(JSONObject object) {
+
+                                    }
+
+                                    @Override
+                                    public void onError(JSONObject object) {
+
+                                    }
+                                });
 
 
                                 dialog.dismiss();

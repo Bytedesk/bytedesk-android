@@ -30,14 +30,20 @@
             android:focusable="true"
             android:focusableInTouchMode="true">
 
-            <android.support.v7.widget.RecyclerView
+            <!--<android.support.v7.widget.RecyclerView-->
+                <!--android:id="@+id/bytedesk_contact_fragment_recyclerview"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:paddingLeft="@dimen/activity_horizontal_margin"-->
+                <!--android:paddingRight="@dimen/activity_horizontal_margin"-->
+                <!--android:scrollbars="vertical"-->
+                <!--android:scrollbarStyle="outsideOverlay"/>-->
+
+            <com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView
                 android:id="@+id/bytedesk_contact_fragment_recyclerview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:scrollbars="vertical"
-                android:scrollbarStyle="outsideOverlay"/>
+                android:layout_height="wrap_content"
+                />
 
         </LinearLayout>
 

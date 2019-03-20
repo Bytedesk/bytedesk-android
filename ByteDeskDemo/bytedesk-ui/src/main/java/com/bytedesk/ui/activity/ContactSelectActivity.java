@@ -7,51 +7,95 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.room.entity.ContactEntity;
+import com.bytedesk.core.util.BDPreferenceManager;
 import com.bytedesk.core.viewmodel.ContactViewModel;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.adapter.SelectAdapter;
-import com.bytedesk.ui.listener.ContactItemClickListener;
+import com.bytedesk.ui.util.BDListViewDecoration;
+import com.bytedesk.ui.util.BDUiConstant;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
+import com.yanzhenjie.recyclerview.swipe.SwipeItemClickListener;
+import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ContactSelectActivity extends AppCompatActivity implements ContactItemClickListener {
+public class ContactSelectActivity extends AppCompatActivity implements SwipeItemClickListener {
 
     private QMUITopBarLayout mTopBar;
     private QMUIPullRefreshLayout mPullRefreshLayout;
-    private RecyclerView mRecyclerView;
+    private SwipeMenuRecyclerView mSwipeMenuRecyclerView;
 
     private SelectAdapter mSelectAdapter;
     private ContactViewModel mContactViewModel;
     private List<ContactEntity> mContactEntities;
     private List<ContactEntity> mSelectedEntities;
 
+    private BDPreferenceManager mPreferenceManager;
+
+    private String mGid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bytedesk_activity_contact_select);
+        mPreferenceManager = BDPreferenceManager.getInstance(this);
+        //
+        mGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
         //
         initTopBar();
         initRecycleView();
         initModel();
+        getContacts();
     }
 
     private void initTopBar() {
         //
         mTopBar = findViewById(R.id.bytedesk_contact_topbar);
+        //
+        mTopBar.addRightTextButton("邀请", R.mipmap.icon_topbar_overflow).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 调用邀请入群接口
+                if (mSelectedEntities.size() < 1) {
+                    Toast.makeText(ContactSelectActivity.this, "至少选择1人及以上", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                //
+                List<String> selectedContactUids = new ArrayList<>();
+                for (int i = 0; i < mSelectedEntities.size(); i++) {
+                    ContactEntity contactEntity = mSelectedEntities.get(i);
+                    selectedContactUids.add(contactEntity.getUid());
+                }
+                // 调用建群接口
+                BDCoreApi.inviteListToGroup(ContactSelectActivity.this, selectedContactUids, mGid, new BaseCallback() {
+                    @Override
+                    public void onSuccess(JSONObject object) {
+
+                        finish();
+                    }
+
+                    @Override
+                    public void onError(JSONObject object) {
+                        Logger.e("邀请失败");
+                    }
+                });
+            }
+        });
+        //
         mTopBar.setTitle("邀请人");
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,21 +115,25 @@ public class ContactSelectActivity extends AppCompatActivity implements ContactI
         mPullRefreshLayout = findViewById(R.id.bytedesk_contact_pulltorefresh);
         mPullRefreshLayout.setOnPullListener(pullListener);
 
-        // TODO: 增加点击聊天界面，去除输入框焦点，让其缩回底部
         // 初始化
-        mRecyclerView = findViewById(R.id.bytedesk_contact_fragment_recyclerview);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mSwipeMenuRecyclerView = findViewById(R.id.bytedesk_contact_fragment_recyclerview);
+        mSwipeMenuRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mSwipeMenuRecyclerView.setHasFixedSize(true);// 如果Item够简单，高度是确定的，打开FixSize将提高性能。
+        mSwipeMenuRecyclerView.setItemAnimator(new DefaultItemAnimator());// 设置Item默认动画，加也行，不加也行。
+        mSwipeMenuRecyclerView.addItemDecoration(new BDListViewDecoration(this));// 添加分割线。
+        mSwipeMenuRecyclerView.setSwipeItemClickListener(this); //
 
         // 设置适配器adapter
         mSelectAdapter = new SelectAdapter(this);
-        mRecyclerView.setAdapter(mSelectAdapter);
+        mSwipeMenuRecyclerView.setAdapter(mSelectAdapter);
     }
 
     /**
      *
      */
     private void initModel() {
+        //
+        mSelectedEntities = new ArrayList<>();
         //
         mContactViewModel = ViewModelProviders.of(this).get(ContactViewModel.class);
         mContactViewModel.getContacts().observe(this, new Observer<List<ContactEntity>>() {
@@ -102,11 +150,11 @@ public class ContactSelectActivity extends AppCompatActivity implements ContactI
      *
      * @param position
      */
-    @Override
-    public void onItemClicked(int position) {
-        Logger.i("contact item clicked: " + position);
-
-    }
+//    @Override
+//    public void onItemClicked(int position) {
+//        Logger.i("contact item clicked: " + position);
+//
+//    }
 
     /**
      * 加载联系人
@@ -169,4 +217,17 @@ public class ContactSelectActivity extends AppCompatActivity implements ContactI
     };
 
 
+    @Override
+    public void onItemClick(View itemView, int position) {
+        //
+        ContactEntity contactEntity = mContactEntities.get(position);
+        contactEntity.setSelected(!contactEntity.isSelected());
+        if (contactEntity.isSelected()) {
+            mSelectedEntities.add(contactEntity);
+        } else {
+            mSelectedEntities.remove(contactEntity);
+        }
+        mContactEntities.set(position, contactEntity);
+        mSelectAdapter.setContacts(mContactEntities);
+    }
 }

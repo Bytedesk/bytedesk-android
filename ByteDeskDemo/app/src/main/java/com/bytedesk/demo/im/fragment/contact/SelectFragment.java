@@ -93,7 +93,7 @@ public class SelectFragment extends BaseFragment implements SwipeItemClickListen
                 }
                 //
                 List<String> selectedContactUids = new ArrayList<>();
-                String nickname = mPreferenceManager.getRealName();
+                String nickname = mPreferenceManager.getNickname();
                 for (int i = 0; i < mSelectedEntities.size(); i++) {
                     ContactEntity contactEntity = mSelectedEntities.get(i);
                     if (i < 4) {
