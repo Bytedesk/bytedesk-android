@@ -156,7 +156,7 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
     private void getThreads() {
         Logger.i("getThreads");
 
-        BDCoreApi.agentThreads(getContext(), new BaseCallback() {
+        BDCoreApi.getThreads(getContext(), new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

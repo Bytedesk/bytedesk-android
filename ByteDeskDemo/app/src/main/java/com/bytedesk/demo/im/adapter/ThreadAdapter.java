@@ -99,7 +99,13 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
         public void setThread(ThreadEntity thread) {
 
             mNicknameTextView.setText(thread.getNickname());
-            mContentTextView.setText(thread.getContent());
+
+            if (thread.isTemp()) {
+                mContentTextView.setText(thread.getContent()+"[临时会话]");
+            } else {
+                mContentTextView.setText(thread.getContent());
+            }
+
             mTimestampTextView.setText(BDUiUtils.friendlyTime(thread.getTimestamp(), mContext));
             Glide.with(mContext).load(thread.getAvatar()).into(mAvatarImageView);
 
