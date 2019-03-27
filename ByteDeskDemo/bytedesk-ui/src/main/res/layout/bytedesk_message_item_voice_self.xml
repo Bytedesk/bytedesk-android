@@ -67,8 +67,8 @@
             android:layout_marginTop="20dp"
             android:indeterminateBehavior="repeat"
             android:indeterminateDrawable="@drawable/bytedesk_animation"
-            android:layout_toLeftOf="@+id/bytedesk_message_item_content"
-            android:layout_alignBottom="@+id/bytedesk_message_item_content"
+            android:layout_toLeftOf="@+id/bytedesk_message_item_content_voice"
+            android:layout_alignBottom="@+id/bytedesk_message_item_content_voice"
             android:visibility="gone"/>
 
         <ImageButton

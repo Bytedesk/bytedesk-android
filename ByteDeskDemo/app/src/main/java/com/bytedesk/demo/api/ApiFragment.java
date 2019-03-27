@@ -33,6 +33,7 @@ import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 
@@ -327,6 +328,7 @@ public class ApiFragment extends BaseFragment {
      * 登录扩展
      */
     private void showLoginSheet() {
+
         new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
                 .addItem("自定义用户名")
                 .addItem("匿名用户")
@@ -370,8 +372,15 @@ public class ApiFragment extends BaseFragment {
             .addAction("确定", new QMUIDialogAction.ActionListener() {
                 @Override
                 public void onClick(QMUIDialog dialog, int index) {
+
                     final CharSequence text = builder.getEditText().getText();
                     if (text != null && text.length() > 0) {
+                        //
+                        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
+                                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                                .setTipWord(getResources().getString(R.string.bytedesk_logining))
+                                .create();
+                        loadingDialog.show();
 
                         //
                         String username = text.toString();
@@ -385,6 +394,7 @@ public class ApiFragment extends BaseFragment {
 
                             @Override
                             public void onSuccess(JSONObject object) {
+                                loadingDialog.dismiss();
 
                                 Toast.makeText(getContext(), "登录成功", Toast.LENGTH_LONG).show();
                             }
@@ -392,6 +402,7 @@ public class ApiFragment extends BaseFragment {
                             @Override
                             public void onError(JSONObject object) {
                                 Logger.e("login failed message");
+                                loadingDialog.dismiss();
 
                                 Toast.makeText(getContext(), "登录失败", Toast.LENGTH_LONG).show();
                             }
@@ -411,6 +422,12 @@ public class ApiFragment extends BaseFragment {
      * 匿名登录
      */
     private void anonymousLogin() {
+        //
+        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
+                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                .setTipWord(getResources().getString(R.string.bytedesk_logining))
+                .create();
+        loadingDialog.show();
 
         // TODO: 参考文档：https://github.com/pengjinning/bytedesk-android
         // appkey和subDomain请替换为真实值
@@ -423,6 +440,7 @@ public class ApiFragment extends BaseFragment {
 
             @Override
             public void onSuccess(JSONObject object) {
+                loadingDialog.dismiss();
                 try {
                     Logger.d("login success message: " + object.get("message")
                             + " status_code:" + object.get("status_code"));
@@ -434,6 +452,7 @@ public class ApiFragment extends BaseFragment {
 
             @Override
             public void onError(JSONObject object) {
+                loadingDialog.dismiss();
                 try {
                     Logger.e("login failed message: " + object.get("message")
                             + " status_code:" + object.get("status_code")

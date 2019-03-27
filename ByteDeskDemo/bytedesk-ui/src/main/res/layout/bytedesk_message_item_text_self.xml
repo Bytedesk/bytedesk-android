@@ -75,7 +75,6 @@
             android:layout_alignBottom="@+id/bytedesk_message_item_content"
             android:visibility="gone"/>
 
-
     </RelativeLayout>
 
 </LinearLayout>

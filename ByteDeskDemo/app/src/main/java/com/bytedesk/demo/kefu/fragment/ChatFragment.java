@@ -100,7 +100,7 @@ public class ChatFragment extends BaseFragment {
                     jsonCustom.setType(BDCoreConstant.MESSAGE_TYPE_COMMODITY);
                     jsonCustom.setTitle("商品标题");
                     jsonCustom.setContent("商品详情");
-                    jsonCustom.setPrice(9.99);
+                    jsonCustom.setPrice("9.99");
                     jsonCustom.setUrl("https://item.m.jd.com/product/12172344.html");
                     jsonCustom.setImageUrl("https://m.360buyimg.com/mobilecms/s750x750_jfs/t4483/332/2284794111/122812/4bf353/58ed7f42Nf16d6b20.jpg!q80.dpg");
                     jsonCustom.setId(100121);
@@ -118,7 +118,7 @@ public class ChatFragment extends BaseFragment {
                     jsonCustom.setType(BDCoreConstant.MESSAGE_TYPE_COMMODITY);
                     jsonCustom.setTitle("商品标题");
                     jsonCustom.setContent("商品详情");
-                    jsonCustom.setPrice(9.99);
+                    jsonCustom.setPrice("9.99");
                     jsonCustom.setUrl("https://item.m.jd.com/product/12172344.html");
                     jsonCustom.setImageUrl("https://m.360buyimg.com/mobilecms/s750x750_jfs/t4483/332/2284794111/122812/4bf353/58ed7f42Nf16d6b20.jpg!q80.dpg");
                     //

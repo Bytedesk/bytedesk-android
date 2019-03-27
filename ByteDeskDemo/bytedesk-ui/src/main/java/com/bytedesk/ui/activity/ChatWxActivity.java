@@ -1593,6 +1593,8 @@ public class ChatWxActivity extends AppCompatActivity
     public void onMessageEvent(MessageEvent messageEvent) {
         Logger.i("会话页面 MessageEvent");
 
+        // TODO: 检查是否当前页面消息，如果是，则发送已读消息回执
+
 
     }
 

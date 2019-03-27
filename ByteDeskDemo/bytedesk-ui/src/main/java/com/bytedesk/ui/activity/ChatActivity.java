@@ -1294,6 +1294,9 @@ public class ChatActivity extends AppCompatActivity
     public void onMessageEvent(MessageEvent messageEvent) {
         Logger.i("MessageEvent");
 
+        // TODO: 检查是否当前页面消息，如果是，则发送已读消息回执
+
+
     }
 
     /**

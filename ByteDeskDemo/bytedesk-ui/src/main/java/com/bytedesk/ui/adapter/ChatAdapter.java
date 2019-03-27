@@ -366,7 +366,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 voiceTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(mContext,"点击播放语音：" + msgEntity.getVoiceUrl() + " length:" + msgEntity.getLength(), Toast.LENGTH_LONG).show();
+//                        Toast.makeText(mContext,"点击播放语音：" + msgEntity.getVoiceUrl() + " length:" + msgEntity.getLength(), Toast.LENGTH_LONG).show();
                         // TODO: 本地播放语音
                         boolean isSend = (messageViewType == MessageEntity.TYPE_VOICE_SELF_ID);
                         onVoiceMessageClicked((TextView)view, isSend, msgEntity.getVoiceUrl());
@@ -419,7 +419,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     }
                 });
                 // TODO: 红包xml layout初始化
-
             }
             // 文件消息
             else if (messageViewType == MessageEntity.TYPE_FILE_ID
