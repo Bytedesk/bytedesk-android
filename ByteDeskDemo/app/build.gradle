@@ -14,6 +14,12 @@ android {
 
         multiDexEnabled true
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     buildTypes {
 //        debug {
 //            buildConfigField("String", "BASE_URL", "\"http://www.kefudashi.com/implementation/v1\"")
