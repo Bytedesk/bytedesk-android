@@ -17,6 +17,7 @@ import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.demo.common.QRCodeFragment;
 import com.bytedesk.demo.common.ScanFragment;
+import com.bytedesk.demo.common.ServerFragment;
 import com.bytedesk.demo.im.fragment.contact.ContactFragment;
 import com.bytedesk.demo.im.fragment.group.GroupFragment;
 import com.bytedesk.demo.im.fragment.notice.NoticeFragment;
@@ -79,6 +80,8 @@ public class ApiFragment extends BaseFragment {
     private void initGroupListView() {
 
         // 公共接口
+        QMUICommonListItemView serverItem = mGroupListView.createItemView("0. 自定义服务器");
+        serverItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView registerItem = mGroupListView.createItemView("1. 注册接口");
         registerItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         loginItem = mGroupListView.createItemView("2. 登录接口");
@@ -89,30 +92,16 @@ public class ApiFragment extends BaseFragment {
         QMUICommonListItemView multiAccountItem = mGroupListView.createItemView("5. 多账号管理(TODO)");
         QMUIGroupListView.newSection(getContext())
                 .setTitle("公共接口")
-                .addItemView(registerItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        showRegisterSheet();
-                    }
+                .addItemView(serverItem, view -> {
+                    ServerFragment serverFragment = new ServerFragment();
+                    startFragment(serverFragment);
                 })
-                .addItemView(loginItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        showLoginSheet();
-                    }
-                })
-                .addItemView(logoutItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        logout();
-                    }
-                })
-                .addItemView(scanItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        final String[] items = new String[]{"登录二维码", "扫一扫"};
-                        new QMUIDialog.CheckableDialogBuilder(getActivity())
+                .addItemView(registerItem, view -> showRegisterSheet())
+                .addItemView(loginItem, view -> showLoginSheet())
+                .addItemView(logoutItem, view -> logout())
+                .addItemView(scanItem, view -> {
+                    final String[] items = new String[]{"登录二维码", "扫一扫"};
+                    new QMUIDialog.CheckableDialogBuilder(getActivity())
                             .addItems(items, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int index) {
@@ -131,15 +120,9 @@ public class ApiFragment extends BaseFragment {
                                     }
                                 }
                             }).show();
-
-                    }
                 })
-                .addItemView(multiAccountItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // TODO: 多账号管理
-
-                    }
+                .addItemView(multiAccountItem, view -> {
+                    // TODO: 多账号管理
                 })
                 .addTo(mGroupListView);
 
@@ -164,65 +147,38 @@ public class ApiFragment extends BaseFragment {
         ticketItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
-                .addItemView(chatItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ChatFragment chatFragment = new ChatFragment();
-                        startFragment(chatFragment);
-                    }
+                .addItemView(chatItem, view -> {
+                    ChatFragment chatFragment = new ChatFragment();
+                    startFragment(chatFragment);
                 })
-                .addItemView(userInfoItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ProfileFragment profileFragment = new ProfileFragment();
-                        startFragment(profileFragment);
-                    }
+                .addItemView(userInfoItem, view -> {
+                    ProfileFragment profileFragment = new ProfileFragment();
+                    startFragment(profileFragment);
                 })
-                .addItemView(statusItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        StatusFragment statusFragment = new StatusFragment();
-                        startFragment(statusFragment);
-                    }
+                .addItemView(statusItem, view -> {
+                    StatusFragment statusFragment = new StatusFragment();
+                    startFragment(statusFragment);
                 })
-                .addItemView(sessionHistoryItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ThreadFragment threadFragment = new ThreadFragment();
-                        startFragment(threadFragment);
-                    }
+                .addItemView(sessionHistoryItem, view -> {
+                    ThreadFragment threadFragment = new ThreadFragment();
+                    startFragment(threadFragment);
                 })
-                .addItemView(feedbackItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // TODO: 意见反馈接口
-                    }
+                .addItemView(feedbackItem, view -> {
+                    // TODO: 意见反馈接口
                 })
-                .addItemView(helpCenterItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // TODO: 帮助中心接口
-                    }
+                .addItemView(helpCenterItem, view -> {
+                    // TODO: 帮助中心接口
                 })
-                .addItemView(faqItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // TODO: 常见问题接口
-                    }
+                .addItemView(faqItem, view -> {
+                    // TODO: 常见问题接口
                 })
-                .addItemView(wapChatItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
-                        String url = "https://vip.bytedesk.com/chatvue?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph";
-                        BDUiApi.startHtml5Chat(getContext(), url);
-                    }
+                .addItemView(wapChatItem, view -> {
+                    // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
+                    String url = "https://vip.bytedesk.com/chatvue?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph";
+                    BDUiApi.startHtml5Chat(getContext(), url);
                 })
-                .addItemView(ticketItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // TODO: 提交工单
-                    }
+                .addItemView(ticketItem, view -> {
+                    // TODO: 提交工单
                 })
                 .addTo(mGroupListView);
 
@@ -246,53 +202,32 @@ public class ApiFragment extends BaseFragment {
 
         QMUIGroupListView.newSection(getContext())
                 .setTitle("IM接口")
-                .addItemView(friendItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        TabFragment tabFragment = new TabFragment();
-                        startFragment(tabFragment);
-                    }
+                .addItemView(friendItem, view -> {
+                    TabFragment tabFragment = new TabFragment();
+                    startFragment(tabFragment);
                 })
-                .addItemView(contactItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ContactFragment contactFragment = new ContactFragment();
-                        startFragment(contactFragment);
-                    }
+                .addItemView(contactItem, view -> {
+                    ContactFragment contactFragment = new ContactFragment();
+                    startFragment(contactFragment);
                 })
-                .addItemView(groupItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        GroupFragment groupFragment = new GroupFragment();
-                        startFragment(groupFragment);
-                    }
+                .addItemView(groupItem, view -> {
+                    GroupFragment groupFragment = new GroupFragment();
+                    startFragment(groupFragment);
                 })
-                .addItemView(threadItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        com.bytedesk.demo.im.fragment.thread.ThreadFragment threadFragment = new com.bytedesk.demo.im.fragment.thread.ThreadFragment();
-                        startFragment(threadFragment);
-                    }
+                .addItemView(threadItem, view -> {
+                    com.bytedesk.demo.im.fragment.thread.ThreadFragment threadFragment = new com.bytedesk.demo.im.fragment.thread.ThreadFragment();
+                    startFragment(threadFragment);
                 })
-                .addItemView(queueItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        QueueFragment queueFragment = new QueueFragment();
-                        startFragment(queueFragment);
-                    }
-                }).addItemView(noticeItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        NoticeFragment noticeFragment = new NoticeFragment();
-                        startFragment(noticeFragment);
-                    }
+                .addItemView(queueItem, view -> {
+                    QueueFragment queueFragment = new QueueFragment();
+                    startFragment(queueFragment);
+                }).addItemView(noticeItem, view -> {
+                    NoticeFragment noticeFragment = new NoticeFragment();
+                    startFragment(noticeFragment);
                 })
-                .addItemView(settingItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        SettingFragment settingFragment = new SettingFragment();
-                        startFragment(settingFragment);
-                    }
+                .addItemView(settingItem, view -> {
+                    SettingFragment settingFragment = new SettingFragment();
+                    startFragment(settingFragment);
                 })
                 .addTo(mGroupListView);
     }
@@ -304,20 +239,13 @@ public class ApiFragment extends BaseFragment {
         new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
                 .addItem("自定义用户名")
                 .addItem("匿名用户")
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
 
                     if (tag.equals("自定义用户名")) {
-
                         registerUser();
-
                     } else {
-
                         Toast.makeText(getContext(), "匿名用户不需要注册，直接调用匿名登录接口即可", Toast.LENGTH_LONG).show();
-                    }
-
                     }
                 })
                 .build()
@@ -332,19 +260,12 @@ public class ApiFragment extends BaseFragment {
         new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
                 .addItem("自定义用户名")
                 .addItem("匿名用户")
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
-
-                        if (tag.equals("自定义用户名")) {
-
-                            login();
-                        } else {
-
-                            anonymousLogin();
-                        }
-
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
+                    if (tag.equals("自定义用户名")) {
+                        login();
+                    } else {
+                        anonymousLogin();
                     }
                 })
                 .build()
@@ -515,7 +436,7 @@ public class ApiFragment extends BaseFragment {
                         // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
                         String subDomain = "vip";
                         //
-                        BDCoreApi.registerUser(username, nickname, password, subDomain, new BaseCallback() {
+                        BDCoreApi.registerUser(getContext(), username, nickname, password, subDomain, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -533,6 +454,7 @@ public class ApiFragment extends BaseFragment {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+
                             }
 
                             @Override

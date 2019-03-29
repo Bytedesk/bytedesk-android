@@ -67,7 +67,7 @@ public class QRCodeActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Bitmap>() {
             @Override
             protected Bitmap doInBackground(Void... params) {
-                return QRCodeEncoder.syncEncodeQRCode(BDCoreUtils.getQRCodeGroup(mGid),
+                return QRCodeEncoder.syncEncodeQRCode(BDCoreUtils.getQRCodeGroup(getBaseContext(), mGid),
                         BGAQRCodeUtil.dp2px(QRCodeActivity.this, 200));
             }
 

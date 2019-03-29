@@ -55,7 +55,7 @@ public class QRCodeFragment extends BaseFragment {
         new AsyncTask<Void, Void, Bitmap>() {
             @Override
             protected Bitmap doInBackground(Void... params) {
-                return QRCodeEncoder.syncEncodeQRCode(BDCoreUtils.getQRCodeLogin(),
+                return QRCodeEncoder.syncEncodeQRCode(BDCoreUtils.getQRCodeLogin(getContext()),
                         BGAQRCodeUtil.dp2px(getContext(), 200));
             }
 

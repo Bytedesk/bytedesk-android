@@ -29,6 +29,7 @@ import com.bytedesk.ui.util.KFResUtil;
 import com.google.gson.Gson;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
+import com.qmuiteam.qmui.widget.QMUIProgressBar;
 import com.qmuiteam.qmui.widget.QMUIRadiusImageView;
 import com.qmuiteam.qmui.widget.textview.QMUILinkTextView;
 
@@ -164,9 +165,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         private Button commoditySendButton;
         // 文件消息
         private ImageView fileImageView;
-
-        //
+        // 阅后即焚倒计时
+        private QMUIProgressBar destroyAfterReadingProgressBar;
+        // 发送中
         private ProgressBar progressBar;
+        // 发送错误
         private ImageView errorImageView;
         //
         private ChatItemClickListener itemClickListener;
@@ -191,7 +194,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 initAvatar();
                 imageImageView = itemView.findViewById(R.id.bytedesk_message_item_image);
             }
-            // TODO: 语音消息
+            // 语音消息
             else if (messageViewType == MessageEntity.TYPE_VOICE_ID
                     || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID) {
                 initAvatar();
@@ -470,6 +473,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     errorImageView.setVisibility(View.GONE);
                 }
             }
+
+            // TODO: 检查是否阅后即焚, 并开始倒计时
+            if (msgEntity.isDestroyAfterReading()) {
+                Logger.i("阅后即焚 content: " + msgEntity.getContent() + " length: " + msgEntity.getDestroyAfterLength());
+                initDestroyAfterReading();
+
+            }
         }
 
         @Override
@@ -491,6 +501,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             avatarImageView.setSelectedBorderColor(ContextCompat.getColor(mContext, R.color.bytedesk_config_color_gray_4));
             avatarImageView.setTouchSelectModeEnabled(true);
             avatarImageView.setCircle(true);
+        }
+
+        private void initDestroyAfterReading() {
+            destroyAfterReadingProgressBar = itemView.findViewById(R.id.bytedesk_message_item_destroy_progress_bar);
+            destroyAfterReadingProgressBar.setVisibility(View.GONE);
+            destroyAfterReadingProgressBar.setQMUIProgressBarTextGenerator((progressBar1, value, maxValue) -> 100 * value / maxValue + "%");
         }
     }
 

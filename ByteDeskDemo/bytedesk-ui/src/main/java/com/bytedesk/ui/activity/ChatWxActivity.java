@@ -195,7 +195,8 @@ public class ChatWxActivity extends AppCompatActivity
     private String mUid;
     // 工作组wid
     private String mWorkGroupWid;
-    private String mThreadTid;
+    // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
+    private String mTidOrUidOrGid;
     // 指定坐席uid
     private String mAgentUid;
     private String mTitle;
@@ -248,18 +249,18 @@ public class ChatWxActivity extends AppCompatActivity
             } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)) {
                 Logger.i("客服会话");
 
-                mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
+                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
             } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
                 Logger.i("一对一会话");
 
-                mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
                 }
             } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
                 Logger.i("群组会话");
 
-                mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
                 }
@@ -408,14 +409,14 @@ public class ChatWxActivity extends AppCompatActivity
                 final String localId = BDCoreUtils.uuid();
 
                 // 插入本地消息
-                mRepository.insertTextMessageLocal(mThreadTid, mWorkGroupWid, textContent, localId, mThreadType);
+                mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, textContent, localId, mThreadType);
 
                 // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
                 // 1. 异步发送文字消息
-                // BDMqttApi.sendTextMessage(this, mThreadTid, content, localId, mThreadType);
+                // BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
 
                 // 2. 同步发送消息(推荐)
-                BDCoreApi.sendTextMessage(this, mThreadTid, textContent, localId, mThreadType, new BaseCallback() {
+                BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, textContent, localId, mThreadType, new BaseCallback() {
 
                     @Override
                     public void onSuccess(JSONObject object) {
@@ -499,8 +500,6 @@ public class ChatWxActivity extends AppCompatActivity
 
         } else if (view.getId() == R.id.appkefu_plus_show_red_packet_btn) {
 
-//            Toast.makeText(this, "红包", Toast.LENGTH_LONG).show();
-
             final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatWxActivity.this);
             builder.setTitle("发送红包")
                     .setPlaceholder("在此输入金额")
@@ -537,7 +536,7 @@ public class ChatWxActivity extends AppCompatActivity
 
         } else if (view.getId() == R.id.appkefu_read_destroy_btn) {
 
-            Toast.makeText(this, "TODO:阅后即焚", Toast.LENGTH_LONG).show();
+            toggleDestroyAfterReading();
 
         } else if (view.getId() == R.id.appkefu_plus_shop_btn) {
 
@@ -800,7 +799,7 @@ public class ChatWxActivity extends AppCompatActivity
             if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
                 Logger.i("访客会话: 指定客服聊天记录");
                 // 指定客服聊天记录
-                mMessageViewModel.getThreadMessages(mThreadTid).observe(this, new Observer<List<MessageEntity>>() {
+                mMessageViewModel.getThreadMessages(mTidOrUidOrGid).observe(this, new Observer<List<MessageEntity>>() {
                     @Override
                     public void onChanged(@Nullable List<MessageEntity> messageEntities) {
                         mChatAdapter.setMessages(messageEntities);
@@ -890,11 +889,11 @@ public class ChatWxActivity extends AppCompatActivity
     private void updateCurrentThread() {
 
         String preTid = mPreferenceManager.getCurrentTid();
-        BDCoreApi.updateCurrentThread(this, preTid, mThreadTid, new BaseCallback() {
+        BDCoreApi.updateCurrentThread(this, preTid, mTidOrUidOrGid, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
                 // 设置当前tid
-                mPreferenceManager.setCurrentTid(mThreadTid);
+                mPreferenceManager.setCurrentTid(mTidOrUidOrGid);
             }
 
             @Override
@@ -1061,7 +1060,7 @@ public class ChatWxActivity extends AppCompatActivity
      */
     private void requestQuestionnaire(String questionnaireItemItemQid) {
 
-        BDCoreApi.requestQuestionnaire(this, mThreadTid, questionnaireItemItemQid, new BaseCallback() {
+        BDCoreApi.requestQuestionnaire(this, mTidOrUidOrGid, questionnaireItemItemQid, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -1171,10 +1170,10 @@ public class ChatWxActivity extends AppCompatActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mThreadTid = message.getJSONObject("thread").getString("tid");
-                Logger.i("mThreadTid:" + mThreadTid);
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                Logger.i("mTidOrUidOrGid:" + mTidOrUidOrGid);
 
-                String threadTopic = "thread/" + mThreadTid;
+                String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatWxActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
@@ -1187,8 +1186,8 @@ public class ChatWxActivity extends AppCompatActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mThreadTid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mThreadTid;
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatWxActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
@@ -1201,8 +1200,8 @@ public class ChatWxActivity extends AppCompatActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mThreadTid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mThreadTid;
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatWxActivity.this, threadTopic);
 
             } else if (status_code == 204) {
@@ -1211,8 +1210,8 @@ public class ChatWxActivity extends AppCompatActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mThreadTid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mThreadTid;
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatWxActivity.this, threadTopic);
 
             } else if (status_code == 205) {
@@ -1220,7 +1219,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                 String title = "";
                 JSONObject message = object.getJSONObject("data");
-                mThreadTid = message.getJSONObject("thread").getString("tid");
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
                 final Map<String, String> questionMap = new HashMap<>();
                 List<String> questionContents = new ArrayList<>();
 
@@ -1384,7 +1383,7 @@ public class ChatWxActivity extends AppCompatActivity
                     public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
                         dialog.dismiss();
                         //
-                        BDCoreApi.agentCloseThread(getApplication(), mThreadTid, new BaseCallback() {
+                        BDCoreApi.agentCloseThread(getApplication(), mTidOrUidOrGid, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -1579,7 +1578,6 @@ public class ChatWxActivity extends AppCompatActivity
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-
     }
 
 
@@ -1595,6 +1593,7 @@ public class ChatWxActivity extends AppCompatActivity
 
         // TODO: 检查是否当前页面消息，如果是，则发送已读消息回执
 
+        // TODO: 判断是否阅后即焚消息，如果是，则倒计时销毁
 
     }
 
@@ -2002,7 +2001,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                 Logger.i("filePath:" + filePath);
 
-                // TODO: 上传、发送图片
+                // 上传、发送文件
                 uploadFile(filePath, BDCoreUtils.uuid());
             }
         }
@@ -2037,14 +2036,14 @@ public class ChatWxActivity extends AppCompatActivity
                     String imageUrl = object.getString("data");
 
                     // 插入本地消息
-                    mRepository.insertImageMessageLocal(mThreadTid, mWorkGroupWid, imageUrl, localId, mThreadType);
+                    mRepository.insertImageMessageLocal(mTidOrUidOrGid, mWorkGroupWid, imageUrl, localId, mThreadType);
 
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
                     // 1. 异步发送图片消息
-                    // BDMqttApi.sendImageMessage(ChatWxActivity.this, mThreadTid, image_url, localId, mThreadType);
+                    // BDMqttApi.sendImageMessage(ChatWxActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
 
                     // 2. 同步发送图片消息(推荐)
-                    BDCoreApi.sendImageMessage(ChatWxActivity.this, mThreadTid, imageUrl, localId, mThreadType, new BaseCallback() {
+                    BDCoreApi.sendImageMessage(ChatWxActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -2116,10 +2115,10 @@ public class ChatWxActivity extends AppCompatActivity
                     String voiceUrl = object.getString("data");
 
                     // 插入本地消息
-                    mRepository.insertVoiceMessageLocal(mThreadTid, mWorkGroupWid, voiceUrl, localId, mThreadType, voiceLength);
+                    mRepository.insertVoiceMessageLocal(mTidOrUidOrGid, mWorkGroupWid, voiceUrl, localId, mThreadType, voiceLength);
 
                     // TODO: 2. 同步发送消息(推荐)
-                    BDCoreApi.sendVoiceMessage(ChatWxActivity.this, mThreadTid, voiceUrl, localId, mThreadType, voiceLength, new BaseCallback() {
+                    BDCoreApi.sendVoiceMessage(ChatWxActivity.this, mTidOrUidOrGid, voiceUrl, localId, mThreadType, voiceLength, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -2169,6 +2168,58 @@ public class ChatWxActivity extends AppCompatActivity
         });
     }
 
+
+    /**
+     * 开启、关闭发送阅后即焚消息
+     */
+    private void toggleDestroyAfterReading() {
+
+        boolean isDestroyAfterReadingEnabled = mPreferenceManager.getDestroyAfterReading(mTidOrUidOrGid, mThreadType);
+        int destroyAfterLength = mPreferenceManager.getDestroyAfterLength(mTidOrUidOrGid, mThreadType);
+        final String[] items = new String[]{isDestroyAfterReadingEnabled ? "开启("+destroyAfterLength+"秒)" : "开启", "关闭"};
+        final int checkedIndex = isDestroyAfterReadingEnabled ? 0 : 1;
+        new QMUIDialog.CheckableDialogBuilder(this)
+                .setTitle("阅后即焚")
+                .setCheckedIndex(checkedIndex)
+                .addItems(items, (dialogInterface, which) -> {
+                    Toast.makeText(ChatWxActivity.this,  items[which] + "阅后即焚", Toast.LENGTH_SHORT).show();
+                    dialogInterface.dismiss();
+
+                    boolean enabled = which == 0 ? true : false;
+                    mPreferenceManager.setDestroyAfterReading(mTidOrUidOrGid, mThreadType, enabled);
+
+                    if (enabled) {
+                        // 设置长度
+                        setDestroyAfterLength();
+                    }
+
+                }).show();
+    }
+
+    private void setDestroyAfterLength() {
+
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatWxActivity.this);
+        builder.setTitle("阅后即焚")
+                .setPlaceholder("输入时长(秒)")
+                .setInputType(InputType.TYPE_CLASS_TEXT)
+                .addAction("取消", (dialog, index) -> {})
+                .addAction("确定", (dialog, index) -> {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
+
+                        // 检查是否有效数字 且 大于0
+                        if (BDCoreUtils.isNumeric(text.toString()) && Integer.valueOf(text.toString()) > 0) {
+                            mPreferenceManager.setDestroyAfterLength(mTidOrUidOrGid, mThreadType, Integer.valueOf(text.toString()));
+                            dialog.dismiss();
+                        }
+
+                    } else {
+                        Toast.makeText(ChatWxActivity.this, "请填入时长", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+    }
+
     /**
      * 上传并发送文件
      *
@@ -2188,10 +2239,10 @@ public class ChatWxActivity extends AppCompatActivity
                     String fileUrl  = object.getString("data");
 
                     // 插入本地消息
-                    mRepository.insertFileMessageLocal(mThreadTid, mWorkGroupWid, fileUrl, localId, mThreadType);
+                    mRepository.insertFileMessageLocal(mTidOrUidOrGid, mWorkGroupWid, fileUrl, localId, mThreadType);
 
                     // 同步发送文件消息
-                    BDCoreApi.sendFileMessage(ChatWxActivity.this, mThreadTid, fileUrl, localId, mThreadType, new BaseCallback() {
+                    BDCoreApi.sendFileMessage(ChatWxActivity.this, mTidOrUidOrGid, fileUrl, localId,  mThreadType, "doc", new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -2238,6 +2289,7 @@ public class ChatWxActivity extends AppCompatActivity
         });
     }
 
+
     /**
      * 发送红包消息
      * @param money 金额
@@ -2248,10 +2300,10 @@ public class ChatWxActivity extends AppCompatActivity
         final String localId = BDCoreUtils.uuid();
 
         // 插入本地消息
-        mRepository.insertRedPacketMessageLocal(mThreadTid, mWorkGroupWid, money, localId, mThreadType);
+        mRepository.insertRedPacketMessageLocal(mTidOrUidOrGid, mWorkGroupWid, money, localId, mThreadType);
 
         //
-        BDCoreApi.sendRedPacketMessage(this, mThreadTid, money, localId, mThreadType, new BaseCallback() {
+        BDCoreApi.sendRedPacketMessage(this, mTidOrUidOrGid, money, localId, mThreadType, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -2275,10 +2327,10 @@ public class ChatWxActivity extends AppCompatActivity
         final String localId = BDCoreUtils.uuid();
 
         // 插入本地消息
-        mRepository.insertCommodityMessageLocal(mThreadTid, mWorkGroupWid, custom, localId, mThreadType);
+        mRepository.insertCommodityMessageLocal(mTidOrUidOrGid, mWorkGroupWid, custom, localId, mThreadType);
 
         // 发送商品
-        BDCoreApi.sendCommodityMessage(this, mThreadTid, custom, localId, mThreadType, new BaseCallback() {
+        BDCoreApi.sendCommodityMessage(this, mTidOrUidOrGid, custom, localId, mThreadType, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
 

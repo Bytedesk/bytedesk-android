@@ -101,7 +101,8 @@ public class ChatActivity extends AppCompatActivity
     private String mUid;
     // 工作组wid
     private String mWorkGroupWid;
-    private String mThreadTid;
+    // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
+    private String mTidOrUidOrGid;
     // 指定坐席uid
     private String mAgentUid;
     private String mTitle;
@@ -154,18 +155,18 @@ public class ChatActivity extends AppCompatActivity
             } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)) {
                 Logger.i("客服会话");
 
-                mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
+                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
             } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
                 Logger.i("一对一会话");
 
-                mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
                 }
             } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
                 Logger.i("群组会话");
 
-                mThreadTid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
                 }
@@ -232,14 +233,14 @@ public class ChatActivity extends AppCompatActivity
                 final String localId = BDCoreUtils.uuid();
 
                 // 插入本地消息
-                mRepository.insertTextMessageLocal(mThreadTid, mWorkGroupWid, content, localId, mThreadType);
+                mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
 
                 // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
                 // 1. 异步发送文字消息
-                // BDMqttApi.sendTextMessage(this, mThreadTid, content, localId, mThreadType);
+                // BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
 
                 // 2. 同步发送消息(推荐)
-                BDCoreApi.sendTextMessage(this, mThreadTid, content, localId, mThreadType, new BaseCallback() {
+                BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType, new BaseCallback() {
 
                     @Override
                     public void onSuccess(JSONObject object) {
@@ -416,7 +417,7 @@ public class ChatActivity extends AppCompatActivity
             if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
                 Logger.i("访客会话: 指定客服聊天记录");
                 // 指定客服聊天记录
-                mMessageViewModel.getThreadMessages(mThreadTid).observe(this, new Observer<List<MessageEntity>>() {
+                mMessageViewModel.getThreadMessages(mTidOrUidOrGid).observe(this, new Observer<List<MessageEntity>>() {
                     @Override
                     public void onChanged(@Nullable List<MessageEntity> messageEntities) {
                         mChatAdapter.setMessages(messageEntities);
@@ -506,11 +507,11 @@ public class ChatActivity extends AppCompatActivity
     private void updateCurrentThread() {
 
         String preTid = mPreferenceManager.getCurrentTid();
-        BDCoreApi.updateCurrentThread(this, preTid, mThreadTid, new BaseCallback() {
+        BDCoreApi.updateCurrentThread(this, preTid, mTidOrUidOrGid, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
                 // 设置当前tid
-                mPreferenceManager.setCurrentTid(mThreadTid);
+                mPreferenceManager.setCurrentTid(mTidOrUidOrGid);
             }
 
             @Override
@@ -679,7 +680,7 @@ public class ChatActivity extends AppCompatActivity
      */
     private void requestQuestionnaire(String questionnaireItemItemQid) {
 
-        BDCoreApi.requestQuestionnaire(this, mThreadTid, questionnaireItemItemQid, new BaseCallback() {
+        BDCoreApi.requestQuestionnaire(this, mTidOrUidOrGid, questionnaireItemItemQid, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -789,10 +790,10 @@ public class ChatActivity extends AppCompatActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mThreadTid = message.getJSONObject("thread").getString("tid");
-                Logger.i("mThreadTid:" + mThreadTid);
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                Logger.i("mTidOrUidOrGid:" + mTidOrUidOrGid);
 
-                String threadTopic = "thread/" + mThreadTid;
+                String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
@@ -805,8 +806,8 @@ public class ChatActivity extends AppCompatActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mThreadTid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mThreadTid;
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
@@ -819,8 +820,8 @@ public class ChatActivity extends AppCompatActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mThreadTid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mThreadTid;
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
             } else if (status_code == 204) {
@@ -829,8 +830,8 @@ public class ChatActivity extends AppCompatActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mThreadTid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mThreadTid;
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
             } else if (status_code == 205) {
@@ -838,7 +839,7 @@ public class ChatActivity extends AppCompatActivity
 
                 String title = "";
                 JSONObject message = object.getJSONObject("data");
-                mThreadTid = message.getJSONObject("thread").getString("tid");
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
                 final Map<String, String> questionMap = new HashMap<>();
                 List<String> questionContents = new ArrayList<>();
 
@@ -1002,7 +1003,7 @@ public class ChatActivity extends AppCompatActivity
                     public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
                         dialog.dismiss();
                         //
-                        BDCoreApi.agentCloseThread(getApplication(), mThreadTid, new BaseCallback() {
+                        BDCoreApi.agentCloseThread(getApplication(), mTidOrUidOrGid, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -1230,14 +1231,14 @@ public class ChatActivity extends AppCompatActivity
                     String imageUrl = object.getString("data");
 
                     // 插入本地消息
-                    mRepository.insertImageMessageLocal(mThreadTid, mWorkGroupWid, imageUrl, localId, mThreadType);
+                    mRepository.insertImageMessageLocal(mTidOrUidOrGid, mWorkGroupWid, imageUrl, localId, mThreadType);
 
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
                     // 1. 异步发送图片消息
-                    // BDMqttApi.sendImageMessage(ChatActivity.this, mThreadTid, image_url, localId, mThreadType);
+                    // BDMqttApi.sendImageMessage(ChatActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
 
                     // 2. 同步发送图片消息(推荐)
-                    BDCoreApi.sendImageMessage(ChatActivity.this, mThreadTid, imageUrl, localId, mThreadType, new BaseCallback() {
+                    BDCoreApi.sendImageMessage(ChatActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -1412,10 +1413,10 @@ public class ChatActivity extends AppCompatActivity
         final String localId = BDCoreUtils.uuid();
 
         // 插入本地消息
-        mRepository.insertCommodityMessageLocal(mThreadTid, mWorkGroupWid, custom, localId, mThreadType);
+        mRepository.insertCommodityMessageLocal(mTidOrUidOrGid, mWorkGroupWid, custom, localId, mThreadType);
 
         // 发送商品
-        BDCoreApi.sendCommodityMessage(this, mThreadTid, custom, localId, mThreadType, new BaseCallback() {
+        BDCoreApi.sendCommodityMessage(this, mTidOrUidOrGid, custom, localId, mThreadType, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
 

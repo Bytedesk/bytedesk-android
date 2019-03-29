@@ -91,7 +91,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="15dp"
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="vertical">
@@ -127,8 +127,7 @@
             android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:visibility="invisible">
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/appkefu_read_destroy_btn"
@@ -150,11 +149,10 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
             android:gravity="center_horizontal"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:visibility="invisible">
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/appkefu_plus_file_btn"
@@ -172,8 +170,6 @@
                 android:layout_marginTop="5dp"
                 android:text="@string/kfds_file_label" />
         </LinearLayout>
-
-
 
         <!--占位符，便于以后扩展-->
         <LinearLayout

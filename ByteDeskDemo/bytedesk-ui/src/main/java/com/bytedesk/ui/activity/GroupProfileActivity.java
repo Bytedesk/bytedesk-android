@@ -662,7 +662,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(QMUIDialog dialog, int index) {
 
-                                            BDCoreApi.transferGroup(GroupProfileActivity.this, uid, mGid, new BaseCallback() {
+                                            BDCoreApi.transferGroup(GroupProfileActivity.this, uid, mGid, false, new BaseCallback() {
 
                                                 @Override
                                                 public void onSuccess(JSONObject object) {
