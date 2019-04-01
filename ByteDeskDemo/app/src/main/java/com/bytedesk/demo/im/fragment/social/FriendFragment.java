@@ -213,6 +213,19 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
                         return;
                     }
 
+                    // 本地缓存删除
+                    BDRepository.getInstance(getContext()).deleteFriend(uid);
+
+                    // 内存删除
+                    for (int i = 0; i < mFriendEntities.size(); i++) {
+                        FriendEntity friendEntity = mFriendEntities.get(i);
+                        if (friendEntity.getUid().equals(uid)) {
+
+                            mFriendEntities.remove(i);
+                            mFriendAdapter.notifyDataSetChanged();
+                        }
+                    }
+
                     Toast.makeText(getContext(), "删除好友成功", Toast.LENGTH_LONG).show();
 
                 } catch (JSONException e) {

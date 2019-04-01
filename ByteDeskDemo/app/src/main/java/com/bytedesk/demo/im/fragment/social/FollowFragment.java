@@ -249,6 +249,16 @@ public class FollowFragment extends BaseFragment implements SwipeItemClickListen
                         return;
                     }
 
+                    // 本地删除
+                    for (int i = 0; i < mContactEntities.size(); i++) {
+                        ContactEntity contactEntity = mContactEntities.get(i);
+                        if (contactEntity.getUid().equals(uid)) {
+
+                            mContactEntities.remove(i);
+                            mContactAdapter.notifyDataSetChanged();
+                        }
+                    }
+
                     Toast.makeText(getContext(), "取消关注成功", Toast.LENGTH_LONG).show();
 
                 } catch (JSONException e) {
