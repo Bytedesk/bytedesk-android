@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
+import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.room.entity.FriendEntity;
 import com.bytedesk.core.util.JsonToEntity;
 import com.bytedesk.core.viewmodel.FriendViewModel;
@@ -127,7 +128,8 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
             @Override
             public void onSuccess(JSONObject object) {
 
-//                mFriendEntities.clear();
+                // 清空本地缓存
+                BDRepository.getInstance(getContext()).deleteAllFriends();
 
                 //
                 try {
@@ -142,15 +144,7 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
                     JSONArray contactArray = object.getJSONObject("data").getJSONArray("content");
                     for (int i = 0; i < contactArray.length(); i++) {
                         mFriendViewModel.insertFriendJson(contactArray.getJSONObject(i));
-
-//                        ContactEntity contactEntity = jsonToEntity.contactEntity(contactArray.getJSONObject(i));
-//                        mFriendEntities.add(contactEntity);
                     }
-//                    mFriendAdapter.setFriends(mFriendEntities);
-
-//                    if (mFriendEntities.size() > 0) {
-//                        mEmptyView.hide();
-//                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();

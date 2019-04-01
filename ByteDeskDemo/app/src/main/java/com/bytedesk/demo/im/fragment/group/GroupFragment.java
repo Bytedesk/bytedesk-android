@@ -7,6 +7,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
@@ -182,6 +183,8 @@ public class GroupFragment extends BaseFragment implements SwipeItemClickListene
             public void onError(JSONObject object) {
                 try {
                     Logger.e(object.getString("message") + object.getString("data"));
+
+                    Toast.makeText(getContext(), object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
