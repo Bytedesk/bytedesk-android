@@ -8,8 +8,8 @@ android {
         applicationId "com.bytedesk.demo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 69
-        versionName "1.6.0"
+        versionCode 70
+        versionName "1.6.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
@@ -48,8 +48,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.bytedesk:core:1.6.0'
-    implementation 'com.bytedesk:ui:1.6.0'
+    implementation 'com.bytedesk:core:1.6.1'
+    implementation 'com.bytedesk:ui:1.6.1'
 
     // Butterknife
     // http://jakewharton.github.io/butterknife/

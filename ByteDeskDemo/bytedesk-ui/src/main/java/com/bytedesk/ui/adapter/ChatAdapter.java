@@ -3,6 +3,8 @@ package com.bytedesk.ui.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -16,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bytedesk.core.api.BDMqttApi;
+import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.room.entity.MessageEntity;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDFileUtils;
@@ -33,6 +37,7 @@ import com.qmuiteam.qmui.widget.QMUIProgressBar;
 import com.qmuiteam.qmui.widget.QMUIRadiusImageView;
 import com.qmuiteam.qmui.widget.textview.QMUILinkTextView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -164,7 +169,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         private ImageView commodityImageView;
         private Button commoditySendButton;
         // 文件消息
-        private ImageView fileImageView;
+        private TextView fileTextView;
         // 阅后即焚倒计时
         private QMUIProgressBar destroyAfterReadingProgressBar;
         // 发送中
@@ -231,7 +236,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             else if (messageViewType == MessageEntity.TYPE_FILE_ID
                     || messageViewType == MessageEntity.TYPE_FILE_SELF_ID) {
                 initAvatar();
-                fileImageView = itemView.findViewById(R.id.bytedesk_message_item_file);
+                fileTextView = itemView.findViewById(R.id.bytedesk_message_item_file);
                 // TODO
             }
 
@@ -260,7 +265,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
 
         public void setContent(final MessageEntity msgEntity) {
 //            Logger.d("setContent uid:" + msgEntity.getUid() + " currentUid:" + msgEntity.getCurrentUid());
-
             timestampTextView.setText(BDUiUtils.friendlyTime(msgEntity.getCreatedAt(), mContext));
 
             // 文字消息
@@ -269,14 +273,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     || messageViewType == MessageEntity.TYPE_EVENT_ID
                     || messageViewType == MessageEntity.TYPE_EVENT_SELF_ID) {
                 //
-                Glide.with(mContext).load(msgEntity.getAvatar()).into(avatarImageView);
-                avatarImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("avatar clicked:" + msgEntity.getAvatar());
-                    }
-                });
-
+                loadAvatar(msgEntity);
                 //
                 String emotionText = ExpressionUtil.CNtoFace(mContext, msgEntity.getContent());
                 String emotionRegex = "appkefu_f0[0-9]{2}|appkefu_f10[0-5]";
@@ -312,14 +309,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             // 图片消息
             else if (messageViewType == MessageEntity.TYPE_IMAGE_ID
                     || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID) {
-                //
-                Glide.with(mContext).load(msgEntity.getAvatar()).into(avatarImageView);
-                avatarImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("avatar clicked:" + msgEntity.getAvatar());
-                    }
-                });
+                loadAvatar(msgEntity);
                 //
                 Glide.with(mContext).load(msgEntity.getImageUrl()).into(imageImageView);
                 imageImageView.setOnClickListener(new View.OnClickListener() {
@@ -345,14 +335,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             // TODO: 语音消息
             else if (messageViewType == MessageEntity.TYPE_VOICE_ID
                     || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID) {
-                //
-                Glide.with(mContext).load(msgEntity.getAvatar()).into(avatarImageView);
-                avatarImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("avatar clicked:" + msgEntity.getAvatar());
-                    }
-                });
+                loadAvatar(msgEntity);
                 //
                 if (messageViewType == MessageEntity.TYPE_VOICE_ID) {
                     voiceTextView.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.appkefu_chatfrom_voice_playing, 0);
@@ -413,28 +396,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             // 红包消息
             else if (messageViewType == MessageEntity.TYPE_RED_PACKET_ID
                     || messageViewType == MessageEntity.TYPE_RED_PACKET_SELF_ID) {
-                //
-                Glide.with(mContext).load(msgEntity.getAvatar()).into(avatarImageView);
-                avatarImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("avatar clicked:" + msgEntity.getAvatar());
-                    }
-                });
+                loadAvatar(msgEntity);
                 // TODO: 红包xml layout初始化
             }
             // 文件消息
             else if (messageViewType == MessageEntity.TYPE_FILE_ID
                     || messageViewType == MessageEntity.TYPE_FILE_SELF_ID) {
+                loadAvatar(msgEntity);
                 //
-                Glide.with(mContext).load(msgEntity.getAvatar()).into(avatarImageView);
-                avatarImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("avatar clicked:" + msgEntity.getAvatar());
-                    }
-                });
-                //
+                fileTextView.setText(msgEntity.getFileUrl());
             }
 
             // 收到的消息
@@ -474,11 +444,27 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 }
             }
 
+            // FIXME: 仅针对单聊和客服会话有效，群聊暂不发送已读状态
+            // 非自己发送的消息
+            if (!msgEntity.isSend() && !msgEntity.getSessionType().equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
+                // 且非系统消息
+                if (!msgEntity.getType().startsWith(BDCoreConstant.MESSAGE_TYPE_NOTIFICATION)) {
+                    // 消息状态
+                    if (msgEntity.getStatus() == null ||
+                            msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_STORED)) {
+                        // TODO: 更新本地消息为已读
+                        msgEntity.setStatus(BDCoreConstant.MESSAGE_STATUS_READ);
+                        BDRepository.getInstance(mContext).insertMessageEntity(msgEntity);
+                        // 发送已读回执，通知服务器更新状态
+                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid());
+                    }
+                }
+            }
+
             // TODO: 检查是否阅后即焚, 并开始倒计时
             if (msgEntity.isDestroyAfterReading()) {
                 Logger.i("阅后即焚 content: " + msgEntity.getContent() + " length: " + msgEntity.getDestroyAfterLength());
-                initDestroyAfterReading();
-
+                initDestroyAfterReading(msgEntity);
             }
         }
 
@@ -503,11 +489,54 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             avatarImageView.setCircle(true);
         }
 
-        private void initDestroyAfterReading() {
-            destroyAfterReadingProgressBar = itemView.findViewById(R.id.bytedesk_message_item_destroy_progress_bar);
-            destroyAfterReadingProgressBar.setVisibility(View.GONE);
-            destroyAfterReadingProgressBar.setQMUIProgressBarTextGenerator((progressBar1, value, maxValue) -> 100 * value / maxValue + "%");
+        private void loadAvatar(MessageEntity messageEntity) {
+            //
+            Glide.with(mContext).load(messageEntity.getAvatar()).into(avatarImageView);
+            avatarImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Logger.d("avatar clicked:" + messageEntity.getAvatar());
+                }
+            });
         }
+
+        /**
+         * FIXME: 待完善
+         */
+        private void initDestroyAfterReading(MessageEntity messageEntity) {
+            destroyAfterReadingProgressBar = itemView.findViewById(R.id.bytedesk_message_item_destroy_progress_bar);
+            destroyAfterReadingProgressBar.setVisibility(View.VISIBLE);
+            // maxValue默认100
+            destroyAfterReadingProgressBar.setQMUIProgressBarTextGenerator((progressBar1, value, maxValue) -> 100 * value / maxValue + "%");
+
+            ProgressHandler myHandler = new ProgressHandler();
+            myHandler.setProgressBar(destroyAfterReadingProgressBar);
+            //
+            destroyAfterReadingProgressBar.setMaxValue(messageEntity.getDestroyAfterLength());
+            new Thread(() -> {
+                for (int i = 0; i <= messageEntity.getDestroyAfterLength(); i++) {
+//                    Logger.i("destroy i:" + i);
+                    if (i == messageEntity.getDestroyAfterLength()) {
+                        Message msg = new Message();
+                        msg.what = STOP;
+                        msg.arg1 = i;
+                        msg.obj = messageEntity.getMid();
+                        myHandler.sendMessage(msg);
+                    } else {
+                        Message msg = new Message();
+                        msg.what = NEXT;
+                        msg.arg1 = i;
+                        myHandler.sendMessage(msg);
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+
     }
 
     /**
@@ -541,7 +570,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
 //        ((ChatWxActivity) mContext).mEmotionLayout.setVisibility(View.GONE);
 //        ((ChatWxActivity) mContext).mExtensionLayout.setVisibility(View.GONE);
     }
-
 
     private final class ChangeImage implements Runnable {
 
@@ -625,6 +653,36 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         }
     }
 
+    protected static final int STOP = 0x10000;
+    protected static final int NEXT = 0x10001;
+    private class ProgressHandler extends Handler {
+        private WeakReference<QMUIProgressBar> weakCircleProgressBar;
+
+        void setProgressBar( QMUIProgressBar circleProgressBar) {
+            weakCircleProgressBar = new WeakReference<>(circleProgressBar);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case STOP:
+                    String mid = (String) msg.obj;
+                    Logger.i("销毁 mid：" + mid);
+                    // 本地销毁阅后即焚消息
+                    BDRepository.getInstance(mContext).deleteMessage(mid);
+                    // 通知服务器销毁
+                    BDMqttApi.sendReceiptReceivedMessage(mContext, mid);
+                case NEXT:
+                    if (!Thread.currentThread().isInterrupted()) {
+                        if (weakCircleProgressBar.get() != null) {
+                            weakCircleProgressBar.get().setProgress(msg.arg1);
+                        }
+                    }
+            }
+
+        }
+    }
 
     @Override
     public boolean onError(MediaPlayer player, int what, int extra) {

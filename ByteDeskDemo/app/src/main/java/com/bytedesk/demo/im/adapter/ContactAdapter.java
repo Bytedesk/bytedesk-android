@@ -72,7 +72,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
         public void setContact(ContactEntity contact) {
 
-            mNicknameTextView.setText(contact.getRealName());
+            mNicknameTextView.setText(contact.getNickname());
             mContentTextView.setText(contact.getDescription());
             Glide.with(mContext).load(contact.getAvatar()).into(mAvatarImageView);
         }

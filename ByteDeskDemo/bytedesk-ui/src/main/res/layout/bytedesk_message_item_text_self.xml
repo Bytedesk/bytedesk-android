@@ -49,6 +49,7 @@
             android:autoLink="phone|email"
             android:background="@drawable/bytedesk_message_item_background_self"
             android:textColorLink="#0082CB"
+            android:gravity="center"
             android:textAlignment="center" />
 
         <!--阅后即焚-->
@@ -59,7 +60,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:textColor="?attr/qmui_config_color_gray_4"
-            android:textSize="12sp"
+            android:textSize="8sp"
             android:layout_toLeftOf="@+id/bytedesk_message_item_content"
             android:layout_alignBottom="@+id/bytedesk_message_item_content"
             app:qmui_background_color="?attr/qmui_config_color_gray_8"

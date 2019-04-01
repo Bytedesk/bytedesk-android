@@ -92,7 +92,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="5dp"
                 android:textColor="?attr/qmui_config_color_gray_4"
-                android:textSize="12sp"
+                android:textSize="8sp"
                 android:layout_toRightOf="@+id/bytedesk_message_item_content_voice"
                 android:layout_alignBottom="@+id/bytedesk_message_item_content_voice"
                 app:qmui_background_color="?attr/qmui_config_color_gray_8"

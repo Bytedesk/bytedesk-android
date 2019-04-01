@@ -227,7 +227,6 @@ public class ChatWxActivity extends AppCompatActivity
             mIsVisitor = getIntent().getBooleanExtra(BDUiConstant.EXTRA_VISITOR, true);
             mThreadType = getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TYPE);
             mCustom = getIntent().getStringExtra(BDUiConstant.EXTRA_CUSTOM);
-
             //
             mPreferenceManager = BDPreferenceManager.getInstance(this);
             mPreferenceManager.setVisitor(mIsVisitor);
@@ -235,7 +234,7 @@ public class ChatWxActivity extends AppCompatActivity
             //
             if (mIsVisitor) {
                 Logger.i("访客会话");
-
+                //
                 mWorkGroupWid = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
                 mRequestType = getIntent().getStringExtra(BDUiConstant.EXTRA_REQUEST_TYPE);
                 // 判断是否指定客服会话
@@ -778,6 +777,10 @@ public class ChatWxActivity extends AppCompatActivity
         findViewById(R.id.appkefu_plus_file_btn).setOnClickListener(this);
         // 阅后即焚
         findViewById(R.id.appkefu_read_destroy_btn).setOnClickListener(this);
+//        // 仅有一对一单聊支持阅后即焚，客服会话和群聊不支持
+//        if (!mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+//            findViewById(R.id.appkefu_read_destroy_btn).setVisibility(View.GONE);
+//        }
         // 商品
         findViewById(R.id.appkefu_plus_shop_btn).setOnClickListener(this);
     }
@@ -2211,6 +2214,9 @@ public class ChatWxActivity extends AppCompatActivity
                         if (BDCoreUtils.isNumeric(text.toString()) && Integer.valueOf(text.toString()) > 0) {
                             mPreferenceManager.setDestroyAfterLength(mTidOrUidOrGid, mThreadType, Integer.valueOf(text.toString()));
                             dialog.dismiss();
+
+                            // TODO: 设置保存到服务器端，并通知对方，在聊天界面显示通知
+
                         }
 
                     } else {
@@ -2239,7 +2245,7 @@ public class ChatWxActivity extends AppCompatActivity
                     String fileUrl  = object.getString("data");
 
                     // 插入本地消息
-                    mRepository.insertFileMessageLocal(mTidOrUidOrGid, mWorkGroupWid, fileUrl, localId, mThreadType);
+                    mRepository.insertFileMessageLocal(mTidOrUidOrGid, mWorkGroupWid, fileUrl, localId, mThreadType, "doc");
 
                     // 同步发送文件消息
                     BDCoreApi.sendFileMessage(ChatWxActivity.this, mTidOrUidOrGid, fileUrl, localId,  mThreadType, "doc", new BaseCallback() {

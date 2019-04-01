@@ -55,7 +55,7 @@
                 android:text="客服小薇"
                 />
 
-            <ImageView
+            <TextView
                 android:id="@+id/bytedesk_message_item_file"
                 style="@style/bytedesk_chat_content_date_style"
                 android:layout_width="150sp"
@@ -71,7 +71,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="5dp"
                 android:textColor="?attr/qmui_config_color_gray_4"
-                android:textSize="12sp"
+                android:textSize="8sp"
                 android:layout_toRightOf="@+id/bytedesk_message_item_file"
                 android:layout_alignBottom="@+id/bytedesk_message_item_file"
                 app:qmui_background_color="?attr/qmui_config_color_gray_8"
