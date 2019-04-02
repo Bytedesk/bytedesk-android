@@ -161,6 +161,8 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
             @Override
             public void onSuccess(JSONObject object) {
 
+//                BDRepository.getInstance(getContext()).deleteAllThreads();
+
                 try {
 
                     JSONArray agentThreadJsonArray = object.getJSONObject("data").getJSONArray("agentThreads");
@@ -349,7 +351,7 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
 
             int viewType = mThreadAdapter.getItemViewType(position);
 
-            Logger.i("viewType fragment: " + viewType);
+//            Logger.i("viewType fragment: " + viewType);
             //
             if (viewType == ThreadAdapter.ViewType.TOP_UNREAD.ordinal()) {
 

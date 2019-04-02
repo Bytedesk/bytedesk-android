@@ -9,10 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bytedesk.demo.R;
 import com.bytedesk.core.room.entity.ThreadEntity;
+import com.bytedesk.demo.R;
 import com.bytedesk.ui.util.BDUiUtils;
-import com.orhanobut.logger.Logger;
 
 import java.util.List;
 
@@ -47,8 +46,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
     @Override
     public int getItemViewType(int position) {
         ThreadEntity threadEntity = mThreadList.get(position);
-        Logger.i("is mark Top: " + threadEntity.isMarkTop() +
-                " is mark unread: " + threadEntity.isMarkUnread());
+//        Logger.i("is mark Top: " + threadEntity.isMarkTop() +
+//                " is mark unread: " + threadEntity.isMarkUnread());
 
         int viewType = 0;
         if (threadEntity.isMarkTop() && threadEntity.isMarkUnread()) {
@@ -61,7 +60,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
             viewType = ViewType.UNTOP_READ.ordinal();
         }
 
-        Logger.i("viewType adapter: " + viewType);
+//        Logger.i("viewType adapter: " + viewType);
 
         return viewType;
     }

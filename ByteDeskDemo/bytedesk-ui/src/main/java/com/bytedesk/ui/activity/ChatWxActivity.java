@@ -2245,10 +2245,10 @@ public class ChatWxActivity extends AppCompatActivity
                     String fileUrl  = object.getString("data");
 
                     // 插入本地消息
-                    mRepository.insertFileMessageLocal(mTidOrUidOrGid, mWorkGroupWid, fileUrl, localId, mThreadType, "doc");
+                    mRepository.insertFileMessageLocal(mTidOrUidOrGid, mWorkGroupWid, fileUrl, localId, mThreadType, "doc", "fileName", "fileSize");
 
                     // 同步发送文件消息
-                    BDCoreApi.sendFileMessage(ChatWxActivity.this, mTidOrUidOrGid, fileUrl, localId,  mThreadType, "doc", new BaseCallback() {
+                    BDCoreApi.sendFileMessage(ChatWxActivity.this, mTidOrUidOrGid, fileUrl,  localId,  mThreadType, "doc", "fileName", "fileSize", new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {

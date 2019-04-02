@@ -654,14 +654,13 @@ public class GroupProfileActivity extends AppCompatActivity {
                                 // 转交群
                                 Logger.d("转交群");
 
-                                new QMUIDialog.CheckBoxMessageDialogBuilder(GroupProfileActivity.this)
-                                    .setTitle("提示")
-                                    .setMessage("确定要转接群？")
-                                    .setChecked(true)
-                                    .addAction("取消", new QMUIDialogAction.ActionListener() {
-                                        @Override
-                                        public void onClick(QMUIDialog dialog, int index) {
+                                new QMUIDialog.MessageDialogBuilder(GroupProfileActivity.this)
+                                        .setTitle("解散群")
+                                        .setMessage("确定要转交群？")
+                                        .addAction("取消", (dialog1, index1) -> dialog.dismiss())
+                                        .addAction(0, "转交", QMUIDialogAction.ACTION_PROP_NEGATIVE, (dialog1, index1) -> {
 
+                                            // 调用服务器接口
                                             BDCoreApi.transferGroup(GroupProfileActivity.this, uid, mGid, false, new BaseCallback() {
 
                                                 @Override
@@ -676,14 +675,8 @@ public class GroupProfileActivity extends AppCompatActivity {
                                             });
 
                                             dialog.dismiss();
-                                        }
-                                    })
-                                    .addAction("退出", new QMUIDialogAction.ActionListener() {
-                                        @Override
-                                        public void onClick(QMUIDialog dialog, int index) {
-                                            dialog.dismiss();
-                                        }
-                                    }).show();
+
+                                        }).show();
 
                             } else if (index == 1) {
                                 // 踢出群
