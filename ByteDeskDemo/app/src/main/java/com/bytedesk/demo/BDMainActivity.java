@@ -5,7 +5,7 @@ import android.os.Bundle;
 import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.demo.api.ApiFragment;
 import com.bytedesk.demo.common.BaseFragment;
-import com.bytedesk.ui.base.BaseFragmentActivity;
+import com.bytedesk.demo.common.BaseFragmentActivity;
 
 public class BDMainActivity extends BaseFragmentActivity {
 

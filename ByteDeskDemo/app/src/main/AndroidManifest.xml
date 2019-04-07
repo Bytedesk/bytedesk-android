@@ -84,6 +84,11 @@
             android:name="com.bytedesk.ui.activity.ContactProfileActivity"
             android:screenOrientation="portrait"/>
 
+        <!--留言页面-->
+        <activity
+            android:name="com.bytedesk.ui.activity.LeaveMessageActivity"
+            android:screenOrientation="portrait"/>
+
         <!--二维码-->
         <activity
             android:name="com.bytedesk.ui.activity.QRCodeActivity"

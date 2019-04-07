@@ -20,18 +20,19 @@
             android:paddingBottom="25dp"
             android:paddingTop="70dp">
 
-            <ImageView
-                android:id="@+id/bytedesk_qrcode_imageview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="Logo"/>
+
+            <!--TODO-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="请查看代码save函数"/>
 
         </LinearLayout>
 
     </ScrollView>
 
     <com.qmuiteam.qmui.widget.QMUITopBarLayout
-        android:id="@+id/bytedesk_qrcode_topbarlayout"
+        android:id="@+id/bytedesk_leave_msg_topbarlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"/>

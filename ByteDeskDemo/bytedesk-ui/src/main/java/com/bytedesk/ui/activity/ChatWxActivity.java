@@ -410,11 +410,7 @@ public class ChatWxActivity extends AppCompatActivity
                 // 插入本地消息
                 mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, textContent, localId, mThreadType);
 
-                // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-                // 1. 异步发送文字消息
-                // BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
-
-                // 2. 同步发送消息(推荐)
+                // 同步发送消息(推荐)
                 BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, textContent, localId, mThreadType, new BaseCallback() {
 
                     @Override
@@ -689,7 +685,6 @@ public class ChatWxActivity extends AppCompatActivity
                         }
                     });
         }
-
         QMUIStatusBarHelper.translucent(this);
     }
 
@@ -1592,7 +1587,7 @@ public class ChatWxActivity extends AppCompatActivity
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent messageEvent) {
-        Logger.i("会话页面 MessageEvent");
+//        Logger.i("会话页面 MessageEvent");
 
         // TODO: 检查是否当前页面消息，如果是，则发送已读消息回执
 

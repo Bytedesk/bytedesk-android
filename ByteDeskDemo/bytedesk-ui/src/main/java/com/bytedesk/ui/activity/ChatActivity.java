@@ -108,6 +108,7 @@ public class ChatActivity extends AppCompatActivity
     private String mTitle;
     // 是否访客端调用接口
     private boolean mIsVisitor;
+    private boolean mIsRobot;
     // 区分客服会话thread、同事会话contact、群组会话group
     private String mThreadType;
     // 区分工作组会话、指定客服会话
@@ -131,6 +132,7 @@ public class ChatActivity extends AppCompatActivity
         if (null != getIntent()) {
             //
             mIsVisitor = getIntent().getBooleanExtra(BDUiConstant.EXTRA_VISITOR, true);
+            mIsRobot = false;
             mThreadType = getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TYPE);
             mCustom = getIntent().getStringExtra(BDUiConstant.EXTRA_CUSTOM);
             //
@@ -229,53 +231,58 @@ public class ChatActivity extends AppCompatActivity
 
                 // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
-                // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
-                final String localId = BDCoreUtils.uuid();
+                // 机器人
+                if (mIsRobot) {
+                    //
+                    robotMessage(content);
+                } else {
+                    // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+                    final String localId = BDCoreUtils.uuid();
 
-                // 插入本地消息
-                mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
+                    // 插入本地消息
+                    mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
 
-                // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-                // 1. 异步发送文字消息
-                // BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
+                    // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
+                    // 1. 异步发送文字消息
+                    // BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
 
-                // 2. 同步发送消息(推荐)
-                BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType, new BaseCallback() {
+                    // 2. 同步发送消息(推荐)
+                    BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType, new BaseCallback() {
 
-                    @Override
-                    public void onSuccess(JSONObject object) {
-                        //
-                        try {
+                        @Override
+                        public void onSuccess(JSONObject object) {
+                            //
+                            try {
 
-                            int status_code = object.getInt("status_code");
-                            if (status_code == 200) {
+                                int status_code = object.getInt("status_code");
+                                if (status_code == 200) {
 
-                                String localId = object.getJSONObject("data").getString("localId");
-                                Logger.i("callback localId: " + localId);
+                                    String localId = object.getJSONObject("data").getString("localId");
+                                    Logger.i("callback localId: " + localId);
 
+                                    // 发送成功
+                                } else {
 
-                                // 发送成功
-                            } else {
+                                    // 修改本地消息发送状态为error
+                                    mRepository.updateMessageStatusError(localId);
 
-                                // 修改本地消息发送状态为error
-                                mRepository.updateMessageStatusError(localId);
+                                    // 发送消息失败
+                                    String message = object.getString("message");
+                                    Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
+                                }
 
-                                // 发送消息失败
-                                String message = object.getString("message");
-                                Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
 
-                    @Override
-                    public void onError(JSONObject object) {
-                        // 发送消息失败
-                        Toast.makeText(ChatActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-                    }
-                });
+                        @Override
+                        public void onError(JSONObject object) {
+                            // 发送消息失败
+                            Toast.makeText(ChatActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
 
                 mInputEditText.setText(null);
             }
@@ -319,23 +326,17 @@ public class ChatActivity extends AppCompatActivity
         } else {
             mTopBar.setTitle(mTitle);
         }
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        // 客服会话
-        if (!mIsVisitor && mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_THREAD)) {
+        mTopBar.addLeftBackImageButton().setOnClickListener(view -> finish());
+        //
+        if (mIsVisitor) {
+            // 访客会话
+            mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
+                    .setOnClickListener(view -> visitorTopRightSheet());
+        }
+        else if (!mIsVisitor && mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_THREAD)) {
             // 客服会话
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
-                    .setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showTopRightSheet();
-                }
-            });
+                    .setOnClickListener(view -> showTopRightSheet());
         } else if (mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_CONTACT)) {
             // 一对一会话
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
@@ -498,6 +499,83 @@ public class ChatActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
+        });
+    }
+
+
+    /**
+     * 初始化机器人
+     */
+    private void requestRobot() {
+
+        BDCoreApi.initAnswer(this, mRequestType, mWorkGroupWid, mAgentUid, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    JSONObject messageObject = object.getJSONObject("data");
+                    //持久化到数据库
+                    mRepository.insertMessageJson(messageObject);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+                try {
+                    Logger.d("init answer message: " + object.get("message") + " status_code:" + object.get("status_code") + " data:" + object.get("data"));
+                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+    }
+
+
+    /**
+     * 请求机器人会话
+     * @param content
+     */
+    private void robotMessage(String content) {
+
+        BDCoreApi.messageAnswer(this, mRequestType, mWorkGroupWid, mAgentUid, content, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    JSONObject queryMessageObject = object.getJSONObject("data").getJSONObject("query");
+                    JSONObject replyMessageObject = object.getJSONObject("data").getJSONObject("reply");
+
+                    //持久化到数据库
+                    mRepository.insertMessageJson(queryMessageObject);
+                    mRepository.insertMessageJson(replyMessageObject);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+                try {
+                    Logger.d("robot message: " + object.get("message") + " status_code:" + object.get("status_code") + " data:" + object.get("data"));
+                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
         });
     }
 
@@ -976,7 +1054,6 @@ public class ChatActivity extends AppCompatActivity
                 .start();
 
         // TODO: 待删除
-        //
 //        if (BDCoreUtils.isSDCardExist()) {
 //            //
 //            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -989,10 +1066,51 @@ public class ChatActivity extends AppCompatActivity
 //        else {
 //            Toast.makeText(this, "SD卡不存在，不能拍照", Toast.LENGTH_SHORT).show();
 //        }
+
     }
 
+
+    private void visitorTopRightSheet() {
+        //
+        new QMUIBottomSheet.BottomListSheetBuilder(this)
+            .addItem("留言")
+            .addItem(mIsRobot ? "人工客服" : "机器人")
+            .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                //
+                dialog.dismiss();
+
+                if (position == 0) {
+
+                    // 跳转留言页面
+                    Intent intent = new Intent(ChatActivity.this, LeaveMessageActivity.class);
+                    intent.putExtra(BDUiConstant.EXTRA_WID, mWorkGroupWid);
+                    intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, mRequestType);
+                    intent.putExtra(BDUiConstant.EXTRA_AID, mAgentUid);
+                    startActivity(intent);
+
+                } else if (position == 1) {
+
+                    if (mIsRobot) {
+
+                        // 切换人工客服
+                        requestThread();
+
+                    } else {
+
+                        // 切换智能机器人
+                        requestRobot();
+
+                    }
+                    mIsRobot = !mIsRobot;
+                }
+            })
+            .build()
+            .show();
+    }
+
+
     /**
-     *
+     * 客服端点击右上角按钮
      */
     private void showTopRightSheet() {
         new QMUIBottomSheet.BottomListSheetBuilder(this)
@@ -1214,6 +1332,11 @@ public class ChatActivity extends AppCompatActivity
      */
     private void uploadImage(String filePath, String fileName) {
 
+        if (mIsRobot) {
+            Toast.makeText(this, "机器人暂时不支持图片", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         BDCoreApi.uploadImage(this, filePath, fileName, new BaseCallback() {
 
             @Override
@@ -1224,6 +1347,7 @@ public class ChatActivity extends AppCompatActivity
                     // TODO: 无客服在线时，禁止发送图片
 
                     // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
+
 
                     // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
                     final String localId = BDCoreUtils.uuid();
@@ -1296,7 +1420,6 @@ public class ChatActivity extends AppCompatActivity
         Logger.i("MessageEvent");
 
         // TODO: 检查是否当前页面消息，如果是，则发送已读消息回执
-
 
     }
 

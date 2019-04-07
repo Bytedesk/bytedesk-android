@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -18,7 +17,6 @@ import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
 import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
 
 public class QRCodeActivity extends AppCompatActivity {
-
 
     QMUITopBarLayout mTopBar;
     ImageView mQRCodeImageView;
@@ -42,12 +40,7 @@ public class QRCodeActivity extends AppCompatActivity {
         //
         mTopBar = findViewById(R.id.bytedesk_qrcode_topbarlayout);
         mTopBar.setTitle("二维码");
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(view -> finish());
         //
         QMUIStatusBarHelper.translucent(this);
     }
