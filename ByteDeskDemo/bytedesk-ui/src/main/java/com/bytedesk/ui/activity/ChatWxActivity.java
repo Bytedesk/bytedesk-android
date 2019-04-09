@@ -404,47 +404,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                 // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
-                // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
-                final String localId = BDCoreUtils.uuid();
-
-                // 插入本地消息
-                mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, textContent, localId, mThreadType);
-
-                // 同步发送消息(推荐)
-                BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, textContent, localId, mThreadType, new BaseCallback() {
-
-                    @Override
-                    public void onSuccess(JSONObject object) {
-                        //
-                        try {
-
-                            int status_code = object.getInt("status_code");
-                            if (status_code == 200) {
-
-                                String localId = object.getJSONObject("data").getString("localId");
-                                Logger.i("callback localId: " + localId);
-
-                            } else {
-
-                                // 修改本地消息发送状态为error
-                                mRepository.updateMessageStatusError(localId);
-
-                                // 发送消息失败
-                                String message = object.getString("message");
-                                Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onError(JSONObject object) {
-                        // 发送消息失败
-                        Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-                    }
-                });
+                sendTextMessage(textContent);
 
                 mInputEditText.setText(null);
             }
@@ -535,10 +495,21 @@ public class ChatWxActivity extends AppCompatActivity
 
         } else if (view.getId() == R.id.appkefu_plus_shop_btn) {
 
+            Toast.makeText(this, "自定义跳转页面，选择商品，发送", Toast.LENGTH_LONG).show();
+
             // TODO: 自定义跳转页面，选择商品，发送
-            if (mCustom != null && mCustom.trim().length() > 0) {
-                sendCommodityMessage(mCustom);
-            }
+//            JsonCustom jsonCustom = new JsonCustom();
+//            jsonCustom.setType(BDCoreConstant.MESSAGE_TYPE_COMMODITY);
+//            jsonCustom.setTitle("商品标题");
+//            jsonCustom.setContent("商品详情");
+//            jsonCustom.setPrice("9.99");
+//            jsonCustom.setUrl("https://item.m.jd.com/product/12172344.html");
+//            jsonCustom.setImageUrl("https://m.360buyimg.com/mobilecms/s750x750_jfs/t4483/332/2284794111/122812/4bf353/58ed7f42Nf16d6b20.jpg!q80.dpg");
+//            jsonCustom.setId(100121);
+//            jsonCustom.setCategoryCode("100010003");
+//            //
+//            String custom = new Gson().toJson(jsonCustom);
+//            sendCommodityMessage(custom);
         }
     }
 
@@ -2003,6 +1974,57 @@ public class ChatWxActivity extends AppCompatActivity
                 uploadFile(filePath, BDCoreUtils.uuid());
             }
         }
+    }
+
+
+    /**
+     * 发送文本消息
+     *
+     * @param content
+     */
+    private void sendTextMessage(String content) {
+
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
+
+        // 同步发送消息(推荐)
+        BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+                //
+                try {
+
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+
+                        String localId = object.getJSONObject("data").getString("localId");
+                        Logger.i("callback localId: " + localId);
+
+                    } else {
+
+                        // 修改本地消息发送状态为error
+                        mRepository.updateMessageStatusError(localId);
+
+                        // 发送消息失败
+                        String message = object.getString("message");
+                        Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                // 发送消息失败
+                Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     /**

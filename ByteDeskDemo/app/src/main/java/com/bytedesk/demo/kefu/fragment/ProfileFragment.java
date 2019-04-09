@@ -53,7 +53,8 @@ public class ProfileFragment extends BaseFragment {
         mTopBar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.app_color_blue));
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {popBackStack();
+            public void onClick(View v) {
+                popBackStack();
             }
         });
         mTopBar.setTitle("设置用户信息接口");

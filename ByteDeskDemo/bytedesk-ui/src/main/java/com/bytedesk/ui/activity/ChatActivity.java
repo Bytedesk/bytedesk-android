@@ -231,57 +231,15 @@ public class ChatActivity extends AppCompatActivity
 
                 // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
+
                 // 机器人
                 if (mIsRobot) {
+
                     //
                     robotMessage(content);
                 } else {
-                    // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
-                    final String localId = BDCoreUtils.uuid();
 
-                    // 插入本地消息
-                    mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
-
-                    // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-                    // 1. 异步发送文字消息
-                    // BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
-
-                    // 2. 同步发送消息(推荐)
-                    BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType, new BaseCallback() {
-
-                        @Override
-                        public void onSuccess(JSONObject object) {
-                            //
-                            try {
-
-                                int status_code = object.getInt("status_code");
-                                if (status_code == 200) {
-
-                                    String localId = object.getJSONObject("data").getString("localId");
-                                    Logger.i("callback localId: " + localId);
-
-                                    // 发送成功
-                                } else {
-
-                                    // 修改本地消息发送状态为error
-                                    mRepository.updateMessageStatusError(localId);
-
-                                    // 发送消息失败
-                                    String message = object.getString("message");
-                                    Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onError(JSONObject object) {
-                            // 发送消息失败
-                            Toast.makeText(ChatActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    sendTextMessage(content);
                 }
 
                 mInputEditText.setText(null);
@@ -546,19 +504,44 @@ public class ChatActivity extends AppCompatActivity
      */
     private void robotMessage(String content) {
 
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
+
         BDCoreApi.messageAnswer(this, mRequestType, mWorkGroupWid, mAgentUid, content, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
 
+                //
                 try {
 
-                    JSONObject queryMessageObject = object.getJSONObject("data").getJSONObject("query");
-                    JSONObject replyMessageObject = object.getJSONObject("data").getJSONObject("reply");
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200 || status_code == 201) {
 
-                    //持久化到数据库
-                    mRepository.insertMessageJson(queryMessageObject);
-                    mRepository.insertMessageJson(replyMessageObject);
+                        //
+                        mRepository.deleteMessageLocal(localId);
+
+                        //
+                        JSONObject queryMessageObject = object.getJSONObject("data").getJSONObject("query");
+                        JSONObject replyMessageObject = object.getJSONObject("data").getJSONObject("reply");
+
+                        //持久化到数据库
+                        mRepository.insertMessageJson(queryMessageObject);
+                        mRepository.insertMessageJson(replyMessageObject);
+
+                        // 发送成功
+                    } else {
+
+                        // 修改本地消息发送状态为error
+                        mRepository.updateMessageStatusError(localId);
+
+                        // 发送消息失败
+                        String message = object.getString("message");
+                        Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
+                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1319,6 +1302,61 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
+
+    /**
+     * 发送文本消息
+     *
+     * @param content
+     */
+    private void sendTextMessage(String content) {
+
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
+        // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
+        // 1. 异步发送文字消息
+        // BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
+
+        // 2. 同步发送消息(推荐)
+        BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+                //
+                try {
+
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+
+                        String localId = object.getJSONObject("data").getString("localId");
+                        Logger.i("callback localId: " + localId);
+
+                        // 发送成功
+                    } else {
+
+                        // 修改本地消息发送状态为error
+                        mRepository.updateMessageStatusError(localId);
+
+                        // 发送消息失败
+                        String message = object.getString("message");
+                        Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                // 发送消息失败
+                Toast.makeText(ChatActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
 
     /**
      * 上传并发送图片
