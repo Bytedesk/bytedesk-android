@@ -126,7 +126,7 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
         //
         mThreadViewModel = ViewModelProviders.of(this).get(ThreadViewModel.class);
         //
-        mThreadViewModel.getThreads().observe(this, new Observer<List<ThreadEntity>>() {
+        mThreadViewModel.getIMThreads().observe(this, new Observer<List<ThreadEntity>>() {
             @Override
             public void onChanged(@Nullable List<ThreadEntity> threadEntities) {
                 mThreadEntities = threadEntities;

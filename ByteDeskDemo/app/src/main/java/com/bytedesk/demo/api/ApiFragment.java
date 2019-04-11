@@ -390,15 +390,23 @@ public class ApiFragment extends BaseFragment {
      */
     private void logout() {
         //
+        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
+                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                .setTipWord(getResources().getString(R.string.bytedesk_logouting))
+                .create();
+        loadingDialog.show();
+        //
         BDCoreApi.logout(getContext(), new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
+                loadingDialog.dismiss();
 
                 Toast.makeText(getContext(), "退出登录成功", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(JSONObject object) {
+                loadingDialog.dismiss();
 
                 Logger.e("退出登录失败");
                 Toast.makeText(getContext(), "退出登录失败", Toast.LENGTH_SHORT).show();
