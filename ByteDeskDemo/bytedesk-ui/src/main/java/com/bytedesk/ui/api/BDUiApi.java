@@ -3,6 +3,7 @@ package com.bytedesk.ui.api;
 import android.content.Context;
 import android.content.Intent;
 
+import com.bytedesk.core.api.BDConfig;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.ui.activity.BrowserActivity;
 import com.bytedesk.ui.activity.ChatActivity;
@@ -27,7 +28,6 @@ public class BDUiApi {
      * @param context
      */
     public static void init(Context context) {
-
         // 初始化相册
         Album.initialize(AlbumConfig.newBuilder(context)
             .setAlbumLoader(new MediaLoader())
@@ -45,6 +45,9 @@ public class BDUiApi {
      * @param title 标题
      */
     public static void startWorkGroupChatActivity(Context context, String wId, String title) {
+        //
+        BDConfig.getInstance(context).switchToKF();
+        //
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
@@ -56,6 +59,9 @@ public class BDUiApi {
     }
 
     public static void startWorkGroupChatActivity(Context context, String wId, String title, String custom) {
+        //
+        BDConfig.getInstance(context).switchToKF();
+        //
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
@@ -77,6 +83,9 @@ public class BDUiApi {
      * @param title 标题
      */
     public static void startAppointChatActivity(Context context, String aId, String title) {
+        //
+        BDConfig.getInstance(context).switchToKF();
+        //
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
@@ -89,6 +98,9 @@ public class BDUiApi {
     }
 
     public static void startAppointChatActivity(Context context, String aId, String title, String custom) {
+        //
+        BDConfig.getInstance(context).switchToKF();
+        //
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
@@ -123,6 +135,9 @@ public class BDUiApi {
      * @param title 标题
      */
     public static void startThreadChatActivity(Context context, String tId, String uId, String title) {
+        //
+        BDConfig.getInstance(context).switchToIM();
+        //
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_TID, tId);
@@ -133,6 +148,9 @@ public class BDUiApi {
     }
 
     public static void startThreadChatActivity(Context context, String tId, String uId, String title, String custom) {
+        //
+        BDConfig.getInstance(context).switchToIM();
+        //
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_TID, tId);
@@ -152,6 +170,9 @@ public class BDUiApi {
      * @param title 标题
      */
     public static void startContactChatActivity(Context context, String uId, String title) {
+        //
+        BDConfig.getInstance(context).switchToIM();
+        //
         Intent intent = new Intent(context, ChatWxActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, uId);
@@ -161,6 +182,9 @@ public class BDUiApi {
     }
 
     public static void startContactChatActivity(Context context, String uId, String title, String custom) {
+        //
+        BDConfig.getInstance(context).switchToIM();
+        //
         Intent intent = new Intent(context, ChatWxActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, uId);
@@ -180,6 +204,9 @@ public class BDUiApi {
      * @param title 标题
      */
     public static void startGroupChatActivity(Context context, String gId, String title) {
+        //
+        BDConfig.getInstance(context).switchToIM();
+        //
         Intent intent = new Intent(context, ChatWxActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, gId);
@@ -189,6 +216,9 @@ public class BDUiApi {
     }
 
     public static void startGroupChatActivity(Context context, String gId, String title, String custom) {
+        //
+        BDConfig.getInstance(context).switchToIM();
+        //
         Intent intent = new Intent(context, ChatWxActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, gId);
