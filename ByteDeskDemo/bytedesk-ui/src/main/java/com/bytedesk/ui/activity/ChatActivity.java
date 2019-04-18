@@ -1333,6 +1333,9 @@ public class ChatActivity extends AppCompatActivity
                         String localId = object.getJSONObject("data").getString("localId");
                         Logger.i("callback localId: " + localId);
 
+                        // TODO: 更新消息发送状态为成功
+                        mRepository.updateMessageStatusSuccess(localId);
+
                         // 发送成功
                     } else {
 
@@ -1412,6 +1415,9 @@ public class ChatActivity extends AppCompatActivity
 
                                     String localId = object.getJSONObject("data").getString("localId");
                                     Logger.i("callback localId: " + localId);
+
+                                    // TODO: 更新消息发送状态为成功
+                                    mRepository.updateMessageStatusSuccess(localId);
 
                                     // 发送成功
                                 } else {
@@ -1580,12 +1586,38 @@ public class ChatActivity extends AppCompatActivity
         BDCoreApi.sendCommodityMessage(this, mTidOrUidOrGid, custom, localId, mThreadType, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
+                //
+                try {
 
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+
+                        String localId = object.getJSONObject("data").getString("localId");
+                        Logger.i("callback localId: " + localId);
+
+                        // TODO: 更新消息发送状态为成功
+                        mRepository.updateMessageStatusSuccess(localId);
+
+                        // 发送成功
+                    } else {
+
+                        // 修改本地消息发送状态为error
+                        mRepository.updateMessageStatusError(localId);
+
+                        // 发送消息失败
+                        String message = object.getString("message");
+                        Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onError(JSONObject object) {
-
+                // 发送消息失败
+                Toast.makeText(ChatActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,7 +22,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -54,7 +52,6 @@ import com.bytedesk.core.event.KickoffEvent;
 import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.event.PreviewEvent;
 import com.bytedesk.core.repository.BDRepository;
-import com.bytedesk.core.room.entity.MessageEntity;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDCoreUtils;
 import com.bytedesk.core.util.BDFileUtils;
@@ -398,7 +395,7 @@ public class ChatWxActivity extends AppCompatActivity
             final String content = mInputEditText.getText().toString();
             if (content.trim().length() > 0) {
                 String textContent = ExpressionUtil.faceToCN(this, content);
-                Logger.i("faceToCn: " + textContent);
+//                Logger.i("faceToCn: " + textContent);
 
                 // TODO: 访客端客服会话：无客服在线时，发送消息会返回机器人答案
 
@@ -768,57 +765,42 @@ public class ChatWxActivity extends AppCompatActivity
             if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
                 Logger.i("访客会话: 指定客服聊天记录");
                 // 指定客服聊天记录
-                mMessageViewModel.getThreadMessages(mTidOrUidOrGid).observe(this, new Observer<List<MessageEntity>>() {
-                    @Override
-                    public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                        mChatAdapter.setMessages(messageEntities);
-                        mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                    }
+                mMessageViewModel.getThreadMessages(mTidOrUidOrGid).observe(this, messageEntities -> {
+                    mChatAdapter.setMessages(messageEntities);
+                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
                 });
             } else {
                 Logger.i("访客会话: 工作组聊天记录");
                 // 工作组聊天记录, TODO: 是否沿用此方式待定，转接会话聊天
-                mMessageViewModel.getWorkGroupMessages(mWorkGroupWid).observe(this, new Observer<List<MessageEntity>>() {
-                    @Override
-                    public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                        mChatAdapter.setMessages(messageEntities);
-                        mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                    }
+                mMessageViewModel.getWorkGroupMessages(mWorkGroupWid).observe(this, messageEntities -> {
+                    mChatAdapter.setMessages(messageEntities);
+                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
                 });
             }
 
         } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
             Logger.i("客服端：客服会话");
 
-            mMessageViewModel.getVisitorMessages(mUid).observe(this, new Observer<List<MessageEntity>>() {
-                @Override
-                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                    mChatAdapter.setMessages(messageEntities);
-                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                }
+            mMessageViewModel.getVisitorMessages(mUid).observe(this, messageEntities -> {
+                mChatAdapter.setMessages(messageEntities);
+                mRecyclerView.scrollToPosition(messageEntities.size() - 1);
             });
             // 设置当前会话
             updateCurrentThread();
         } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
             Logger.i("客服端：一对一会话");
 
-            mMessageViewModel.getContactMessages(mUid).observe(this, new Observer<List<MessageEntity>>() {
-                @Override
-                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                    mChatAdapter.setMessages(messageEntities);
-                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                }
+            mMessageViewModel.getContactMessages(mUid).observe(this, messageEntities -> {
+                mChatAdapter.setMessages(messageEntities);
+                mRecyclerView.scrollToPosition(messageEntities.size() - 1);
             });
 
         } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
             Logger.i("客服端：群组会话");
 
-            mMessageViewModel.getGroupMessages(mUid).observe(this, new Observer<List<MessageEntity>>() {
-                @Override
-                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                    mChatAdapter.setMessages(messageEntities);
-                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                }
+            mMessageViewModel.getGroupMessages(mUid).observe(this, messageEntities -> {
+                mChatAdapter.setMessages(messageEntities);
+                mRecyclerView.scrollToPosition(messageEntities.size() - 1);
             });
         }
     }
@@ -1976,7 +1958,6 @@ public class ChatWxActivity extends AppCompatActivity
         }
     }
 
-
     /**
      * 发送文本消息
      *
@@ -2003,6 +1984,9 @@ public class ChatWxActivity extends AppCompatActivity
 
                         String localId = object.getJSONObject("data").getString("localId");
                         Logger.i("callback localId: " + localId);
+
+                        // TODO: 更新消息发送状态为成功
+                        mRepository.updateMessageStatusSuccess(localId);
 
                     } else {
 
@@ -2075,6 +2059,9 @@ public class ChatWxActivity extends AppCompatActivity
 
                                     String localId = object.getJSONObject("data").getString("localId");
                                     Logger.i("callback localId: " + localId);
+
+                                    // TODO: 更新消息发送状态为成功
+                                    mRepository.updateMessageStatusSuccess(localId);
 
                                     // 发送成功
                                 } else {
@@ -2151,6 +2138,9 @@ public class ChatWxActivity extends AppCompatActivity
                                     String localId = object.getJSONObject("data").getString("localId");
                                     Logger.i("callback localId: " + localId);
 
+                                    // TODO: 更新消息发送状态为成功
+                                    mRepository.updateMessageStatusSuccess(localId);
+
                                     // 发送成功
                                 } else {
 
@@ -2185,6 +2175,187 @@ public class ChatWxActivity extends AppCompatActivity
                 Toast.makeText(ChatWxActivity.this, "上传语音失败", Toast.LENGTH_LONG).show();
             }
 
+        });
+    }
+
+
+    /**
+     * 上传并发送文件
+     *
+     * @param filePath
+     * @param fileName
+     */
+    private void uploadFile(String filePath, String fileName) {
+
+        BDCoreApi.uploadFile(this, filePath, fileName, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+                    // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
+                    final String localId = BDCoreUtils.uuid();
+                    String fileUrl  = object.getString("data");
+
+                    // 插入本地消息
+                    mRepository.insertFileMessageLocal(mTidOrUidOrGid, mWorkGroupWid, fileUrl, localId, mThreadType, "doc", "fileName", "fileSize");
+
+                    // 同步发送文件消息
+                    BDCoreApi.sendFileMessage(ChatWxActivity.this, mTidOrUidOrGid, fileUrl,  localId,  mThreadType, "doc", "fileName", "fileSize", new BaseCallback() {
+
+                        @Override
+                        public void onSuccess(JSONObject object) {
+                            //
+                            try {
+
+                                int status_code = object.getInt("status_code");
+                                if (status_code == 200) {
+
+                                    String localId = object.getJSONObject("data").getString("localId");
+                                    Logger.i("callback localId: " + localId);
+
+                                    // TODO: 更新消息发送状态为成功
+                                    mRepository.updateMessageStatusSuccess(localId);
+
+
+                                } else {
+                                    // 修改本地消息发送状态为error
+                                    mRepository.updateMessageStatusError(localId);
+
+                                    // 发送消息失败
+                                    String message = object.getString("message");
+                                    Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+                            // 发送消息失败
+                            Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+            }
+        });
+    }
+
+
+    /**
+     * 发送红包消息
+     * @param money 金额
+     */
+    private void sendRedPacketMessage(String money) {
+
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertRedPacketMessageLocal(mTidOrUidOrGid, mWorkGroupWid, money, localId, mThreadType);
+
+        //
+        BDCoreApi.sendRedPacketMessage(this, mTidOrUidOrGid, money, localId, mThreadType, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+                //
+                try {
+
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+
+                        String localId = object.getJSONObject("data").getString("localId");
+                        Logger.i("callback localId: " + localId);
+
+                        // TODO: 更新消息发送状态为成功
+                        mRepository.updateMessageStatusSuccess(localId);
+
+                        // 发送成功
+                    } else {
+
+                        // 修改本地消息发送状态为error
+                        mRepository.updateMessageStatusError(localId);
+
+                        // 发送消息失败
+                        String message = object.getString("message");
+                        Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                // 发送消息失败
+                Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+            }
+
+        });
+    }
+
+    /**
+     * 发送商品消息等
+     * @param custom
+     */
+    private void sendCommodityMessage(String custom) {
+
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertCommodityMessageLocal(mTidOrUidOrGid, mWorkGroupWid, custom, localId, mThreadType);
+
+        // 发送商品
+        BDCoreApi.sendCommodityMessage(this, mTidOrUidOrGid, custom, localId, mThreadType, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+                //
+                try {
+
+                    int status_code = object.getInt("status_code");
+                    if (status_code == 200) {
+
+                        String localId = object.getJSONObject("data").getString("localId");
+                        Logger.i("callback localId: " + localId);
+
+                        // TODO: 更新消息发送状态为成功
+                        mRepository.updateMessageStatusSuccess(localId);
+
+                        // 发送成功
+                    } else {
+
+                        // 修改本地消息发送状态为error
+                        mRepository.updateMessageStatusError(localId);
+
+                        // 发送消息失败
+                        String message = object.getString("message");
+                        Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                // 发送消息失败
+                Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+            }
         });
     }
 
@@ -2241,129 +2412,6 @@ public class ChatWxActivity extends AppCompatActivity
                     }
                 })
                 .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-    }
-
-    /**
-     * 上传并发送文件
-     *
-     * @param filePath
-     * @param fileName
-     */
-    private void uploadFile(String filePath, String fileName) {
-
-        BDCoreApi.uploadFile(this, filePath, fileName, new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-
-                try {
-                    // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
-                    final String localId = BDCoreUtils.uuid();
-                    String fileUrl  = object.getString("data");
-
-                    // 插入本地消息
-                    mRepository.insertFileMessageLocal(mTidOrUidOrGid, mWorkGroupWid, fileUrl, localId, mThreadType, "doc", "fileName", "fileSize");
-
-                    // 同步发送文件消息
-                    BDCoreApi.sendFileMessage(ChatWxActivity.this, mTidOrUidOrGid, fileUrl,  localId,  mThreadType, "doc", "fileName", "fileSize", new BaseCallback() {
-
-                        @Override
-                        public void onSuccess(JSONObject object) {
-                            //
-                            try {
-
-                                int status_code = object.getInt("status_code");
-                                if (status_code == 200) {
-
-                                    String localId = object.getJSONObject("data").getString("localId");
-                                    Logger.i("callback localId: " + localId);
-
-                                } else {
-                                    // 修改本地消息发送状态为error
-                                    mRepository.updateMessageStatusError(localId);
-
-                                    // 发送消息失败
-                                    String message = object.getString("message");
-                                    Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onError(JSONObject object) {
-                            // 发送消息失败
-                            Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-
-            }
-        });
-    }
-
-
-    /**
-     * 发送红包消息
-     * @param money 金额
-     */
-    private void sendRedPacketMessage(String money) {
-
-        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
-        final String localId = BDCoreUtils.uuid();
-
-        // 插入本地消息
-        mRepository.insertRedPacketMessageLocal(mTidOrUidOrGid, mWorkGroupWid, money, localId, mThreadType);
-
-        //
-        BDCoreApi.sendRedPacketMessage(this, mTidOrUidOrGid, money, localId, mThreadType, new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-
-            }
-        });
-    }
-
-    /**
-     * 发送商品消息等
-     * @param custom
-     */
-    private void sendCommodityMessage(String custom) {
-
-        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
-        final String localId = BDCoreUtils.uuid();
-
-        // 插入本地消息
-        mRepository.insertCommodityMessageLocal(mTidOrUidOrGid, mWorkGroupWid, custom, localId, mThreadType);
-
-        // 发送商品
-        BDCoreApi.sendCommodityMessage(this, mTidOrUidOrGid, custom, localId, mThreadType, new BaseCallback() {
-            @Override
-            public void onSuccess(JSONObject object) {
-
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-
-            }
-        });
     }
 
 
