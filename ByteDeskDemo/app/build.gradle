@@ -51,8 +51,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.bytedesk:core:1.7.3'
-    implementation 'com.bytedesk:ui:1.7.3'
+    implementation 'com.bytedesk:core:1.7.3.jjldxz.com'
+    implementation 'com.bytedesk:ui:1.7.3.jjldxz.com'
 
     // Butterknife
     // http://jakewharton.github.io/butterknife/
