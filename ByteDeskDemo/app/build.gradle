@@ -10,8 +10,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode 72
-        versionName "1.7.2"
+        versionCode 73
+        versionName "1.7.3"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -51,8 +51,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.bytedesk:core:1.7.2'
-    implementation 'com.bytedesk:ui:1.7.2'
+    implementation 'com.bytedesk:core:1.7.3'
+    implementation 'com.bytedesk:ui:1.7.3'
 
     // Butterknife
     // http://jakewharton.github.io/butterknife/
