@@ -1,6 +1,5 @@
 package com.bytedesk.demo.api;
 
-import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,15 +20,15 @@ import com.bytedesk.demo.common.ServerFragment;
 import com.bytedesk.demo.im.fragment.contact.ContactFragment;
 import com.bytedesk.demo.im.fragment.group.GroupFragment;
 import com.bytedesk.demo.im.fragment.notice.NoticeFragment;
+import com.bytedesk.demo.im.fragment.profile.ProfileFragment;
 import com.bytedesk.demo.im.fragment.queue.QueueFragment;
-import com.bytedesk.demo.im.fragment.setting.SettingFragment;
 import com.bytedesk.demo.im.fragment.social.TabFragment;
 import com.bytedesk.demo.kefu.fragment.ChatFragment;
-import com.bytedesk.demo.kefu.fragment.ProfileFragment;
 import com.bytedesk.demo.kefu.fragment.StatusFragment;
 import com.bytedesk.demo.kefu.fragment.ThreadFragment;
 import com.bytedesk.ui.api.BDUiApi;
 import com.orhanobut.logger.Logger;
+import com.qmuiteam.qmui.util.QMUIPackageHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
@@ -58,6 +57,8 @@ public class ApiFragment extends BaseFragment {
     private BDPreferenceManager mPreferenceManager;
     private QMUICommonListItemView loginItem;
 
+    private String version;
+
     @Override
     protected View onCreateView() {
         //
@@ -67,6 +68,8 @@ public class ApiFragment extends BaseFragment {
         mPreferenceManager = BDPreferenceManager.getInstance(getContext());
         EventBus.getDefault().register(this);
 
+        version = QMUIPackageHelper.getAppVersion(getContext());
+
         initTopBar();
         initGroupListView();
 
@@ -74,7 +77,8 @@ public class ApiFragment extends BaseFragment {
     }
 
     private void initTopBar() {
-        mTopBar.setTitle("萝卜丝(未连接)");
+
+        mTopBar.setTitle("萝卜丝" + version + "(未连接)");
     }
 
     private void initGroupListView() {
@@ -102,22 +106,18 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(scanItem, view -> {
                     final String[] items = new String[]{"登录二维码", "扫一扫"};
                     new QMUIDialog.CheckableDialogBuilder(getActivity())
-                            .addItems(items, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int index) {
+                            .addItems(items, (dialog, which) -> {
+                                dialog.dismiss();
 
-                                    dialog.dismiss();
+                                if (which == 0) {
+                                    // 生成登录二维码
+                                    QRCodeFragment qrCodeFragment = new QRCodeFragment();
+                                    startFragment(qrCodeFragment);
 
-                                    if (index == 0) {
-                                        // 生成登录二维码
-                                        QRCodeFragment qrCodeFragment = new QRCodeFragment();
-                                        startFragment(qrCodeFragment);
-
-                                    } else if (index == 1) {
-                                        // 扫一扫
-                                        ScanFragment scanFragment = new ScanFragment();
-                                        startFragment(scanFragment);
-                                    }
+                                } else if (which == 1) {
+                                    // 扫一扫
+                                    ScanFragment scanFragment = new ScanFragment();
+                                    startFragment(scanFragment);
                                 }
                             }).show();
                 })
@@ -145,6 +145,10 @@ public class ApiFragment extends BaseFragment {
         wapChatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView ticketItem = mGroupListView.createItemView("9.提交工单(TODO)");
         ticketItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView rateItem = mGroupListView.createItemView("10.引导应用商店好评(TODO)");
+        rateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView upgrateItem = mGroupListView.createItemView("11.引导新版本升级(TODO)");
+        upgrateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
                 .addItemView(chatItem, view -> {
@@ -152,7 +156,7 @@ public class ApiFragment extends BaseFragment {
                     startFragment(chatFragment);
                 })
                 .addItemView(userInfoItem, view -> {
-                    ProfileFragment profileFragment = new ProfileFragment();
+                    com.bytedesk.demo.kefu.fragment.ProfileFragment profileFragment = new com.bytedesk.demo.kefu.fragment.ProfileFragment();
                     startFragment(profileFragment);
                 })
                 .addItemView(statusItem, view -> {
@@ -180,6 +184,12 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(ticketItem, view -> {
                     // TODO: 提交工单
                 })
+                .addItemView(rateItem,  view -> {
+                    // TODO: 引导应用商店好评
+                })
+                .addItemView(upgrateItem,  view -> {
+                    // TODO: 引导新版本升级
+                })
                 .addTo(mGroupListView);
 
         // IM接口
@@ -197,7 +207,9 @@ public class ApiFragment extends BaseFragment {
         queueItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.通知接口");
         noticeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView settingItem = mGroupListView.createItemView("7.设置接口");
+        QMUICommonListItemView profileItem = mGroupListView.createItemView("7.个人资料接口");
+        profileItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView settingItem = mGroupListView.createItemView("8.设置接口");
         settingItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
 
         QMUIGroupListView.newSection(getContext())
@@ -225,9 +237,12 @@ public class ApiFragment extends BaseFragment {
                     NoticeFragment noticeFragment = new NoticeFragment();
                     startFragment(noticeFragment);
                 })
+                .addItemView(profileItem, view -> {
+                    ProfileFragment profileFragment = new ProfileFragment();
+                    startFragment(profileFragment);
+                })
                 .addItemView(settingItem, view -> {
-                    SettingFragment settingFragment = new SettingFragment();
-                    startFragment(settingFragment);
+
                 })
                 .addTo(mGroupListView);
     }
@@ -389,29 +404,49 @@ public class ApiFragment extends BaseFragment {
      * 退出登录
      */
     private void logout() {
-        //
-        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
-                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                .setTipWord(getResources().getString(R.string.bytedesk_logouting))
-                .create();
-        loadingDialog.show();
-        //
-        BDCoreApi.logout(getContext(), new BaseCallback() {
-            @Override
-            public void onSuccess(JSONObject object) {
-                loadingDialog.dismiss();
 
-                Toast.makeText(getContext(), "退出登录成功", Toast.LENGTH_SHORT).show();
-            }
+        new QMUIDialog.MessageDialogBuilder(getContext())
+                .setTitle("提示")
+                .setMessage("确定要退出登录吗？")
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
 
-            @Override
-            public void onError(JSONObject object) {
-                loadingDialog.dismiss();
+                        ///
+                        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
+                                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                                .setTipWord(getResources().getString(R.string.bytedesk_logouting))
+                                .create();
+                        loadingDialog.show();
+                        //
+                        BDCoreApi.logout(getContext(), new BaseCallback() {
+                            @Override
+                            public void onSuccess(JSONObject object) {
+                                loadingDialog.dismiss();
 
-                Logger.e("退出登录失败");
-                Toast.makeText(getContext(), "退出登录失败", Toast.LENGTH_SHORT).show();
-            }
-        });
+                                Toast.makeText(getContext(), "退出登录成功", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(JSONObject object) {
+                                loadingDialog.dismiss();
+
+                                Logger.e("退出登录失败");
+                                Toast.makeText(getContext(), "退出登录失败", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }
+                })
+                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+
     }
 
     /**
@@ -495,14 +530,14 @@ public class ApiFragment extends BaseFragment {
         String title = connectionStatus;
         if (connectionStatus.equals(BDCoreConstant.USER_STATUS_CONNECTING)) {
 
-            title = "萝卜丝(连接中...)";
+            title = "萝卜丝" + version + "(连接中...)";
         } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_CONNECTED)) {
 
-            title = "萝卜丝(已连接)";
+            title = "萝卜丝" + version + "(已连接)";
             loginItem.setDetailText("连接已建立: " + mPreferenceManager.getUsername());
         } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_DISCONNECTED)) {
 
-            title = "萝卜丝(连接断开)";
+            title = "萝卜丝" + version + "(连接断开)";
             loginItem.setDetailText("当前未连接");
         }
         mTopBar.setTitle(title);

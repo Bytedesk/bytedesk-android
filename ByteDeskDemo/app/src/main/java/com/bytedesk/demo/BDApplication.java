@@ -21,8 +21,17 @@ public class BDApplication extends Application{
         // http://facebook.github.io/stetho/
         // 使用方法： 浏览器中打开 chrome://inspect and 点击 "Inspect"
         Stetho.initializeWithDefaults(this);
+
+        // Logger初始化
         // https://github.com/orhanobut/logger
-        Logger.addLogAdapter(new AndroidLogAdapter());
+        Logger.addLogAdapter(new AndroidLogAdapter() {
+            @Override public boolean isLoggable(int priority, String tag) {
+//                return BuildConfig.DEBUG;
+                return true;
+            }
+        });
+
+        // QMUI初始化
         QMUISwipeBackActivityManager.init(this);
 
         // 初始化萝卜丝UI界面库

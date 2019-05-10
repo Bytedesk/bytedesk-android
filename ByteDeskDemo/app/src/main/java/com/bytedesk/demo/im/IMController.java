@@ -18,7 +18,7 @@ import com.bytedesk.demo.common.BaseController;
 import com.bytedesk.demo.im.fragment.contact.ContactFragment;
 import com.bytedesk.demo.im.fragment.group.GroupFragment;
 import com.bytedesk.demo.im.fragment.login.IntroFragment;
-import com.bytedesk.demo.im.fragment.setting.SettingFragment;
+import com.bytedesk.demo.im.fragment.profile.ProfileFragment;
 import com.bytedesk.demo.im.fragment.queue.QueueFragment;
 import com.bytedesk.demo.im.fragment.thread.ThreadFragment;
 import com.orhanobut.logger.Logger;
@@ -143,8 +143,8 @@ public class IMController extends BaseController {
                 .addItemView(settingItem, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        SettingFragment settingFragment = new SettingFragment();
-                        startFragment(settingFragment);
+                        ProfileFragment profileFragment = new ProfileFragment();
+                        startFragment(profileFragment);
                     }
                 })
                 .addTo(mGroupListView);

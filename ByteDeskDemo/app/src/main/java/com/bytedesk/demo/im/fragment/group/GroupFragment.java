@@ -78,22 +78,10 @@ public class GroupFragment extends BaseFragment implements SwipeItemClickListene
      */
     protected void initTopBar() {
         //
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         // 建群
-        mTopBar.addRightTextButton(getResources().getString(R.string.bytedesk_select), QMUIViewHelper.generateViewId())
-                .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //
-                SelectFragment selectFragment = new SelectFragment();
-                startFragment(selectFragment);
-            }
-        });
+        mTopBar.addRightTextButton("更多", QMUIViewHelper.generateViewId())
+                .setOnClickListener(v -> showActionSheet());
         mTopBar.setTitle(getResources().getString(R.string.bytedesk_group));
     }
 
@@ -194,6 +182,57 @@ public class GroupFragment extends BaseFragment implements SwipeItemClickListene
         });
     }
 
+    private void showActionSheet() {
+        new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
+                .addItem("建群")
+                .addItem("加群")
+                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
+                    @Override
+                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
+                        dialog.dismiss();
+
+                        if (position == 0) {
+
+                            SelectFragment selectFragment = new SelectFragment();
+                            startFragment(selectFragment);
+                        } else {
+
+                            BDCoreApi.joinGroup(getContext(), "201904231608313", new BaseCallback() {
+
+                                @Override
+                                public void onSuccess(JSONObject object) {
+
+                                    try {
+
+                                        int status_code = object.getInt("status_code");
+                                        if (status_code == 200) {
+
+                                            Logger.d("加群成功");
+
+                                        } else {
+                                            // 发送消息失败
+                                            String message = object.getString("message");
+                                            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                                        }
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }
+
+                                @Override
+                                public void onError(JSONObject object) {
+                                    Logger.e("加群失败");
+                                }
+
+                            });
+                        }
+                    }
+                })
+                .build()
+                .show();
+    }
 
     @Override
     public void onItemClick(View itemView, int position) {

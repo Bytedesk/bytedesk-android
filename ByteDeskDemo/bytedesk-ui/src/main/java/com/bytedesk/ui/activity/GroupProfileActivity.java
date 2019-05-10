@@ -161,13 +161,14 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                         final String nickname = text.toString();
 
-                        // TODO: 调用服务器接口
+                        // 调用服务器接口
                         BDCoreApi.updateGroupNickname(context, mGid, nickname, new BaseCallback() {
                             @Override
                             public void onSuccess(JSONObject object) {
 
                                 nicknameItem.setDetailText(nickname);
-                                // TODO: 更新本地群组会话thread昵称
+
+                                // TODO: 更新本地群组会话thread昵称、群组昵称
 
                             }
 

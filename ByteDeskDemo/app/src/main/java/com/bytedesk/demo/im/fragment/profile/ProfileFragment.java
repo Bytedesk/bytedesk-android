@@ -1,4 +1,4 @@
-package com.bytedesk.demo.im.fragment.setting;
+package com.bytedesk.demo.im.fragment.profile;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +32,7 @@ import butterknife.ButterKnife;
 /**
  * @author bytedesk.com on 2018/3/26.
  */
-public class SettingFragment extends BaseFragment {
+public class ProfileFragment extends BaseFragment {
 
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
     @BindView(R.id.groupListView) QMUIGroupListView mGroupListView;
