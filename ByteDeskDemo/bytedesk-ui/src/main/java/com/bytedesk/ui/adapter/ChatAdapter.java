@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -117,6 +118,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 break;
             case MessageEntity.TYPE_FILE_SELF_ID:
                 layout = R.layout.bytedesk_message_item_file_self;
+                break;
+            case MessageEntity.TYPE_ROBOT_ID:
+                layout = R.layout.bytedesk_message_item_robot;
+                break;
+            case MessageEntity.TYPE_ROBOT_SELF_ID:
+                layout = R.layout.bytedesk_message_item_robot;
                 break;
             default:
                 layout = R.layout.bytedesk_message_item_text;
@@ -238,6 +245,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 initAvatar();
                 fileTextView = itemView.findViewById(R.id.bytedesk_message_item_file);
                 // TODO
+            } else if (messageViewType == MessageEntity.TYPE_ROBOT_ID
+                    || messageViewType == MessageEntity.TYPE_ROBOT_SELF_ID) {
+                initAvatar();
+                contentTextView = itemView.findViewById(R.id.bytedesk_message_item_content);
             }
 
             // 收到的消息
@@ -246,7 +257,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     || messageViewType == MessageEntity.TYPE_VOICE_ID
                     || messageViewType == MessageEntity.TYPE_VIDEO_ID
                     || messageViewType == MessageEntity.TYPE_FILE_ID
-                    || messageViewType == MessageEntity.TYPE_RED_PACKET_ID) {
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_ID
+                    || messageViewType == MessageEntity.TYPE_ROBOT_ID) {
                 nicknameTextView = itemView.findViewById(R.id.bytedesk_message_item_nickname);
             }
 
@@ -256,7 +268,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID
                     || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID
                     || messageViewType == MessageEntity.TYPE_FILE_SELF_ID
-                    || messageViewType == MessageEntity.TYPE_RED_PACKET_SELF_ID) {
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_ROBOT_SELF_ID) {
                 progressBar = itemView.findViewById(R.id.bytedesk_message_item_loading);
                 errorImageView = itemView.findViewById(R.id.bytedesk_message_item_error);
             }
@@ -405,6 +418,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 loadAvatar(msgEntity);
                 //
                 fileTextView.setText(msgEntity.getFileUrl());
+            }
+            // 机器
+            else if (messageViewType == MessageEntity.TYPE_ROBOT_ID
+                        || messageViewType == MessageEntity.TYPE_ROBOT_SELF_ID) {
+                loadAvatar(msgEntity);
+                //
+                contentTextView.setText(Html.fromHtml(msgEntity.getContent()));
             }
 
             // 收到的消息

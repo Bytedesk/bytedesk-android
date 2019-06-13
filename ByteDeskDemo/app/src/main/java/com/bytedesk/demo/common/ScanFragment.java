@@ -21,15 +21,12 @@ import cn.bingoogolapple.qrcode.zxing.ZXingView;
 import static android.content.Context.VIBRATOR_SERVICE;
 
 /**
- * 关于界面
- * <p>
- * Created by Kayo on 2016/11/18.
+ *
  */
 public class ScanFragment extends BaseFragment implements QRCodeView.Delegate {
 
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
     @BindView(R.id.zxingview) ZXingView mZXingView;
-
 
     @Override
     protected View onCreateView() {
@@ -42,15 +39,8 @@ public class ScanFragment extends BaseFragment implements QRCodeView.Delegate {
         return root;
     }
 
-
     private void initTopBar() {
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
-
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle(getResources().getString(R.string.bytedesk_scan));
     }
 

@@ -14,18 +14,24 @@ import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDPreferenceManager;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
-import com.bytedesk.demo.common.QRCodeFragment;
-import com.bytedesk.demo.common.ScanFragment;
+import com.bytedesk.demo.common.ScanQRFragment;
 import com.bytedesk.demo.common.ServerFragment;
+import com.bytedesk.demo.common.SettingFragment;
 import com.bytedesk.demo.im.fragment.contact.ContactFragment;
 import com.bytedesk.demo.im.fragment.group.GroupFragment;
 import com.bytedesk.demo.im.fragment.notice.NoticeFragment;
 import com.bytedesk.demo.im.fragment.profile.ProfileFragment;
 import com.bytedesk.demo.im.fragment.queue.QueueFragment;
 import com.bytedesk.demo.im.fragment.social.TabFragment;
+import com.bytedesk.demo.kefu.fragment.AppRateFragment;
+import com.bytedesk.demo.kefu.fragment.AppUpgradeFragment;
 import com.bytedesk.demo.kefu.fragment.ChatFragment;
+import com.bytedesk.demo.kefu.fragment.FeedbackFragment;
+import com.bytedesk.demo.kefu.fragment.SupportFragment;
 import com.bytedesk.demo.kefu.fragment.StatusFragment;
 import com.bytedesk.demo.kefu.fragment.ThreadFragment;
+import com.bytedesk.demo.kefu.fragment.TicketFragment;
+import com.bytedesk.demo.utils.BDDemoConst;
 import com.bytedesk.ui.api.BDUiApi;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIPackageHelper;
@@ -92,8 +98,10 @@ public class ApiFragment extends BaseFragment {
         loginItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView logoutItem = mGroupListView.createItemView("3. 退出登录接口");
         logoutItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView scanItem = mGroupListView.createItemView("4. 扫码登录/扫一扫");
+        QMUICommonListItemView scanItem = mGroupListView.createItemView("4. 二维码");
+        scanItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView multiAccountItem = mGroupListView.createItemView("5. 多账号管理(TODO)");
+        multiAccountItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("公共接口")
                 .addItemView(serverItem, view -> {
@@ -104,22 +112,8 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(loginItem, view -> showLoginSheet())
                 .addItemView(logoutItem, view -> logout())
                 .addItemView(scanItem, view -> {
-                    final String[] items = new String[]{"登录二维码", "扫一扫"};
-                    new QMUIDialog.CheckableDialogBuilder(getActivity())
-                            .addItems(items, (dialog, which) -> {
-                                dialog.dismiss();
-
-                                if (which == 0) {
-                                    // 生成登录二维码
-                                    QRCodeFragment qrCodeFragment = new QRCodeFragment();
-                                    startFragment(qrCodeFragment);
-
-                                } else if (which == 1) {
-                                    // 扫一扫
-                                    ScanFragment scanFragment = new ScanFragment();
-                                    startFragment(scanFragment);
-                                }
-                            }).show();
+                    ScanQRFragment scanQRFragment = new ScanQRFragment();
+                    startFragment(scanQRFragment);
                 })
                 .addItemView(multiAccountItem, view -> {
                     // TODO: 多账号管理
@@ -135,19 +129,17 @@ public class ApiFragment extends BaseFragment {
         statusItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView sessionHistoryItem = mGroupListView.createItemView("4.历史会话记录接口");
         sessionHistoryItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView feedbackItem = mGroupListView.createItemView("5.意见反馈接口(TODO)");
-        feedbackItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView helpCenterItem = mGroupListView.createItemView("6.帮助中心接口(TODO)");
-        helpCenterItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView faqItem = mGroupListView.createItemView("7.常见问题接口(TODO)");
-        faqItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView wapChatItem = mGroupListView.createItemView("8.网页会话演示");
-        wapChatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView ticketItem = mGroupListView.createItemView("9.提交工单(TODO)");
+        QMUICommonListItemView ticketItem = mGroupListView.createItemView("5.提交工单");
         ticketItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView rateItem = mGroupListView.createItemView("10.引导应用商店好评(TODO)");
+        QMUICommonListItemView feedbackItem = mGroupListView.createItemView("6.意见反馈");
+        feedbackItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView helpCenterItem = mGroupListView.createItemView("7.帮助中心");
+        helpCenterItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView wapChatItem = mGroupListView.createItemView("8.网页会话");
+        wapChatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView rateItem = mGroupListView.createItemView("9.引导应用商店好评(TODO)");
         rateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView upgrateItem = mGroupListView.createItemView("11.引导新版本升级(TODO)");
+        QMUICommonListItemView upgrateItem = mGroupListView.createItemView("10.引导新版本升级(TODO)");
         upgrateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
@@ -167,28 +159,32 @@ public class ApiFragment extends BaseFragment {
                     ThreadFragment threadFragment = new ThreadFragment();
                     startFragment(threadFragment);
                 })
+                .addItemView(ticketItem, view -> {
+                    TicketFragment ticketFragment = new TicketFragment();
+                    startFragment(ticketFragment);
+                })
                 .addItemView(feedbackItem, view -> {
-                    // TODO: 意见反馈接口
+                    FeedbackFragment feedbackFragment = new FeedbackFragment();
+                    startFragment(feedbackFragment);
                 })
                 .addItemView(helpCenterItem, view -> {
-                    // TODO: 帮助中心接口
-                })
-                .addItemView(faqItem, view -> {
-                    // TODO: 常见问题接口
+                    SupportFragment supportFragment = new SupportFragment();
+                    startFragment(supportFragment);
                 })
                 .addItemView(wapChatItem, view -> {
-                    // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
-                    String url = "https://vip.bytedesk.com/chatvue?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph";
-                    BDUiApi.startHtml5Chat(getContext(), url);
-                })
-                .addItemView(ticketItem, view -> {
-                    // TODO: 提交工单
+                    // 注意: 登录后台->所有设置->所有客服->技能组->获取代码 获取相应URL
+                    String url = "https://www.bytedesk.com/chatvue?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
+                    BDUiApi.startHtml5Chat(getContext(), url, "在线客服");
                 })
                 .addItemView(rateItem,  view -> {
                     // TODO: 引导应用商店好评
+                    AppRateFragment appRateFragment = new AppRateFragment();
+                    startFragment(appRateFragment);
                 })
                 .addItemView(upgrateItem,  view -> {
                     // TODO: 引导新版本升级
+                    AppUpgradeFragment appUpgradeFragment = new AppUpgradeFragment();
+                    startFragment(appUpgradeFragment);
                 })
                 .addTo(mGroupListView);
 
@@ -205,7 +201,7 @@ public class ApiFragment extends BaseFragment {
         threadItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView queueItem = mGroupListView.createItemView("5.排队接口");
         queueItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.通知接口");
+        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.系统消息接口");
         noticeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView profileItem = mGroupListView.createItemView("7.个人资料接口");
         profileItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
@@ -242,7 +238,8 @@ public class ApiFragment extends BaseFragment {
                     startFragment(profileFragment);
                 })
                 .addItemView(settingItem, view -> {
-
+                    SettingFragment settingFragment = new SettingFragment();
+                    startFragment(settingFragment);
                 })
                 .addTo(mGroupListView);
     }
@@ -251,6 +248,7 @@ public class ApiFragment extends BaseFragment {
      * 注册扩展
      */
     private void showRegisterSheet() {
+        //
         new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
                 .addItem("自定义用户名")
                 .addItem("匿名用户")
@@ -321,12 +319,9 @@ public class ApiFragment extends BaseFragment {
                         //
                         String username = text.toString();
                         String password = "123456";
-                        String appKey = "201809171553112";
-                        // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
-                        String subDomain = "vip";
 
                         // 调用登录接口
-                        BDCoreApi.login(getContext(), username, password, appKey, subDomain, new BaseCallback() {
+                        BDCoreApi.login(getContext(), username, password, BDDemoConst.DEFAULT_TEST_APPKEY, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -353,7 +348,6 @@ public class ApiFragment extends BaseFragment {
             .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
     }
 
-
     /**
      * 匿名登录
      */
@@ -365,14 +359,8 @@ public class ApiFragment extends BaseFragment {
                 .create();
         loadingDialog.show();
 
-        // TODO: 参考文档：https://github.com/pengjinning/bytedesk-android
-        // appkey和subDomain请替换为真实值
-        final String appKey = "201809171553112";
-        // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
-        final String subDomain = "vip";
-
         // 授权登录接口
-        BDCoreApi.visitorLogin(getContext(), appKey, subDomain, new LoginCallback() {
+        BDCoreApi.visitorLogin(getContext(), BDDemoConst.DEFAULT_TEST_APPKEY, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new LoginCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -476,15 +464,14 @@ public class ApiFragment extends BaseFragment {
                         String username = text.toString();
                         String nickname = "自定义测试账号"+username;
                         String password = "123456";
-                        // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
-                        String subDomain = "vip";
                         //
-                        BDCoreApi.registerUser(getContext(), username, nickname, password, subDomain, new BaseCallback() {
+                        BDCoreApi.registerUser(getContext(), username, nickname, password, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
 
                                 try {
+                                    //
                                     String message = object.getString("message");
                                     int status_code = object.getInt("status_code");
                                     //
@@ -497,7 +484,6 @@ public class ApiFragment extends BaseFragment {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-
                             }
 
                             @Override
@@ -513,7 +499,6 @@ public class ApiFragment extends BaseFragment {
                 }
             })
             .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-
     }
 
     /**

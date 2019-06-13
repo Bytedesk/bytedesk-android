@@ -1,5 +1,7 @@
 package com.bytedesk.demo.im.fragment.profile;
 
+import android.support.annotation.NonNull;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -17,14 +19,21 @@ import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUIRadiusImageView;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
+import com.yanzhenjie.album.Action;
+import com.yanzhenjie.album.Album;
+import com.yanzhenjie.album.AlbumFile;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -108,19 +117,23 @@ public class ProfileFragment extends BaseFragment {
         acceptStatusItem.setDetailText(mPreferenceManager.getAcceptStatus());
         acceptStatusItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
 
-        QMUIGroupListView.newSection(getContext()).addItemView(autoItem, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Logger.d("autoItem item clicked");
-                showAutoReplySheet();
-            }
-        }).addItemView(acceptStatusItem, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Logger.d("acceptStatusItem item clicked");
-                showAcceptStatusSheet();
-            }
-        }).addTo(mGroupListView);
+        //
+        QMUIGroupListView.newSection(getContext())
+                .setTitle("客服端相关接口")
+                .setDescription("可用于开发者自行开发客服端(用于客服接待访客)，注意: 非访客端")
+                .addItemView(autoItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Logger.d("autoItem item clicked");
+                        showAutoReplySheet();
+                    }
+                }).addItemView(acceptStatusItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Logger.d("acceptStatusItem item clicked");
+                        showAcceptStatusSheet();
+                    }
+                }).addTo(mGroupListView);
     }
 
     /**
@@ -137,6 +150,22 @@ public class ProfileFragment extends BaseFragment {
                     public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
                         dialog.dismiss();
 
+                        if (position == 0) {
+
+                            // 选取头像
+                            chooseImage();
+
+                        } else if (position == 1) {
+
+                            // 弹出输入框，修改昵称
+                            showEditNicknameDialog();
+
+                        } else if (position == 2) {
+
+                            // 弹出输入框，修改签名
+                            showEditDescriptionDialog();
+
+                        }
                     }
                 })
                 .build()
@@ -227,6 +256,135 @@ public class ProfileFragment extends BaseFragment {
                 })
                 .build()
                 .show();
+    }
+
+
+    /**
+     * 输入昵称
+     */
+    private void showEditNicknameDialog() {
+
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        builder.setTitle("昵称")
+                .setPlaceholder("在此输入昵称")
+                .setInputType(InputType.TYPE_CLASS_TEXT)
+                .addAction("取消", (dialog, index) -> dialog.dismiss())
+                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        final CharSequence text = builder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
+
+                            dialog.dismiss();
+
+
+                        } else {
+                            Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+    }
+
+    /**
+     * 输入签名
+     */
+    private void showEditDescriptionDialog() {
+
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        builder.setTitle("签名")
+            .setPlaceholder("在此输入签名")
+            .setInputType(InputType.TYPE_CLASS_TEXT)
+            .addAction("取消", (dialog, index) -> dialog.dismiss())
+            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
+
+                        dialog.dismiss();
+
+
+                    } else {
+                        Toast.makeText(getActivity(), "请填入签名", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            })
+            .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+    }
+
+
+    /**
+     * 选择图片
+     */
+    private void chooseImage() {
+        // 目前仅允许一次选一张图片
+        Album.image(this)
+                .singleChoice()
+                .camera(false)
+                .onResult(new Action<ArrayList<AlbumFile>>() {
+                    @Override
+                    public void onAction(@NonNull ArrayList<AlbumFile> result) {
+
+                        if (result.size() > 0) {
+                            AlbumFile albumFile = result.get(0);
+
+                            uploadAvatar(albumFile.getPath());
+                        }
+                    }
+                })
+                .onCancel(new Action<String>() {
+                    @Override
+                    public void onAction(@NonNull String result) {
+                        Toast.makeText(getContext(), "取消选择图片", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .start();
+    }
+
+    /**
+     * 上传图片 并 设置头像
+     * @param filePath
+     */
+    private void uploadAvatar(String filePath) {
+
+        Logger.i("uploadAvatar %s", filePath);
+
+        BDCoreApi.uploadAvatar(getContext(), filePath, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                try {
+
+                    String avatarUrl = object.getString("data");
+                    Logger.i("avatarUrl %s", avatarUrl);
+
+                    BDCoreApi.setAvatar(getContext(), avatarUrl, new BaseCallback() {
+                        @Override
+                        public void onSuccess(JSONObject object) {
+
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //
+
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+            }
+        });
+
     }
 
     /**

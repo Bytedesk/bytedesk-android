@@ -19,11 +19,16 @@ import android.webkit.WebViewClient;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.util.BDUiConstant;
 import com.orhanobut.logger.Logger;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 
 public class BrowserActivity extends AppCompatActivity {
 
+    private QMUITopBarLayout mTopBar;
     private WebView mWebView;
+    //
     private String mUrl;
+    private String mTitle;
 
     //Android 中Webview 自适应屏幕
     //http://www.cnblogs.com/bluestorm/archive/2013/04/15/3021996.html
@@ -42,6 +47,7 @@ public class BrowserActivity extends AppCompatActivity {
         setContentView(R.layout.bytedesk_activity_browser);
 
         mUrl = getIntent().getStringExtra(BDUiConstant.EXTRA_URL);
+        mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
 
         mWebView = findViewById(R.id.bytedesk_webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -68,6 +74,12 @@ public class BrowserActivity extends AppCompatActivity {
         mWebView.setWebChromeClient(myWebChromeClient);
 
         mWebView.loadUrl(mUrl);
+
+        //
+        mTopBar = findViewById(R.id.bytedesk_browser_topbarlayout);
+        mTopBar.setTitle(mTitle);
+        mTopBar.addLeftBackImageButton().setOnClickListener(view -> finish());
+        QMUIStatusBarHelper.translucent(this);
     }
 
     /**

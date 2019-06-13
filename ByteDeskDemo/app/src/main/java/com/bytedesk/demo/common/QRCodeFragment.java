@@ -17,9 +17,7 @@ import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
 import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
 
 /**
- * 关于界面
- * <p>
- * Created by Kayo on 2016/11/18.
+ * 
  */
 public class QRCodeFragment extends BaseFragment {
 
@@ -38,12 +36,7 @@ public class QRCodeFragment extends BaseFragment {
     }
 
     private void initTopBar() {
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle(getResources().getString(R.string.bytedesk_qrcode));
     }
 
@@ -67,11 +60,6 @@ public class QRCodeFragment extends BaseFragment {
                 }
             }
         }.execute();
-    }
-
-    @Override
-    public TransitionConfig onFetchTransitionConfig() {
-        return SCALE_TRANSITION_CONFIG;
     }
 
 }

@@ -43,29 +43,32 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import static com.bytedesk.demo.utils.BDDemoConst.DEFAULT_TEST_ADMIN_UID;
 
-
 /**
  * TODO： 待上线
- *
  */
-public class FeedbackFragment extends BaseFragment {
+public class TicketFragment extends BaseFragment {
 
     @BindView(R.id.topbar)
     QMUITopBarLayout mTopBar;
     @BindView(R.id.groupListView)
     QMUIGroupListView mGroupListView;
 
+    //
+    private QMUICommonListItemView urgentItem;
     private QMUICommonListItemView categoryItem;
     private QMUICommonListItemView contentItem;
     private QMUICommonListItemView imageItem;
     private QMUICommonListItemView mobileItem;
     private QMUICommonListItemView emailItem;
+//    private ImageView imageView;
 
-    private String mTitle = "意见反馈";
+    private String mTitle = "提交工单";
 
     //
     private Map<String, String> mCategoryMap = new HashMap<>();
-    //
+
+    // 注意：mUrgent仅有两个值，NSString类型，紧急：“1”，一般：“0”
+    private String mUrgent = "0";
     private String mCategoryCid;
     //
     private String mContent;
@@ -82,30 +85,32 @@ public class FeedbackFragment extends BaseFragment {
         initGroupListView();
 
         //
-        getFeedbackCategories();
+        getTicketCategories();
+
+        //
+        requirePermissions();
 
         return root;
     }
 
     private void initTopBar() {
-
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
-
+        mTopBar.addLeftBackImageButton().setOnClickListener(v ->  popBackStack());
         mTopBar.setTitle(mTitle);
     }
 
     private void initGroupListView() {
-
         //
+        urgentItem = mGroupListView.createItemView("优先级");
+        urgentItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        urgentItem.setDetailText(mUrgent.equals("0") ? "一般" : "紧急");
         categoryItem = mGroupListView.createItemView("分类");
         categoryItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
-                .addItemView(categoryItem, v -> {
+                .addItemView(urgentItem, v -> {
+
+                    showChooseUrgentDialog();
+
+                }).addItemView(categoryItem, v -> {
 
                     showChooseCategoryDialog();
 
@@ -145,9 +150,9 @@ public class FeedbackFragment extends BaseFragment {
 
                 }).addItemView(emailItem, v -> {
 
-            showEditEmailDialog();
+                    showEditEmailDialog();
 
-        }).addTo(mGroupListView);
+                }).addTo(mGroupListView);
 
         // 提交
         QMUICommonListItemView submitItem = mGroupListView.createItemView("提交");
@@ -156,18 +161,18 @@ public class FeedbackFragment extends BaseFragment {
                 .addItemView(submitItem, v -> {
                     Logger.i("提交");
 
-                    createFeedback();
+                    createTicket();
 
                 }).addTo(mGroupListView);
 
     }
 
     /**
-     * 加载意见反馈分类
+     * 加载工单分类
      */
-    private void getFeedbackCategories() {
+    private void getTicketCategories() {
 
-        BDCoreApi.getFeedbackCategories(getContext(), DEFAULT_TEST_ADMIN_UID, new BaseCallback() {
+        BDCoreApi.getTicketCategories(getContext(), DEFAULT_TEST_ADMIN_UID, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -196,13 +201,36 @@ public class FeedbackFragment extends BaseFragment {
 
             @Override
             public void onError(JSONObject object) {
-                Toast.makeText(getContext(), "加载意见反馈分类失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "加载工单分类失败", Toast.LENGTH_LONG).show();
             }
         });
     }
 
     /**
-     * 选择意见反馈分类
+     * 选择优先级
+     */
+    private void showChooseUrgentDialog() {
+
+        final String[] items = new String[]{"一般", "紧急"};
+        final int checkedIndex = 0;
+        new QMUIDialog.CheckableDialogBuilder(getActivity())
+                .setCheckedIndex(checkedIndex)
+                .addItems(items, (dialog, which) -> {
+                    dialog.dismiss();
+
+                    if (which == 0) {
+                        urgentItem.setDetailText("一般");
+                        mUrgent = "0";
+                    } else {
+                        urgentItem.setDetailText("紧急");
+                        mUrgent = "1";
+                    }
+
+                }).show();
+    }
+
+    /**
+     * 选择工单分类
      */
     private void showChooseCategoryDialog() {
 
@@ -226,33 +254,31 @@ public class FeedbackFragment extends BaseFragment {
     }
 
     /**
-     * 输入反馈内容
+     * 输入工单内容
      */
     private void showEditContentDialog() {
-
+        //
         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
         builder.setTitle("工单内容")
-                .setPlaceholder("在此输入内容")
-                .setInputType(InputType.TYPE_CLASS_TEXT)
-                .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        final CharSequence text = builder.getEditText().getText();
-                        if (text != null && text.length() > 0) {
+            .setPlaceholder("在此输入内容")
+            .setInputType(InputType.TYPE_CLASS_TEXT)
+            .addAction("取消", (dialog, index) -> dialog.dismiss())
+            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
 
-                            dialog.dismiss();
-                            mContent = text.toString();
-                            contentItem.setDetailText(text.toString());
+                        dialog.dismiss();
+                        mContent = text.toString();
+                        contentItem.setDetailText(text.toString());
 
-
-                        } else {
-                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-
+                }
+            })
+            .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
     }
 
     /**
@@ -266,7 +292,7 @@ public class FeedbackFragment extends BaseFragment {
                 .onResult(new Action<ArrayList<AlbumFile>>() {
                     @Override
                     public void onAction(@NonNull ArrayList<AlbumFile> result) {
-
+                        //
                         if (result.size() > 0) {
                             AlbumFile albumFile = result.get(0);
 
@@ -288,98 +314,93 @@ public class FeedbackFragment extends BaseFragment {
      * 输入手机号
      */
     private void showEditMobileDialog() {
-
+        //
         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
         builder.setTitle("手机号")
-                .setPlaceholder("在此输入手机号")
-                .setInputType(InputType.TYPE_CLASS_TEXT)
-                .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        final CharSequence text = builder.getEditText().getText();
-                        if (text != null && text.length() > 0) {
+            .setPlaceholder("在此输入手机号")
+            .setInputType(InputType.TYPE_CLASS_TEXT)
+            .addAction("取消", (dialog, index) -> dialog.dismiss())
+            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
 
-                            dialog.dismiss();
-                            mMobile = text.toString();
-                            mobileItem.setDetailText(text.toString());
+                        dialog.dismiss();
+                        mMobile = text.toString();
+                        mobileItem.setDetailText(text.toString());
 
-                        } else {
-                            Toast.makeText(getActivity(), "请填入手机号", Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Toast.makeText(getActivity(), "请填入手机号", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-
+                }
+            })
+            .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
     }
 
     /**
      * 输入邮箱
      */
     private void showEditEmailDialog() {
-
+        //
         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
         builder.setTitle("邮箱")
-                .setPlaceholder("在此输入邮箱")
-                .setInputType(InputType.TYPE_CLASS_TEXT)
-                .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        final CharSequence text = builder.getEditText().getText();
-                        if (text != null && text.length() > 0) {
+            .setPlaceholder("在此输入邮箱")
+            .setInputType(InputType.TYPE_CLASS_TEXT)
+            .addAction("取消", (dialog, index) -> dialog.dismiss())
+            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
 
-                            dialog.dismiss();
-                            mEmail = text.toString();
-                            emailItem.setDetailText(text.toString());
+                        dialog.dismiss();
+                        mEmail = text.toString();
+                        emailItem.setDetailText(text.toString());
 
-                        } else {
-                            Toast.makeText(getActivity(), "请填入邮箱", Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Toast.makeText(getActivity(), "请填入邮箱", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-
+                }
+            }).create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
     }
 
     /**
-     * 提交反馈
+     * 提交工单
      */
-    private void createFeedback() {
+    private void createTicket() {
         //
-        BDCoreApi.createFeedback(getContext(), DEFAULT_TEST_ADMIN_UID,
-                mCategoryCid, mContent, mMobile, mEmail, mFileUrl,
-                new BaseCallback() {
+        BDCoreApi.createTicket(getContext(), DEFAULT_TEST_ADMIN_UID,
+            mUrgent, mCategoryCid, mContent, mMobile, mEmail, mFileUrl,
+            new BaseCallback() {
 
-                    @Override
-                    public void onSuccess(JSONObject object) {
-
+                @Override
+                public void onSuccess(JSONObject object) {
+                    //
+                    try {
                         //
-                        try {
+                        int status_code = object.getInt("status_code");
+                        if (status_code == 200) {
 
-                            int status_code = object.getInt("status_code");
-                            if (status_code == 200) {
+                            Toast.makeText(getContext(), "提交工单成功", Toast.LENGTH_LONG).show();
 
-                                Toast.makeText(getContext(), "提交意见反馈成功", Toast.LENGTH_LONG).show();
+                        } else {
 
-                            } else {
-
-                                String message = object.getString("message");
-                                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            String message = object.getString("message");
+                            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
                         }
-                    }
 
-                    @Override
-                    public void onError(JSONObject object) {
-                        Toast.makeText(getContext(), "提交意见反馈失败", Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                });
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+                    Toast.makeText(getContext(), "提交工单失败", Toast.LENGTH_LONG).show();
+                }
+            });
     }
-
 
 
     // 请求拍照 和 相册权限
@@ -473,5 +494,6 @@ public class FeedbackFragment extends BaseFragment {
             imageItem.setImageDrawable(result);
         }
     }
+
 
 }

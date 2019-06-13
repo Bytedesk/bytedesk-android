@@ -19,10 +19,6 @@ import butterknife.ButterKnife;
 /**
  *
  *  TODO:
- *    1. 普通会话
- *    2. 电商会话：传递商品参数
- *    3. 默认机器人会话
- *    4. activity方式打开
  *    5. fragment方式打开
  *
  */
@@ -36,8 +32,10 @@ public class ChatFragment extends BaseFragment {
     private String wId = "201807171659201";
     // 指定坐席uid
     private String agentUid = "201808221551193";
-    // 设置有前置选择的工作组
+    // 设置有前置选择的工作组: dxz测试组
     private String preWid = "201808101819291";
+    // 机器人测试组
+    private String robotWid = "201809061716221";
 
     @Override
     protected View onCreateView() {
@@ -137,9 +135,19 @@ public class ChatFragment extends BaseFragment {
                 @Override
                 public void onClick(View view) {
                     //
-                    BDUiApi.startWorkGroupChatActivity(getContext(), preWid, "工作组会话");
+                    BDUiApi.startWorkGroupChatActivity(getContext(), preWid, "前置选择");
                 }
             }).addTo(mGroupListView);
+
+        //
+        QMUICommonListItemView robotChatItem = mGroupListView.createItemView("工作组会话:" +  robotWid);
+        //
+        QMUIGroupListView.newSection(getContext())
+                .setTitle("默认机器人")
+                .setDescription("在后台设置默认机器人")
+                .addItemView(robotChatItem, v -> {
+                    BDUiApi.startWorkGroupChatActivity(getContext(), robotWid, "默认机器人");
+                }).addTo(mGroupListView);
 
 
     }

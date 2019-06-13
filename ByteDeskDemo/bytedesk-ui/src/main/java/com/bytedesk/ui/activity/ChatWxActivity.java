@@ -475,8 +475,7 @@ public class ChatWxActivity extends AppCompatActivity
                                 Toast.makeText(ChatWxActivity.this, "请填入金额", Toast.LENGTH_SHORT).show();
                             }
                         }
-                    })
-                    .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+                    }).show();
 
 
         } else if (view.getId() == R.id.appkefu_plus_file_btn) {
@@ -1133,6 +1132,11 @@ public class ChatWxActivity extends AppCompatActivity
                             }
                         }).show();
 
+            } else if (status_code == 206) {
+
+
+
+
             } else {
                 // 请求会话失败
                 String message = object.getString("message");
@@ -1465,8 +1469,7 @@ public class ChatWxActivity extends AppCompatActivity
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         BDUiConstant.PERMISSION_REQUEST_ALBUM);
                             }
-                        })
-                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+                        }).show();
             }
             else {
                 pickImageFromAlbum();
@@ -1510,8 +1513,7 @@ public class ChatWxActivity extends AppCompatActivity
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         BDUiConstant.PERMISSION_REQUEST_CAMERA);
                             }
-                        })
-                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+                        }).show();
             }
             else {
                 takeCameraImage();
@@ -2488,8 +2490,7 @@ public class ChatWxActivity extends AppCompatActivity
                     } else {
                         Toast.makeText(ChatWxActivity.this, "请填入时长", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+                }).show();
     }
 
 

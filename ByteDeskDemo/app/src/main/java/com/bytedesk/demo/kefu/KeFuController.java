@@ -20,6 +20,7 @@ import com.bytedesk.demo.kefu.fragment.IntroFragment;
 import com.bytedesk.demo.kefu.fragment.ProfileFragment;
 import com.bytedesk.demo.kefu.fragment.StatusFragment;
 import com.bytedesk.demo.kefu.fragment.ThreadFragment;
+import com.bytedesk.demo.utils.BDDemoConst;
 import com.bytedesk.ui.api.BDUiApi;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
@@ -145,8 +146,8 @@ public class KeFuController extends BaseController {
                     @Override
                     public void onClick(View view) {
                         // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
-                        String url = "https://vip.bytedesk.com/visitor/chat?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph";
-                        BDUiApi.startHtml5Chat(getContext(), url);
+                        String url = "https://vip.bytedesk.com/visitor/chat?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
+                        BDUiApi.startHtml5Chat(getContext(), url, "在线客服");
                     }
                 })
                 .addTo(mGroupListView);
@@ -155,13 +156,8 @@ public class KeFuController extends BaseController {
 
     private void login() {
 
-        // TODO: 参考文档：https://github.com/pengjinning/bytedesk-android
-        // appkey和subDomain请替换为真实值
-        final String appKey = "201809171553112";
-        final String subDomain = "vip";
-
         // 授权登录接口
-        BDCoreApi.visitorLogin(getContext(), appKey, subDomain, new LoginCallback() {
+        BDCoreApi.visitorLogin(getContext(), BDDemoConst.DEFAULT_TEST_APPKEY, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new LoginCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

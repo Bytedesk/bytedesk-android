@@ -211,7 +211,6 @@ public class ChatActivity extends AppCompatActivity
         super.onDestroy();
 
         // TODO: 清理
-
     }
 
     /**
@@ -861,6 +860,15 @@ public class ChatActivity extends AppCompatActivity
                         }
                     }).show();
 
+            } else if (status_code == 206) {
+                //
+                JSONObject message = object.getJSONObject("data");
+                mMessageViewModel.insertMessageJson(message);
+
+                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                String threadTopic = "thread/" + mTidOrUidOrGid;
+                BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
+
             } else {
                 // 请求会话失败
 
@@ -1015,7 +1023,8 @@ public class ChatActivity extends AppCompatActivity
      */
     private void chooseWorkGroupLiuXue(final String workGroupWid, String workGroupNickname) {
 
-        BDCoreApi.chooseWorkGroupLiuXue(this, workGroupWid, workGroupNickname,  new BaseCallback() {
+        // LBS版本，传入当前用户所在 省份 和 城市名
+        BDCoreApi.chooseWorkGroupLiuXueLBS(this, workGroupWid, workGroupNickname, "辽宁", "大连",  new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -1039,6 +1048,8 @@ public class ChatActivity extends AppCompatActivity
                 }
             }
         });
+
+
     }
 
     /**
@@ -1133,39 +1144,57 @@ public class ChatActivity extends AppCompatActivity
     private void visitorTopRightSheet() {
         //
         new QMUIBottomSheet.BottomListSheetBuilder(this)
-            .addItem("留言")
-            .addItem(mIsRobot ? "人工客服" : "机器人")
-            .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
-                //
-                dialog.dismiss();
+                .addItem("满意度评价")
+                .addItem("留言")
+                .addItem(mIsRobot ? "人工客服" : "机器人")
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    //
+                    dialog.dismiss();
 
-                if (position == 0) {
+                    if (position == 0) {
 
-                    // 跳转留言页面
-                    Intent intent = new Intent(ChatActivity.this, LeaveMessageActivity.class);
-                    intent.putExtra(BDUiConstant.EXTRA_WID, mWorkGroupWid);
-                    intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, mRequestType);
-                    intent.putExtra(BDUiConstant.EXTRA_AID, mAgentUid);
-                    startActivity(intent);
+                        // TODO: 暂未增加评价页面，开发者可自行设计。具体参数意思可跟进函数定义查看
+                        BDCoreApi.rate(ChatActivity.this, mTidOrUidOrGid, 5, "附言", false, new BaseCallback() {
 
-                } else if (position == 1) {
+                            @Override
+                            public void onSuccess(JSONObject object) {
 
-                    if (mIsRobot) {
+                            }
 
-                        // 切换人工客服
-                        requestThread();
+                            @Override
+                            public void onError(JSONObject object) {
 
-                    } else {
+                            }
 
-                        // 切换智能机器人
-                        requestRobot();
+                        });
 
+                    } else if (position == 1) {
+
+                        // 跳转留言页面
+                        Intent intent = new Intent(ChatActivity.this, LeaveMessageActivity.class);
+                        intent.putExtra(BDUiConstant.EXTRA_WID, mWorkGroupWid);
+                        intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, mRequestType);
+                        intent.putExtra(BDUiConstant.EXTRA_AID, mAgentUid);
+                        startActivity(intent);
+
+                    } else if (position == 1) {
+
+                        if (mIsRobot) {
+
+                            // 切换人工客服
+                            requestThread();
+
+                        } else {
+
+                            // 切换智能机器人
+                            requestRobot();
+
+                        }
+                        mIsRobot = !mIsRobot;
                     }
-                    mIsRobot = !mIsRobot;
-                }
-            })
-            .build()
-            .show();
+                })
+                .build()
+                .show();
     }
 
 
@@ -1234,8 +1263,7 @@ public class ChatActivity extends AppCompatActivity
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         BDUiConstant.PERMISSION_REQUEST_ALBUM);
                             }
-                        })
-                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+                        }).show();
             }
             else {
                 pickImageFromAlbum();
@@ -1279,8 +1307,7 @@ public class ChatActivity extends AppCompatActivity
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         BDUiConstant.PERMISSION_REQUEST_CAMERA);
                             }
-                        })
-                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+                        }).show();
             }
             else {
                 takeCameraImage();

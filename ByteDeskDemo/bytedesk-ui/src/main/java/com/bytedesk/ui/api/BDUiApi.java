@@ -120,9 +120,10 @@ public class BDUiApi {
      * @param context 上下文
      * @param url url
      */
-    public static void startHtml5Chat(Context context, String url) {
+    public static void startHtml5Chat(Context context, String url, String title) {
         Intent intent = new Intent(context, BrowserActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_URL, url);
+        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         context.startActivity(intent);
     }
 

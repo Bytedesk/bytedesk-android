@@ -30,6 +30,9 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
     @BindView(R.id.groupListView) QMUIGroupListView mGroupListView;
 
+    private QMUICommonListItemView nicknameItem;
+    private QMUICommonListItemView selfDefineItem;
+
     private String mDefaultNickname = "";
     private String mTagName;
     private String mTagKey;
@@ -45,133 +48,92 @@ public class ProfileFragment extends BaseFragment {
 
         initTopBar();
         initGroupListView();
+        getFingerPrint();
 
         return root;
     }
 
     private void initTopBar() {
         mTopBar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.app_color_blue));
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle("设置用户信息接口");
     }
 
     private void initGroupListView() {
 
-        final QMUICommonListItemView nicknameItem = mGroupListView.createItemView("昵称");
+        nicknameItem = mGroupListView.createItemView("昵称");
         nicknameItem.setDetailText(mDefaultNickname);
 
         QMUIGroupListView.newSection(getContext())
                 .setTitle("默认用户信息接口")
-//                .setDescription("默认描述")
-                .addItemView(nicknameItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        //
-                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                        builder.setTitle("自定义昵称")
-                                .setPlaceholder("在此输入您的昵称")
-                                .setInputType(InputType.TYPE_CLASS_TEXT)
-                                .addAction("取消", new QMUIDialogAction.ActionListener() {
-                                    @Override
-                                    public void onClick(QMUIDialog dialog, int index) {dialog.dismiss();
-                                    }
-                                })
-                                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                    @Override
-                                    public void onClick(QMUIDialog dialog, int index) {
-                                        final CharSequence text = builder.getEditText().getText();
-                                        if (text != null && text.length() > 0) {
-//                                            Toast.makeText(getActivity(), "您的昵称: " + text, Toast.LENGTH_SHORT).show();
-
-                                              mDefaultNickname = text.toString();
-                                              // 调用接口设置昵称
-                                              BDCoreApi.setNickname(getContext(), mDefaultNickname, new BaseCallback() {
-                                                  @Override
-                                                  public void onSuccess(JSONObject object) {
-                                                      //解析 object
-//                                                      try {
-//                                                          String nickname = object.getJSONObject("data").getString("nickname");
-//                                                      } catch (JSONException e) {
-//                                                          e.printStackTrace();
-//                                                      }
-                                                      nicknameItem.setDetailText(mDefaultNickname);
-                                                  }
-
-                                                  @Override
-                                                  public void onError(JSONObject object) {
-                                                      BDUiUtils.showTipDialog(getContext(), "设置昵称失败");
-                                                  }
-                                              });
-
-                                            dialog.dismiss();
-                                        } else {
-                                            Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                })
-                                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-                    }
-                })
+                .addItemView(nicknameItem, v -> showEditNicknameDialog())
                 .addTo(mGroupListView);
 
-        final QMUICommonListItemView selfDefineItem = mGroupListView.createItemView("自定义标签");
+        selfDefineItem = mGroupListView.createItemView("自定义标签");
         selfDefineItem.setDetailText(mTagValue);
 
         QMUIGroupListView.newSection(getContext())
                 .setTitle("自定义用户信息接口")
-//                .setDescription("自定义描述")
-                .addItemView(selfDefineItem, new View.OnClickListener() {
+                .addItemView(selfDefineItem, v -> showEditTagDialog())
+                .addTo(mGroupListView);
+    }
+
+
+    private void showEditNicknameDialog() {
+
+        //
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        builder.setTitle("自定义昵称")
+                .setPlaceholder("在此输入您的昵称")
+                .setInputType(InputType.TYPE_CLASS_TEXT)
+                .addAction("取消", (dialog, index) -> dialog.dismiss())
+                .addAction("确定", new QMUIDialogAction.ActionListener() {
                     @Override
-                    public void onClick(View view) {
-//
-                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                        builder.setTitle("自定义标签")
-                                .setPlaceholder("在此输入自定义标签")
-                                .setInputType(InputType.TYPE_CLASS_TEXT)
-                                .addAction("取消", new QMUIDialogAction.ActionListener() {
-                                    @Override
-                                    public void onClick(QMUIDialog dialog, int index) {
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                    @Override
-                                    public void onClick(QMUIDialog dialog, int index) {
-                                        final CharSequence text = builder.getEditText().getText();
-                                        if (text != null && text.length() > 0) {
+                    public void onClick(QMUIDialog dialog, int index) {
+                        final CharSequence text = builder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
 
-                                            // 调用接口设置自定义标签
-                                            mTagValue = text.toString();
-                                            BDCoreApi.setFingerPrint(getContext(), "", mTagKey, mTagValue, new BaseCallback() {
-                                                @Override
-                                                public void onSuccess(JSONObject object) {
-                                                    selfDefineItem.setDetailText(mTagValue);
-                                                }
+                            dialog.dismiss();
+                            mDefaultNickname = text.toString();
+                            setNickname();
 
-                                                @Override
-                                                public void onError(JSONObject object) {
-                                                    BDUiUtils.showTipDialog(getContext(), "设置自定义标签失败");
-
-                                                }
-                                            });
-
-                                            dialog.dismiss();
-                                        } else {
-                                            Toast.makeText(getActivity(), "请填入自定义标签值", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                })
-                                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+                        } else {
+                            Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
-                .addTo(mGroupListView);
+                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+    }
 
 
+    private void showEditTagDialog() {
+
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        builder.setTitle("自定义标签")
+                .setPlaceholder("在此输入自定义标签")
+                .setInputType(InputType.TYPE_CLASS_TEXT)
+                .addAction("取消", (dialog, index) -> dialog.dismiss())
+                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        final CharSequence text = builder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
+
+                            dialog.dismiss();
+                            // 调用接口设置自定义标签
+                            mTagValue = text.toString();
+                            setTag();
+
+                        } else {
+                            Toast.makeText(getActivity(), "请填入自定义标签值", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+
+    }
+
+    private void getFingerPrint() {
         ///////
         BDCoreApi.getFingerPrint(getContext(), new BaseCallback() {
 
@@ -218,8 +180,40 @@ public class ProfileFragment extends BaseFragment {
             }
 
         });
-
     }
+
+    private void setNickname() {
+        // 调用接口设置昵称
+        BDCoreApi.setNickname(getContext(), mDefaultNickname, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+                //解析 object
+                nicknameItem.setDetailText(mDefaultNickname);
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                BDUiUtils.showTipDialog(getContext(), "设置昵称失败");
+            }
+        });
+    }
+
+    private void setTag() {
+
+        BDCoreApi.setFingerPrint(getContext(), "", mTagKey, mTagValue, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+                selfDefineItem.setDetailText(mTagValue);
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                BDUiUtils.showTipDialog(getContext(), "设置自定义标签失败");
+
+            }
+        });
+    }
+
 
 
 }
