@@ -7,8 +7,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.room.entity.MessageEntity;
@@ -41,6 +45,8 @@ import com.qmuiteam.qmui.widget.textview.QMUILinkTextView;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -277,7 +283,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         }
 
         public void setContent(final MessageEntity msgEntity) {
-//            Logger.d("setContent uid:" + msgEntity.getUid() + " currentUid:" + msgEntity.getCurrentUid());
+//            Logger.i("type: " + msgEntity.getType() + " content:" + msgEntity.getContent());
             timestampTextView.setText(BDUiUtils.friendlyTime(msgEntity.getCreatedAt(), mContext));
 
             // 文字消息
@@ -297,7 +303,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 catch (Exception e) {
                     e.printStackTrace();
                 }
-//                contentTextView.setText(msgEntity.getContent());
                 contentTextView.setOnLinkClickListener(new QMUILinkTextView.OnLinkClickListener() {
 
                     @Override
@@ -419,12 +424,48 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 //
                 fileTextView.setText(msgEntity.getFileUrl());
             }
-            // 机器
+            // 机器人
             else if (messageViewType == MessageEntity.TYPE_ROBOT_ID
                         || messageViewType == MessageEntity.TYPE_ROBOT_SELF_ID) {
                 loadAvatar(msgEntity);
                 //
-                contentTextView.setText(Html.fromHtml(msgEntity.getContent()));
+                Logger.i("type: " + msgEntity.getType() + " content:" + msgEntity.getContent());
+                contentTextView.setText("");
+                //
+//                contentTextView.setText(Html.fromHtml(msgEntity.getContent()));
+                String robotMessageString = msgEntity.getContent();
+                Boolean matchFlagBoolean = false;
+                int startIndex = 0;
+                Pattern robotPattern = Pattern.compile("[0-9]+:[0-9A-Za-z:/[-]_#[?][(),\"\"][“”（），、。？][ ][=][.][&][\\u4e00-\\u9fa5]]*");
+                Matcher robotMatcher = robotPattern.matcher(robotMessageString);
+
+                while (robotMatcher.find()) {
+
+                    Logger.i("startIndex: " + startIndex + " matchStart: " + robotMatcher.start());
+
+                    matchFlagBoolean = true;
+                    contentTextView.append(robotMessageString.substring(startIndex, robotMatcher.start()));
+
+                    String matchString = robotMessageString.substring(robotMatcher.start(), robotMatcher.end());
+                    Logger.i("matchString: " + matchString + " start:" + robotMatcher.start() + " end:" + robotMatcher.end());
+
+                    String[] matParts = matchString.split(":");
+
+                    String pidString = matParts[0];
+                    String questionString = matchString.substring(pidString.length()+1);
+                    Logger.i("pidString:" + pidString + " questionString:" + questionString);
+
+                    ClickableSpan robotSpan = new CustomizedClickableSpan(pidString, questionString);
+                    SpannableString spannableMatch = new SpannableString(questionString);
+                    spannableMatch.setSpan(robotSpan, 0, questionString.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+                    contentTextView.append(spannableMatch);
+                    startIndex = robotMatcher.end();
+                }
+                if (!matchFlagBoolean) {
+                    contentTextView.setText(robotMessageString);
+                }
+                contentTextView.setMovementMethod(LinkMovementMethod.getInstance());
             }
 
             // 收到的消息
@@ -433,7 +474,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     || messageViewType == MessageEntity.TYPE_VOICE_ID
                     || messageViewType == MessageEntity.TYPE_VIDEO_ID
                     || messageViewType == MessageEntity.TYPE_FILE_ID
-                    || messageViewType == MessageEntity.TYPE_RED_PACKET_ID) {
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_ID
+                    || messageViewType == MessageEntity.TYPE_ROBOT_ID) {
                 nicknameTextView.setText(msgEntity.getNickname());
             }
 
@@ -443,7 +485,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     || messageViewType == MessageEntity.TYPE_VOICE_SELF_ID
                     || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID
                     || messageViewType == MessageEntity.TYPE_FILE_SELF_ID
-                    || messageViewType == MessageEntity.TYPE_RED_PACKET_SELF_ID) {
+                    || messageViewType == MessageEntity.TYPE_RED_PACKET_SELF_ID
+                    || messageViewType == MessageEntity.TYPE_ROBOT_SELF_ID) {
                 //
                 if (msgEntity.getStatus() == null) {
                     return;
@@ -701,6 +744,33 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     }
             }
 
+        }
+    }
+
+    private class CustomizedClickableSpan extends ClickableSpan {
+
+        String aid;
+        String question;
+
+        public CustomizedClickableSpan(String aid, String question) {
+            super();
+            this.aid = aid;
+            this.question = question;
+        }
+
+        @Override
+        public void updateDrawState(TextPaint ds) {
+            ds.setColor(ds.linkColor);
+            // ds.setColor(Color.GREEN);
+            ds.setUnderlineText(true);
+            // ds.setAlpha(50);
+        }
+
+        @Override
+        public void onClick(View widget) {
+            Logger.i("aid:" + aid + " question:"+question);
+            // TODO: 请求服务器答案
+            // BDCoreApi.queryAnswer(mContext, aid, new );
         }
     }
 

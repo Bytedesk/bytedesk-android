@@ -750,7 +750,6 @@ public class ChatActivity extends AppCompatActivity
                 mMessageViewModel.insertMessageJson(message);
 
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
-                Logger.i("mTidOrUidOrGid:" + mTidOrUidOrGid);
 
                 String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
@@ -766,6 +765,7 @@ public class ChatActivity extends AppCompatActivity
                 mMessageViewModel.insertMessageJson(message);
 
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+
                 String threadTopic = "thread/" + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
 
@@ -861,7 +861,8 @@ public class ChatActivity extends AppCompatActivity
                     }).show();
 
             } else if (status_code == 206) {
-                //
+                // 返回机器人初始欢迎语 + 欢迎问题列表
+
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
@@ -1028,15 +1029,26 @@ public class ChatActivity extends AppCompatActivity
 
             @Override
             public void onSuccess(JSONObject object) {
-                // 重新选择工作组成功 old wid:201807171659201 new wid:201810201758121
-                Logger.i("重新选择工作组成功 old wid:" + mWorkGroupWid + " new wid:" + workGroupWid);
-                // 重新初始化model，根据新的wid加载聊天记录
-                mWorkGroupWid = workGroupWid;
-                Logger.i("mWorkGroupWid:" + mWorkGroupWid);
 
-                initModel();
-                //
-                dealWithThread(object);
+                try {
+
+                    String newWid = object.getJSONObject("data").getString("wid");
+
+                    // 重新选择工作组成功 old wid:201807171659201 new wid:201810201758121
+                    Logger.i("重新选择工作组成功 old wid:" + mWorkGroupWid + " new wid:" + newWid);
+
+                    // 重新初始化model，根据新的wid加载聊天记录
+                    mWorkGroupWid = newWid;
+                    Logger.i("mWorkGroupWid:" + mWorkGroupWid);
+
+                    initModel();
+                    //
+                    dealWithThread(object);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override
@@ -1048,8 +1060,6 @@ public class ChatActivity extends AppCompatActivity
                 }
             }
         });
-
-
     }
 
     /**
@@ -1420,7 +1430,8 @@ public class ChatActivity extends AppCompatActivity
         // 插入本地消息
         mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
         // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-        // 1. 异步发送文字消息
+
+        // 1. 异步发送文字消息, TODO: 增加Future机制？
         // BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
 
         // 2. 同步发送消息(推荐)
@@ -1503,7 +1514,8 @@ public class ChatActivity extends AppCompatActivity
                     mRepository.insertImageMessageLocal(mTidOrUidOrGid, mWorkGroupWid, imageUrl, localId, mThreadType);
 
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-                    // 1. 异步发送图片消息
+
+                    // 1. 异步发送图片消息，TODO: 增加Future机制？
                     // BDMqttApi.sendImageMessage(ChatActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
 
                     // 2. 同步发送图片消息(推荐)

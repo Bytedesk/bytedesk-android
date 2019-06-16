@@ -121,13 +121,13 @@ public class ApiFragment extends BaseFragment {
                 .addTo(mGroupListView);
 
         // 客服接口
-        QMUICommonListItemView chatItem = mGroupListView.createItemView("1.联系客服接口");
+        QMUICommonListItemView chatItem = mGroupListView.createItemView("1.联系客服");
         chatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView userInfoItem = mGroupListView.createItemView("2.自定义用户信息接口");
+        QMUICommonListItemView userInfoItem = mGroupListView.createItemView("2.自定义用户信息");
         userInfoItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView statusItem = mGroupListView.createItemView("3.在线状态接口");
+        QMUICommonListItemView statusItem = mGroupListView.createItemView("3.在线状态");
         statusItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView sessionHistoryItem = mGroupListView.createItemView("4.历史会话记录接口");
+        QMUICommonListItemView sessionHistoryItem = mGroupListView.createItemView("4.历史会话记录");
         sessionHistoryItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView ticketItem = mGroupListView.createItemView("5.提交工单");
         ticketItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
@@ -189,23 +189,23 @@ public class ApiFragment extends BaseFragment {
                 .addTo(mGroupListView);
 
         // IM接口
-        QMUICommonListItemView friendItem = mGroupListView.createItemView("1.好友接口");
+        QMUICommonListItemView friendItem = mGroupListView.createItemView("1.好友关系");
         friendItem.setDetailText("社交：关注/粉丝/好友/黑名单");
         friendItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView contactItem = mGroupListView.createItemView("2.联系人接口");
+        QMUICommonListItemView contactItem = mGroupListView.createItemView("2.联系人");
         contactItem.setDetailText("客服同事");
         contactItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView groupItem = mGroupListView.createItemView("3.群组接口");
+        QMUICommonListItemView groupItem = mGroupListView.createItemView("3.群组");
         groupItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView threadItem = mGroupListView.createItemView("4.会话接口");
+        QMUICommonListItemView threadItem = mGroupListView.createItemView("4.会话");
         threadItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView queueItem = mGroupListView.createItemView("5.排队接口");
+        QMUICommonListItemView queueItem = mGroupListView.createItemView("5.排队");
         queueItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.系统消息接口");
+        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.系统消息");
         noticeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView profileItem = mGroupListView.createItemView("7.个人资料接口");
+        QMUICommonListItemView profileItem = mGroupListView.createItemView("7.个人资料");
         profileItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView settingItem = mGroupListView.createItemView("8.设置接口");
+        QMUICommonListItemView settingItem = mGroupListView.createItemView("8.设置");
         settingItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
 
         QMUIGroupListView.newSection(getContext())

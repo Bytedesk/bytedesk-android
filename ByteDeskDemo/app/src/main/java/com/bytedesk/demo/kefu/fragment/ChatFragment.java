@@ -126,7 +126,7 @@ public class ChatFragment extends BaseFragment {
             }).addTo(mGroupListView);
 
         //
-        QMUICommonListItemView preChoiceChatItem = mGroupListView.createItemView("工作组会话:" +  preWid);
+        QMUICommonListItemView preChoiceChatItem = mGroupListView.createItemView("前置选择:" +  preWid);
         //
         QMUIGroupListView.newSection(getContext())
             .setTitle("前置选择")
@@ -140,7 +140,7 @@ public class ChatFragment extends BaseFragment {
             }).addTo(mGroupListView);
 
         //
-        QMUICommonListItemView robotChatItem = mGroupListView.createItemView("工作组会话:" +  robotWid);
+        QMUICommonListItemView robotChatItem = mGroupListView.createItemView("默认机器人:" +  robotWid);
         //
         QMUIGroupListView.newSection(getContext())
                 .setTitle("默认机器人")
