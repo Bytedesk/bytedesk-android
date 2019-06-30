@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -22,8 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
+import com.bytedesk.core.event.QueryAnswerEvent;
+import com.bytedesk.core.event.SendCommodityEvent;
 import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.room.entity.MessageEntity;
 import com.bytedesk.core.util.BDCoreConstant;
@@ -41,6 +43,8 @@ import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.QMUIProgressBar;
 import com.qmuiteam.qmui.widget.QMUIRadiusImageView;
 import com.qmuiteam.qmui.widget.textview.QMUILinkTextView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -129,7 +133,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 layout = R.layout.bytedesk_message_item_robot;
                 break;
             case MessageEntity.TYPE_ROBOT_SELF_ID:
-                layout = R.layout.bytedesk_message_item_robot;
+                layout = R.layout.bytedesk_message_item_robot_self;
                 break;
             default:
                 layout = R.layout.bytedesk_message_item_text;
@@ -303,6 +307,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 catch (Exception e) {
                     e.printStackTrace();
                 }
+                //
                 contentTextView.setOnLinkClickListener(new QMUILinkTextView.OnLinkClickListener() {
 
                     @Override
@@ -408,6 +413,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     public void onClick(View view) {
                         Logger.i("发送商品信息");
                         // TODO
+                        EventBus.getDefault().post(new SendCommodityEvent());
                     }
                 });
             }
@@ -428,11 +434,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             else if (messageViewType == MessageEntity.TYPE_ROBOT_ID
                         || messageViewType == MessageEntity.TYPE_ROBOT_SELF_ID) {
                 loadAvatar(msgEntity);
-                //
-                Logger.i("type: " + msgEntity.getType() + " content:" + msgEntity.getContent());
                 contentTextView.setText("");
-                //
 //                contentTextView.setText(Html.fromHtml(msgEntity.getContent()));
+                //
                 String robotMessageString = msgEntity.getContent();
                 Boolean matchFlagBoolean = false;
                 int startIndex = 0;
@@ -441,19 +445,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
 
                 while (robotMatcher.find()) {
 
-                    Logger.i("startIndex: " + startIndex + " matchStart: " + robotMatcher.start());
-
                     matchFlagBoolean = true;
                     contentTextView.append(robotMessageString.substring(startIndex, robotMatcher.start()));
 
                     String matchString = robotMessageString.substring(robotMatcher.start(), robotMatcher.end());
-                    Logger.i("matchString: " + matchString + " start:" + robotMatcher.start() + " end:" + robotMatcher.end());
 
                     String[] matParts = matchString.split(":");
 
                     String pidString = matParts[0];
                     String questionString = matchString.substring(pidString.length()+1);
-                    Logger.i("pidString:" + pidString + " questionString:" + questionString);
 
                     ClickableSpan robotSpan = new CustomizedClickableSpan(pidString, questionString);
                     SpannableString spannableMatch = new SpannableString(questionString);
@@ -463,7 +463,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     startIndex = robotMatcher.end();
                 }
                 if (!matchFlagBoolean) {
-                    contentTextView.setText(robotMessageString);
+//                    contentTextView.setText(robotMessageString);
+                    contentTextView.setText(Html.fromHtml(msgEntity.getContent()));
                 }
                 contentTextView.setMovementMethod(LinkMovementMethod.getInstance());
             }
@@ -630,8 +631,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         playMusic(voiceUrl);
         // 隐藏键盘
         BDUiUtils.showSysSoftKeybord(mContext, false);
-//        ((ChatWxActivity) mContext).mEmotionLayout.setVisibility(View.GONE);
-//        ((ChatWxActivity) mContext).mExtensionLayout.setVisibility(View.GONE);
+//        ((ChatIMActivity) mContext).mEmotionLayout.setVisibility(View.GONE);
+//        ((ChatIMActivity) mContext).mExtensionLayout.setVisibility(View.GONE);
     }
 
     private final class ChangeImage implements Runnable {
@@ -769,8 +770,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         @Override
         public void onClick(View widget) {
             Logger.i("aid:" + aid + " question:"+question);
-            // TODO: 请求服务器答案
-            // BDCoreApi.queryAnswer(mContext, aid, new );
+
+            EventBus.getDefault().post(new QueryAnswerEvent(aid, question));
         }
     }
 

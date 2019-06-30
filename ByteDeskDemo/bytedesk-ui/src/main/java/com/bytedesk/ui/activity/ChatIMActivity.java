@@ -96,8 +96,7 @@ import java.util.Map;
 
 /**
  *  用途：
- *  1. 访客聊天界面
- *  2. 客服 工作组、1v1、群聊 聊天界面
+ *  1. 1v1、群聊 聊天界面
  *
  *  TODO:
  *    1. 访客关闭会话窗口的时候通知客服
@@ -105,7 +104,7 @@ import java.util.Map;
  *
  * @author bytedesk.com
  */
-public class ChatWxActivity extends AppCompatActivity
+public class ChatIMActivity extends AppCompatActivity
         implements ChatItemClickListener,
         View.OnClickListener,
         View.OnTouchListener,
@@ -452,7 +451,7 @@ public class ChatWxActivity extends AppCompatActivity
 
         } else if (view.getId() == R.id.appkefu_plus_show_red_packet_btn) {
 
-            final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatWxActivity.this);
+            final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatIMActivity.this);
             builder.setTitle("发送红包")
                     .setPlaceholder("在此输入金额")
                     .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -472,7 +471,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                                 dialog.dismiss();
                             } else {
-                                Toast.makeText(ChatWxActivity.this, "请填入金额", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ChatIMActivity.this, "请填入金额", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }).show();
@@ -527,13 +526,13 @@ public class ChatWxActivity extends AppCompatActivity
 
                     m_recordedVoiceLength = (int) (m_endRecordingTimestamp - m_startRecordingTimestamp) / 1000;
                     if (m_recordedVoiceLength < 1) {
-                        Toast.makeText(ChatWxActivity.this, R.string.kfds_record_voice_too_short, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, R.string.kfds_record_voice_too_short, Toast.LENGTH_LONG).show();
                     } else if (m_recordedVoiceLength > 60) {
-                        Toast.makeText(ChatWxActivity.this, R.string.kfds_record_voice_too_long, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, R.string.kfds_record_voice_too_long, Toast.LENGTH_LONG).show();
                     } else {
                         //
                         if (mIsRobot) {
-                            Toast.makeText(ChatWxActivity.this, R.string.kfds_robot_cannot_send_voice, Toast.LENGTH_LONG).show();
+                            Toast.makeText(ChatIMActivity.this, R.string.kfds_robot_cannot_send_voice, Toast.LENGTH_LONG).show();
                             return false;
                         }
                         //
@@ -557,14 +556,14 @@ public class ChatWxActivity extends AppCompatActivity
 //					int checkRecordAudioPermission = checkSelfPermission(Manifest.permission.RECORD_AUDIO);
                     if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
                             checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        new AlertDialog.Builder(ChatWxActivity.this)
+                        new AlertDialog.Builder(ChatIMActivity.this)
                                 .setMessage(getString(R.string.kfds_record_permission_tip))
                                 .setPositiveButton(
                                         getString(R.string.kfds_ok),
                                         new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                ActivityCompat.requestPermissions(ChatWxActivity.this,
+                                                ActivityCompat.requestPermissions(ChatIMActivity.this,
                                                         new String[] { Manifest.permission.RECORD_AUDIO,
                                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE },
                                                         CHECK_RECORD_AUDIO_PERMISSION);
@@ -633,7 +632,7 @@ public class ChatWxActivity extends AppCompatActivity
                         @Override
                         public void onClick(View view) {
                             //
-                            Intent intent = new Intent(ChatWxActivity.this, ContactProfileActivity.class);
+                            Intent intent = new Intent(ChatIMActivity.this, ContactProfileActivity.class);
                             intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
                             startActivity(intent);
                         }
@@ -646,7 +645,7 @@ public class ChatWxActivity extends AppCompatActivity
                         @Override
                         public void onClick(View view) {
                             //
-                            Intent intent = new Intent(ChatWxActivity.this, GroupProfileActivity.class);
+                            Intent intent = new Intent(ChatIMActivity.this, GroupProfileActivity.class);
                             intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
                             startActivity(intent);
                         }
@@ -825,7 +824,7 @@ public class ChatWxActivity extends AppCompatActivity
                     Logger.d("request thread message: " + object.get("message")
                             + " status_code:" + object.get("status_code")
                             + " data:" + object.get("data"));
-                    Toast.makeText(ChatWxActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -850,7 +849,7 @@ public class ChatWxActivity extends AppCompatActivity
             public void onError(JSONObject object) {
                 Logger.e("更新当前会话失败");
                 try {
-                    Toast.makeText(ChatWxActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -891,7 +890,7 @@ public class ChatWxActivity extends AppCompatActivity
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatWxActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -926,7 +925,7 @@ public class ChatWxActivity extends AppCompatActivity
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatWxActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -960,7 +959,7 @@ public class ChatWxActivity extends AppCompatActivity
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatWxActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -993,7 +992,7 @@ public class ChatWxActivity extends AppCompatActivity
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatWxActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -1025,7 +1024,7 @@ public class ChatWxActivity extends AppCompatActivity
                 Logger.i("mTidOrUidOrGid:" + mTidOrUidOrGid);
 
                 String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatWxActivity.this, threadTopic);
+                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
@@ -1039,7 +1038,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
                 String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatWxActivity.this, threadTopic);
+                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
@@ -1053,7 +1052,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
                 String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatWxActivity.this, threadTopic);
+                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
 
             } else if (status_code == 204) {
                 // 当前无客服在线，请自助查询或留言
@@ -1063,7 +1062,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
                 String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatWxActivity.this, threadTopic);
+                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
 
             } else if (status_code == 205) {
                 // TODO: 咨询前问卷
@@ -1105,7 +1104,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                 // 1. 弹窗选择列表：类型、工作组
                 final String[] items = questionContents.toArray(new String[0]);
-                new QMUIDialog.MenuDialogBuilder(ChatWxActivity.this)
+                new QMUIDialog.MenuDialogBuilder(ChatIMActivity.this)
                         .setTitle(title)
                         .addItems(items, new DialogInterface.OnClickListener() {
                             @Override
@@ -1140,7 +1139,7 @@ public class ChatWxActivity extends AppCompatActivity
             } else {
                 // 请求会话失败
                 String message = object.getString("message");
-                Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_SHORT).show();
             }
 
             //
@@ -1184,7 +1183,7 @@ public class ChatWxActivity extends AppCompatActivity
 //
 //                        //
 //                        String toast = object.getString("message");
-//                        Toast.makeText(ChatWxActivity.this, toast, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(ChatIMActivity.this, toast, Toast.LENGTH_LONG).show();
 //                    }
 //
 //                } catch (JSONException e) {
@@ -1195,7 +1194,7 @@ public class ChatWxActivity extends AppCompatActivity
 //            @Override
 //            public void onError(JSONObject object) {
 //                try {
-//                    Toast.makeText(ChatWxActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
 //                } catch (JSONException e) {
 //                    e.printStackTrace();
 //                }
@@ -1224,7 +1223,7 @@ public class ChatWxActivity extends AppCompatActivity
 
             // 1. 弹窗选择列表：工作组
             final String[] items = workGroupNames.toArray(new String[0]);
-            new QMUIDialog.MenuDialogBuilder(ChatWxActivity.this)
+            new QMUIDialog.MenuDialogBuilder(ChatIMActivity.this)
                     .setTitle("请选择")
                     .addItems(items, new DialogInterface.OnClickListener() {
                         @Override
@@ -1274,7 +1273,7 @@ public class ChatWxActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 try {
-                    Toast.makeText(ChatWxActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1308,7 +1307,7 @@ public class ChatWxActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 try {
-                    Toast.makeText(ChatWxActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1343,7 +1342,7 @@ public class ChatWxActivity extends AppCompatActivity
                 .onCancel(new Action<String>() {
                     @Override
                     public void onAction(@NonNull String result) {
-                        Toast.makeText(ChatWxActivity.this, "取消发送图片", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, "取消发送图片", Toast.LENGTH_LONG).show();
                     }
                 })
                 .start();
@@ -1383,7 +1382,7 @@ public class ChatWxActivity extends AppCompatActivity
                 .onCancel(new Action<String>() {
                     @Override
                     public void onAction(@NonNull String result) {
-                        Toast.makeText(ChatWxActivity.this, "取消拍照", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, "取消拍照", Toast.LENGTH_LONG).show();
                     }
                 })
                 .start();
@@ -1464,7 +1463,7 @@ public class ChatWxActivity extends AppCompatActivity
                             public void onClick(QMUIDialog dialog, int index) {
                                 dialog.dismiss();
                                 // 请求授权
-                                ActivityCompat.requestPermissions(ChatWxActivity.this,
+                                ActivityCompat.requestPermissions(ChatIMActivity.this,
                                         new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         BDUiConstant.PERMISSION_REQUEST_ALBUM);
@@ -1508,7 +1507,7 @@ public class ChatWxActivity extends AppCompatActivity
                             public void onClick(QMUIDialog dialog, int index) {
                                 dialog.dismiss();
                                 // 请求授权
-                                ActivityCompat.requestPermissions(ChatWxActivity.this,
+                                ActivityCompat.requestPermissions(ChatIMActivity.this,
                                         new String[] { Manifest.permission.CAMERA,
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         BDUiConstant.PERMISSION_REQUEST_CAMERA);
@@ -2023,11 +2022,11 @@ public class ChatWxActivity extends AppCompatActivity
                     return;
                 }
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
-                    filePath = BDFileUtils.getPath(ChatWxActivity.this, uri);
+                    filePath = BDFileUtils.getPath(ChatIMActivity.this, uri);
                     Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
                 } else {//4.4以下下系统调用方法
-                    filePath = BDFileUtils.getRealPathFromURI(ChatWxActivity.this, uri);
-                    Toast.makeText(ChatWxActivity.this, filePath, Toast.LENGTH_SHORT).show();
+                    filePath = BDFileUtils.getRealPathFromURI(ChatIMActivity.this, uri);
+                    Toast.makeText(ChatIMActivity.this, filePath, Toast.LENGTH_SHORT).show();
                 }
 
                 Logger.i("filePath:" + filePath);
@@ -2075,7 +2074,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                         // 发送消息失败
                         String message = object.getString("message");
-                        Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {
@@ -2086,7 +2085,7 @@ public class ChatWxActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 // 发送消息失败
-                Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2124,10 +2123,10 @@ public class ChatWxActivity extends AppCompatActivity
 
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
                     // 1. 异步发送图片消息
-                    // BDMqttApi.sendImageMessage(ChatWxActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
+                    // BDMqttApi.sendImageMessage(ChatIMActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
 
                     // 2. 同步发送图片消息(推荐)
-                    BDCoreApi.sendImageMessage(ChatWxActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
+                    BDCoreApi.sendImageMessage(ChatIMActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -2151,7 +2150,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                                     // 发送消息失败
                                     String message = object.getString("message");
-                                    Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
                                 }
 
                             } catch (JSONException e) {
@@ -2162,7 +2161,7 @@ public class ChatWxActivity extends AppCompatActivity
                         @Override
                         public void onError(JSONObject object) {
                             // 发送消息失败
-                            Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -2205,7 +2204,7 @@ public class ChatWxActivity extends AppCompatActivity
                     mRepository.insertVoiceMessageLocal(mTidOrUidOrGid, mWorkGroupWid, voiceUrl, localId, mThreadType, voiceLength);
 
                     // TODO: 2. 同步发送消息(推荐)
-                    BDCoreApi.sendVoiceMessage(ChatWxActivity.this, mTidOrUidOrGid, voiceUrl, localId, mThreadType, voiceLength, new BaseCallback() {
+                    BDCoreApi.sendVoiceMessage(ChatIMActivity.this, mTidOrUidOrGid, voiceUrl, localId, mThreadType, voiceLength, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -2229,7 +2228,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                                     // 发送消息失败
                                     String message = object.getString("message");
-                                    Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
                                 }
 
                             } catch (JSONException e) {
@@ -2240,7 +2239,7 @@ public class ChatWxActivity extends AppCompatActivity
                         @Override
                         public void onError(JSONObject object) {
                             // 发送消息失败
-                            Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -2252,7 +2251,7 @@ public class ChatWxActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
 
-                Toast.makeText(ChatWxActivity.this, "上传语音失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(ChatIMActivity.this, "上传语音失败", Toast.LENGTH_LONG).show();
             }
 
         });
@@ -2281,7 +2280,7 @@ public class ChatWxActivity extends AppCompatActivity
                     mRepository.insertFileMessageLocal(mTidOrUidOrGid, mWorkGroupWid, fileUrl, localId, mThreadType, "doc", "fileName", "fileSize");
 
                     // 同步发送文件消息
-                    BDCoreApi.sendFileMessage(ChatWxActivity.this, mTidOrUidOrGid, fileUrl,  localId,  mThreadType, "doc", "fileName", "fileSize", new BaseCallback() {
+                    BDCoreApi.sendFileMessage(ChatIMActivity.this, mTidOrUidOrGid, fileUrl,  localId,  mThreadType, "doc", "fileName", "fileSize", new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -2304,7 +2303,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                                     // 发送消息失败
                                     String message = object.getString("message");
-                                    Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -2314,7 +2313,7 @@ public class ChatWxActivity extends AppCompatActivity
                         @Override
                         public void onError(JSONObject object) {
                             // 发送消息失败
-                            Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -2370,7 +2369,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                         // 发送消息失败
                         String message = object.getString("message");
-                        Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {
@@ -2381,7 +2380,7 @@ public class ChatWxActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 // 发送消息失败
-                Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
             }
 
         });
@@ -2423,7 +2422,7 @@ public class ChatWxActivity extends AppCompatActivity
 
                         // 发送消息失败
                         String message = object.getString("message");
-                        Toast.makeText(ChatWxActivity.this, message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {
@@ -2434,7 +2433,7 @@ public class ChatWxActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 // 发送消息失败
-                Toast.makeText(ChatWxActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2453,7 +2452,7 @@ public class ChatWxActivity extends AppCompatActivity
                 .setTitle("阅后即焚")
                 .setCheckedIndex(checkedIndex)
                 .addItems(items, (dialogInterface, which) -> {
-                    Toast.makeText(ChatWxActivity.this,  items[which] + "阅后即焚", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatIMActivity.this,  items[which] + "阅后即焚", Toast.LENGTH_SHORT).show();
                     dialogInterface.dismiss();
 
                     boolean enabled = which == 0 ? true : false;
@@ -2469,7 +2468,7 @@ public class ChatWxActivity extends AppCompatActivity
 
     private void setDestroyAfterLength() {
 
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatWxActivity.this);
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatIMActivity.this);
         builder.setTitle("阅后即焚")
                 .setPlaceholder("输入时长(秒)")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -2488,7 +2487,7 @@ public class ChatWxActivity extends AppCompatActivity
                         }
 
                     } else {
-                        Toast.makeText(ChatWxActivity.this, "请填入时长", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChatIMActivity.this, "请填入时长", Toast.LENGTH_SHORT).show();
                     }
                 }).show();
     }

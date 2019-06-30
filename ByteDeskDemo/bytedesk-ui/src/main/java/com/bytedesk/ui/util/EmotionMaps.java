@@ -8,7 +8,7 @@ import android.widget.GridView;
 import android.widget.SimpleAdapter;
 
 import com.bytedesk.ui.R;
-import com.bytedesk.ui.activity.ChatWxActivity;
+import com.bytedesk.ui.activity.ChatIMActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -536,19 +536,19 @@ public class EmotionMaps {
 		///////////////////////////////////////////////////////////////
 
 		m_emotionViewPagerGridView1.setAdapter(m_emotionViewPagerGridView1Adapter);
-		m_emotionViewPagerGridView1.setOnItemClickListener((ChatWxActivity)m_context);
+		m_emotionViewPagerGridView1.setOnItemClickListener((ChatIMActivity)m_context);
 
 		m_emotionViewPagerGridView2.setAdapter(m_emotionViewPagerGridView2Adapter);
-		m_emotionViewPagerGridView2.setOnItemClickListener((ChatWxActivity)m_context);
+		m_emotionViewPagerGridView2.setOnItemClickListener((ChatIMActivity)m_context);
 
 		m_emotionViewPagerGridView3.setAdapter(m_emotionViewPagerGridView3Adapter);
-		m_emotionViewPagerGridView3.setOnItemClickListener((ChatWxActivity)m_context);
+		m_emotionViewPagerGridView3.setOnItemClickListener((ChatIMActivity)m_context);
 
 		m_emotionViewPagerGridView4.setAdapter(m_emotionViewPagerGridView4Adapter);
-		m_emotionViewPagerGridView4.setOnItemClickListener((ChatWxActivity)m_context);
+		m_emotionViewPagerGridView4.setOnItemClickListener((ChatIMActivity)m_context);
 
 		m_emotionViewPagerGridView5.setAdapter(m_emotionViewPagerGridView5Adapter);
-		m_emotionViewPagerGridView5.setOnItemClickListener((ChatWxActivity)m_context);
+		m_emotionViewPagerGridView5.setOnItemClickListener((ChatIMActivity)m_context);
 
 	}
 

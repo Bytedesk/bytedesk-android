@@ -6,8 +6,8 @@ import android.content.Intent;
 import com.bytedesk.core.api.BDConfig;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.ui.activity.BrowserActivity;
-import com.bytedesk.ui.activity.ChatActivity;
-import com.bytedesk.ui.activity.ChatWxActivity;
+import com.bytedesk.ui.activity.ChatIMActivity;
+import com.bytedesk.ui.activity.ChatKFActivity;
 import com.bytedesk.ui.util.BDUiConstant;
 import com.bytedesk.ui.util.MediaLoader;
 import com.yanzhenjie.album.Album;
@@ -48,7 +48,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToKF();
         //
-        Intent intent = new Intent(context, ChatActivity.class);
+        Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
         intent.putExtra(BDUiConstant.EXTRA_WID, wId);
@@ -62,7 +62,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToKF();
         //
-        Intent intent = new Intent(context, ChatActivity.class);
+        Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
         intent.putExtra(BDUiConstant.EXTRA_WID, wId);
@@ -86,7 +86,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToKF();
         //
-        Intent intent = new Intent(context, ChatActivity.class);
+        Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
         intent.putExtra(BDUiConstant.EXTRA_WID, "");
@@ -101,7 +101,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToKF();
         //
-        Intent intent = new Intent(context, ChatActivity.class);
+        Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
         intent.putExtra(BDUiConstant.EXTRA_UID, "");
         intent.putExtra(BDUiConstant.EXTRA_WID, "");
@@ -139,7 +139,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToIM();
         //
-        Intent intent = new Intent(context, ChatActivity.class);
+        Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_TID, tId);
         intent.putExtra(BDUiConstant.EXTRA_UID, uId);
@@ -152,7 +152,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToIM();
         //
-        Intent intent = new Intent(context, ChatActivity.class);
+        Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_TID, tId);
         intent.putExtra(BDUiConstant.EXTRA_UID, uId);
@@ -174,7 +174,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToIM();
         //
-        Intent intent = new Intent(context, ChatWxActivity.class);
+        Intent intent = new Intent(context, ChatIMActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, uId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
@@ -186,7 +186,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToIM();
         //
-        Intent intent = new Intent(context, ChatWxActivity.class);
+        Intent intent = new Intent(context, ChatIMActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, uId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
@@ -208,7 +208,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToIM();
         //
-        Intent intent = new Intent(context, ChatWxActivity.class);
+        Intent intent = new Intent(context, ChatIMActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, gId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
@@ -220,7 +220,7 @@ public class BDUiApi {
         //
         BDConfig.getInstance(context).switchToIM();
         //
-        Intent intent = new Intent(context, ChatWxActivity.class);
+        Intent intent = new Intent(context, ChatIMActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
         intent.putExtra(BDUiConstant.EXTRA_UID, gId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);

@@ -64,6 +64,8 @@ public class ProfileFragment extends BaseFragment {
         initTopBar();
         initGroupListView();
 
+        getProfile();
+
         return root;
     }
 
@@ -78,7 +80,7 @@ public class ProfileFragment extends BaseFragment {
                 popBackStack();
             }
         });
-        mTopBar.setTitle(getResources().getString(R.string.bytedesk_setting));
+        mTopBar.setTitle("个人资料");
     }
 
     /**
@@ -433,4 +435,20 @@ public class ProfileFragment extends BaseFragment {
         }
     }
 
+
+    private void getProfile() {
+
+        BDCoreApi.userProfile(getContext(), new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+            }
+        });
+    }
 }

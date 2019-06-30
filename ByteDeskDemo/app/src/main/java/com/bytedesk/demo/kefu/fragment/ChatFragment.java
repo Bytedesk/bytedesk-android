@@ -17,12 +17,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- *
  *  TODO:
  *    5. fragment方式打开
- *
  */
-
 public class ChatFragment extends BaseFragment {
 
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;

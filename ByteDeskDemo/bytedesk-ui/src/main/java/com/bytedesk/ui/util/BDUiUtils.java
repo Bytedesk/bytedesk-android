@@ -3,7 +3,7 @@ package com.bytedesk.ui.util;
 import android.content.Context;
 import android.view.inputmethod.InputMethodManager;
 
-import com.bytedesk.ui.activity.ChatWxActivity;
+import com.bytedesk.ui.activity.ChatIMActivity;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import java.text.ParseException;
@@ -37,7 +37,7 @@ public class BDUiUtils {
                 imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);//SHOW_FORCED表示强制显示
             }
             else {
-                imm.hideSoftInputFromWindow(((ChatWxActivity)context).getCurrentFocus().getWindowToken(), 0);////强制隐藏键盘
+                imm.hideSoftInputFromWindow(((ChatIMActivity)context).getCurrentFocus().getWindowToken(), 0);////强制隐藏键盘
             }
 
         } catch (Exception e) {

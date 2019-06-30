@@ -67,11 +67,11 @@
 
         <!--对话页面-->
         <activity
-            android:name="com.bytedesk.ui.activity.ChatActivity"
+            android:name="com.bytedesk.ui.activity.ChatKFActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name="com.bytedesk.ui.activity.ChatWxActivity"
+            android:name="com.bytedesk.ui.activity.ChatIMActivity"
             android:screenOrientation="portrait"/>
 
         <!--群组会话详情页-->

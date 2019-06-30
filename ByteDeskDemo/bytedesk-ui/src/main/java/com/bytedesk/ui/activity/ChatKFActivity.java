@@ -30,6 +30,8 @@ import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.event.KickoffEvent;
 import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.event.PreviewEvent;
+import com.bytedesk.core.event.QueryAnswerEvent;
+import com.bytedesk.core.event.SendCommodityEvent;
 import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.room.entity.MessageEntity;
 import com.bytedesk.core.util.BDCoreConstant;
@@ -67,8 +69,7 @@ import java.util.Map;
 
 /**
  *  用途：
- *  1. 访客聊天界面
- *  2. 客服 工作组、1v1、群聊 聊天界面
+ *  1. 客服聊天界面
  *
  *  TODO:
  *    1. 访客关闭会话窗口的时候通知客服
@@ -76,7 +77,7 @@ import java.util.Map;
  *
  * @author bytedesk.com
  */
-public class ChatActivity extends AppCompatActivity
+public class ChatKFActivity extends AppCompatActivity
         implements ChatItemClickListener, View.OnClickListener {
 
     private QMUITopBarLayout mTopBar;
@@ -176,7 +177,6 @@ public class ChatActivity extends AppCompatActivity
             //
             mUid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
             mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
-
         }
 
         //
@@ -233,7 +233,7 @@ public class ChatActivity extends AppCompatActivity
                 // 机器人
                 if (mIsRobot) {
                     //
-                    robotMessage(content);
+                    sendRobotMessage(content);
                 } else {
                     //
                     sendTextMessage(content);
@@ -299,7 +299,7 @@ public class ChatActivity extends AppCompatActivity
                         @Override
                         public void onClick(View view) {
                             //
-                            Intent intent = new Intent(ChatActivity.this, ContactProfileActivity.class);
+                            Intent intent = new Intent(ChatKFActivity.this, ContactProfileActivity.class);
                             intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
                             startActivity(intent);
                         }
@@ -311,7 +311,7 @@ public class ChatActivity extends AppCompatActivity
                         @Override
                         public void onClick(View view) {
                             //
-                            Intent intent = new Intent(ChatActivity.this, GroupProfileActivity.class);
+                            Intent intent = new Intent(ChatKFActivity.this, GroupProfileActivity.class);
                             intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
                             startActivity(intent);
                         }
@@ -449,7 +449,7 @@ public class ChatActivity extends AppCompatActivity
                     Logger.d("request thread message: " + object.get("message")
                             + " status_code:" + object.get("status_code")
                             + " data:" + object.get("data"));
-                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -485,7 +485,7 @@ public class ChatActivity extends AppCompatActivity
 
                 try {
                     Logger.d("init answer message: " + object.get("message") + " status_code:" + object.get("status_code") + " data:" + object.get("data"));
-                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -497,9 +497,10 @@ public class ChatActivity extends AppCompatActivity
 
     /**
      * 请求机器人会话
-     * @param content
+     * @param content 关键词
      */
-    private void robotMessage(String content) {
+    private void sendRobotMessage(String content) {
+        Logger.i("tid: %s, wid %s, type %s, content %s", mTidOrUidOrGid, mWorkGroupWid, mRequestType, content);
 
         // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
         final String localId = BDCoreUtils.uuid();
@@ -511,33 +512,45 @@ public class ChatActivity extends AppCompatActivity
 
             @Override
             public void onSuccess(JSONObject object) {
-
                 //
                 try {
 
                     int status_code = object.getInt("status_code");
-                    if (status_code == 200 || status_code == 201) {
-
-                        //
+                    if (status_code == 200) {
+                        // 正确匹配到答案
                         mRepository.deleteMessageLocal(localId);
 
                         //
                         JSONObject queryMessageObject = object.getJSONObject("data").getJSONObject("query");
                         JSONObject replyMessageObject = object.getJSONObject("data").getJSONObject("reply");
 
+                        // TODO: 答案中添加 '有帮助'、'无帮助'，访客点击可反馈答案是否有用
+
                         //持久化到数据库
                         mRepository.insertMessageJson(queryMessageObject);
-                        mRepository.insertMessageJson(replyMessageObject);
+                        mRepository.insertRobotRightAnswerMessageJson(replyMessageObject);
 
-                        // 发送成功
+                    } else if (status_code == 201) {
+                        // 未匹配到答案
+                        mRepository.deleteMessageLocal(localId);
+
+                        //
+                        JSONObject queryMessageObject = object.getJSONObject("data").getJSONObject("query");
+                        JSONObject replyMessageObject = object.getJSONObject("data").getJSONObject("reply");
+
+                        // TODO: 回答内容中添加 '人工客服' 字样，访客点击可直接联系人工客服
+
+                        //持久化到数据库
+                        mRepository.insertMessageJson(queryMessageObject);
+                        mRepository.insertRobotNoAnswerMessageJson(replyMessageObject);
+
                     } else {
-
                         // 修改本地消息发送状态为error
                         mRepository.updateMessageStatusError(localId);
 
                         // 发送消息失败
                         String message = object.getString("message");
-                        Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {
@@ -550,7 +563,7 @@ public class ChatActivity extends AppCompatActivity
 
                 try {
                     Logger.d("robot message: " + object.get("message") + " status_code:" + object.get("status_code") + " data:" + object.get("data"));
-                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -576,7 +589,7 @@ public class ChatActivity extends AppCompatActivity
             public void onError(JSONObject object) {
                 Logger.e("更新当前会话失败");
                 try {
-                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -617,7 +630,7 @@ public class ChatActivity extends AppCompatActivity
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -652,7 +665,7 @@ public class ChatActivity extends AppCompatActivity
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatActivity.this,
+                        Toast.makeText(ChatKFActivity.this,
                                 object.getString("message"),
                                 Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
@@ -688,7 +701,7 @@ public class ChatActivity extends AppCompatActivity
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -721,14 +734,13 @@ public class ChatActivity extends AppCompatActivity
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
             });
         }
-
     }
 
     /**
@@ -752,7 +764,7 @@ public class ChatActivity extends AppCompatActivity
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
 
                 String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
+                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
@@ -767,7 +779,7 @@ public class ChatActivity extends AppCompatActivity
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
 
                 String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
+                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
@@ -781,7 +793,7 @@ public class ChatActivity extends AppCompatActivity
 
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
                 String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
+                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else if (status_code == 204) {
                 // 当前无客服在线，请自助查询或留言
@@ -791,10 +803,10 @@ public class ChatActivity extends AppCompatActivity
 
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
                 String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
+                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else if (status_code == 205) {
-                // TODO: 咨询前问卷
+                // 咨询前问卷
 
                 String title = "";
                 JSONObject message = object.getJSONObject("data");
@@ -833,7 +845,7 @@ public class ChatActivity extends AppCompatActivity
 
                 // 1. 弹窗选择列表：类型、工作组
                 final String[] items = questionContents.toArray(new String[0]);
-                new QMUIDialog.MenuDialogBuilder(ChatActivity.this)
+                new QMUIDialog.MenuDialogBuilder(ChatKFActivity.this)
                     .setTitle(title)
                     .addItems(items, new DialogInterface.OnClickListener() {
                         @Override
@@ -862,19 +874,20 @@ public class ChatActivity extends AppCompatActivity
 
             } else if (status_code == 206) {
                 // 返回机器人初始欢迎语 + 欢迎问题列表
+                mIsRobot = true;
 
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
                 String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatActivity.this, threadTopic);
+                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else {
                 // 请求会话失败
 
                 String message = object.getString("message");
-                Toast.makeText(ChatActivity.this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_SHORT).show();
             }
 
             //
@@ -887,55 +900,6 @@ public class ChatActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
-
-    /**
-     * 选择问卷答案
-     *
-     * @param questionnaireItemItemQid qid
-     */
-//    private void requestQuestionnaire(String questionnaireItemItemQid) {
-//
-//        BDCoreApi.requestQuestionnaire(this, mTidOrUidOrGid, questionnaireItemItemQid, new BaseCallback() {
-//
-//            @Override
-//            public void onSuccess(JSONObject object) {
-//
-//                try {
-//
-//                    JSONObject message = object.getJSONObject("data");
-//
-//                    int status_code = object.getInt("status_code");
-//                    if (status_code == 200) {
-//
-////                      String  title = message.getString("content");
-//                        if (!message.isNull("workGroups")) {
-//
-//                            JSONArray workGroupsArray = message.getJSONArray("workGroups");
-//                            showWorkGroupDialog(workGroupsArray);
-//                        }
-//
-//                    } else {
-//
-//                        //
-//                        String toast = object.getString("message");
-//                        Toast.makeText(ChatActivity.this, toast, Toast.LENGTH_LONG).show();
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(JSONObject object) {
-//                try {
-//                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
 
     /**
      * 显示选择工作组提示框
@@ -958,7 +922,7 @@ public class ChatActivity extends AppCompatActivity
 
             // 1. 弹窗选择列表：工作组
             final String[] items = workGroupNames.toArray(new String[0]);
-            new QMUIDialog.MenuDialogBuilder(ChatActivity.this)
+            new QMUIDialog.MenuDialogBuilder(ChatKFActivity.this)
                     .setTitle("请选择")
                     .addItems(items, new DialogInterface.OnClickListener() {
                         @Override
@@ -1008,7 +972,7 @@ public class ChatActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 try {
-                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1054,7 +1018,7 @@ public class ChatActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 try {
-                    Toast.makeText(ChatActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1089,7 +1053,7 @@ public class ChatActivity extends AppCompatActivity
                 .onCancel(new Action<String>() {
                     @Override
                     public void onAction(@NonNull String result) {
-                        Toast.makeText(ChatActivity.this, "取消发送图片", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatKFActivity.this, "取消发送图片", Toast.LENGTH_LONG).show();
                     }
                 })
                 .start();
@@ -1129,7 +1093,7 @@ public class ChatActivity extends AppCompatActivity
                 .onCancel(new Action<String>() {
                     @Override
                     public void onAction(@NonNull String result) {
-                        Toast.makeText(ChatActivity.this, "取消拍照", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatKFActivity.this, "取消拍照", Toast.LENGTH_LONG).show();
                     }
                 })
                 .start();
@@ -1164,7 +1128,7 @@ public class ChatActivity extends AppCompatActivity
                     if (position == 0) {
 
                         // TODO: 暂未增加评价页面，开发者可自行设计。具体参数意思可跟进函数定义查看
-                        BDCoreApi.rate(ChatActivity.this, mTidOrUidOrGid, 5, "附言", false, new BaseCallback() {
+                        BDCoreApi.rate(ChatKFActivity.this, mTidOrUidOrGid, 5, "附言", false, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -1181,7 +1145,7 @@ public class ChatActivity extends AppCompatActivity
                     } else if (position == 1) {
 
                         // 跳转留言页面
-                        Intent intent = new Intent(ChatActivity.this, LeaveMessageActivity.class);
+                        Intent intent = new Intent(ChatKFActivity.this, LeaveMessageActivity.class);
                         intent.putExtra(BDUiConstant.EXTRA_WID, mWorkGroupWid);
                         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, mRequestType);
                         intent.putExtra(BDUiConstant.EXTRA_AID, mAgentUid);
@@ -1198,8 +1162,8 @@ public class ChatActivity extends AppCompatActivity
 
                             // 切换智能机器人
                             requestRobot();
-
                         }
+
                         mIsRobot = !mIsRobot;
                     }
                 })
@@ -1268,7 +1232,7 @@ public class ChatActivity extends AppCompatActivity
                             public void onClick(QMUIDialog dialog, int index) {
                                 dialog.dismiss();
                                 // 请求授权
-                                ActivityCompat.requestPermissions(ChatActivity.this,
+                                ActivityCompat.requestPermissions(ChatKFActivity.this,
                                         new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         BDUiConstant.PERMISSION_REQUEST_ALBUM);
@@ -1312,7 +1276,7 @@ public class ChatActivity extends AppCompatActivity
                             public void onClick(QMUIDialog dialog, int index) {
                                 dialog.dismiss();
                                 // 请求授权
-                                ActivityCompat.requestPermissions(ChatActivity.this,
+                                ActivityCompat.requestPermissions(ChatKFActivity.this,
                                         new String[] { Manifest.permission.CAMERA,
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         BDUiConstant.PERMISSION_REQUEST_CAMERA);
@@ -1459,7 +1423,7 @@ public class ChatActivity extends AppCompatActivity
 
                         // 发送消息失败
                         String message = object.getString("message");
-                        Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {
@@ -1470,7 +1434,7 @@ public class ChatActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 // 发送消息失败
-                Toast.makeText(ChatActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -1516,10 +1480,10 @@ public class ChatActivity extends AppCompatActivity
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
 
                     // 1. 异步发送图片消息，TODO: 增加Future机制？
-                    // BDMqttApi.sendImageMessage(ChatActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
+                    // BDMqttApi.sendImageMessage(ChatKFActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
 
                     // 2. 同步发送图片消息(推荐)
-                    BDCoreApi.sendImageMessage(ChatActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
+                    BDCoreApi.sendImageMessage(ChatKFActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -1543,7 +1507,7 @@ public class ChatActivity extends AppCompatActivity
 
                                     // 发送消息失败
                                     String message = object.getString("message");
-                                    Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
                                 }
 
                             } catch (JSONException e) {
@@ -1554,7 +1518,7 @@ public class ChatActivity extends AppCompatActivity
                         @Override
                         public void onError(JSONObject object) {
                             // 发送消息失败
-                            Toast.makeText(ChatActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -1637,6 +1601,105 @@ public class ChatActivity extends AppCompatActivity
     }
 
     /**
+     * 监听 EventBus 广播消息: 发送商品信息
+     *
+     * @param sendCommodityEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSendCommodityEvent(SendCommodityEvent sendCommodityEvent) {
+        Logger.i("SendCommodityEvent");
+
+        if (mCustom != null && mCustom.trim().length() > 0) {
+            sendCommodityMessage(mCustom);
+        }
+    }
+
+    /**
+     * 监听 EventBus 广播消息: 点击智能问答消息记录上面的问题
+     *
+     * @param queryAnswerEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onQueryAnswerEvent(QueryAnswerEvent queryAnswerEvent) {
+        Logger.i("QueryAnswerEvent aid: %s, question %s", queryAnswerEvent.getAid(), queryAnswerEvent.getQuestion());
+
+        if (queryAnswerEvent.getAid().equals("00001")) {
+
+            // 请求人工客服
+            // TODO: mTidOrUidOrGid 替换为 agentUid, agentUid不能为空
+            BDCoreApi.requestAgent(this, mWorkGroupWid, mRequestType, mTidOrUidOrGid, new BaseCallback() {
+
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    dealWithThread(object);
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+                    try {
+                        Logger.d("request thread message: " + object.get("message")
+                                + " status_code:" + object.get("status_code")
+                                + " data:" + object.get("data"));
+                        Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+        } else {
+
+            // 请求服务器答案
+            BDCoreApi.queryAnswer(this, mTidOrUidOrGid, queryAnswerEvent.getAid(), new BaseCallback() {
+
+                @Override
+                public void onSuccess(JSONObject object) {
+                    //
+                    try {
+
+                        int status_code = object.getInt("status_code");
+                        if (status_code == 200) {
+                            //
+                            JSONObject queryMessageObject = object.getJSONObject("data").getJSONObject("query");
+                            JSONObject replyMessageObject = object.getJSONObject("data").getJSONObject("reply");
+
+                            // TODO: 答案中添加 '有帮助'、'无帮助'，访客点击可反馈答案是否有用
+
+                            //持久化到数据库
+                            mRepository.insertMessageJson(queryMessageObject);
+                            mRepository.insertRobotRightAnswerMessageJson(replyMessageObject);
+
+                        } else {
+
+                            // 发送消息失败
+                            String message = object.getString("message");
+                            Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+
+                    try {
+                        Logger.d("robot message: " + object.get("message") + " status_code:" + object.get("status_code") + " data:" + object.get("data"));
+                        Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            });
+        }
+
+
+    }
+
+    /**
      * 下拉刷新
      */
     private QMUIPullRefreshLayout.OnPullListener pullListener = new QMUIPullRefreshLayout.OnPullListener() {
@@ -1685,7 +1748,6 @@ public class ChatActivity extends AppCompatActivity
         }
     };
 
-
     /**
      * 发送商品消息等
      * @param custom
@@ -1722,7 +1784,7 @@ public class ChatActivity extends AppCompatActivity
 
                         // 发送消息失败
                         String message = object.getString("message");
-                        Toast.makeText(ChatActivity.this, message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {
@@ -1733,10 +1795,54 @@ public class ChatActivity extends AppCompatActivity
             @Override
             public void onError(JSONObject object) {
                 // 发送消息失败
-                Toast.makeText(ChatActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
             }
         });
     }
+
 }
 
 
+//    private void requestQuestionnaire(String questionnaireItemItemQid) {
+//
+//        BDCoreApi.requestQuestionnaire(this, mTidOrUidOrGid, questionnaireItemItemQid, new BaseCallback() {
+//
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//
+//                try {
+//
+//                    JSONObject message = object.getJSONObject("data");
+//
+//                    int status_code = object.getInt("status_code");
+//                    if (status_code == 200) {
+//
+////                      String  title = message.getString("content");
+//                        if (!message.isNull("workGroups")) {
+//
+//                            JSONArray workGroupsArray = message.getJSONArray("workGroups");
+//                            showWorkGroupDialog(workGroupsArray);
+//                        }
+//
+//                    } else {
+//
+//                        //
+//                        String toast = object.getString("message");
+//                        Toast.makeText(ChatKFActivity.this, toast, Toast.LENGTH_LONG).show();
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//                try {
+//                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
