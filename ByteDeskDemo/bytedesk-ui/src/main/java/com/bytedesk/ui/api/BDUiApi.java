@@ -8,6 +8,9 @@ import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.ui.activity.BrowserActivity;
 import com.bytedesk.ui.activity.ChatIMActivity;
 import com.bytedesk.ui.activity.ChatKFActivity;
+import com.bytedesk.ui.activity.FeedbackActivity;
+import com.bytedesk.ui.activity.SupportApiActivity;
+import com.bytedesk.ui.activity.TicketActivity;
 import com.bytedesk.ui.util.BDUiConstant;
 import com.bytedesk.ui.util.MediaLoader;
 import com.yanzhenjie.album.Album;
@@ -229,6 +232,42 @@ public class BDUiApi {
         context.startActivity(intent);
     }
 
+
+    public static void startFeedbackActivity(Context context, String uid) {
+        //
+        BDConfig.getInstance(context).switchToKF();
+        //
+        Intent intent = new Intent(context, FeedbackActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_UID, uid);
+        context.startActivity(intent);
+    }
+
+
+    public static void startTicketActivity(Context context, String uid) {
+        //
+        BDConfig.getInstance(context).switchToKF();
+        //
+        Intent intent = new Intent(context, TicketActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_UID, uid);
+        context.startActivity(intent);
+    }
+
+
+    public static void startSupportApiActivity(Context context, String uid) {
+        //
+        BDConfig.getInstance(context).switchToKF();
+        //
+        Intent intent = new Intent(context, SupportApiActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_UID, uid);
+        context.startActivity(intent);
+    }
+
+
+    public static void startSupportURLActivity(Context context, String uid) {
+
+        String url = "https://www.bytedesk.com/support?uid=" + uid + "&ph=ph";
+        BDUiApi.startHtml5Chat(context, url, "帮助中心");
+    }
 
 
 

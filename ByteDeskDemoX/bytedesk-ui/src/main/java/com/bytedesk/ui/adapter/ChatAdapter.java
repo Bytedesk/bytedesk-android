@@ -3,6 +3,7 @@ package com.bytedesk.ui.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import androidx.core.content.ContextCompat;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bytedesk.core.api.BDMqttApi;
+import com.bytedesk.core.event.LongClickEvent;
 import com.bytedesk.core.event.QueryAnswerEvent;
 import com.bytedesk.core.event.SendCommodityEvent;
 import com.bytedesk.core.repository.BDRepository;
@@ -33,6 +35,7 @@ import com.bytedesk.core.util.BDFileUtils;
 import com.bytedesk.core.util.JsonCustom;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.activity.BigImageViewActivity;
+import com.bytedesk.ui.api.BDUiApi;
 import com.bytedesk.ui.listener.ChatItemClickListener;
 import com.bytedesk.ui.util.BDUiUtils;
 import com.bytedesk.ui.util.ExpressionUtil;
@@ -307,25 +310,43 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 catch (Exception e) {
                     e.printStackTrace();
                 }
-                //
+                // 点击link
                 contentTextView.setOnLinkClickListener(new QMUILinkTextView.OnLinkClickListener() {
 
                     @Override
                     public void onTelLinkClick(String phoneNumber) {
                         // TODO:
                         Toast.makeText(mContext, "识别到电话号码是：" + phoneNumber, Toast.LENGTH_SHORT).show();
+
+//                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+//                        mContext.startActivity(intent);
                     }
 
                     @Override
                     public void onMailLinkClick(String mailAddress) {
                         // TODO:
                         Toast.makeText(mContext, "识别到邮件地址是：" + mailAddress, Toast.LENGTH_SHORT).show();
+
                     }
 
                     @Override
                     public void onWebUrlLinkClick(String url) {
                         // TODO:
                         Toast.makeText(mContext, "识别到网页链接是：" + url, Toast.LENGTH_SHORT).show();
+
+                        BDUiApi.startHtml5Chat(mContext, url, "打开网址");
+                    }
+                });
+                // 长按
+                contentTextView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+
+                        Logger.d("mid:" + msgEntity.getMid());
+
+                        EventBus.getDefault().post(new LongClickEvent(msgEntity));
+
+                        return false;
                     }
                 });
             }

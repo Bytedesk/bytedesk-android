@@ -26,11 +26,9 @@ import com.bytedesk.demo.im.fragment.social.TabFragment;
 import com.bytedesk.demo.kefu.fragment.AppRateFragment;
 import com.bytedesk.demo.kefu.fragment.AppUpgradeFragment;
 import com.bytedesk.demo.kefu.fragment.ChatFragment;
-import com.bytedesk.demo.kefu.fragment.FeedbackFragment;
-import com.bytedesk.demo.kefu.fragment.SupportFragment;
 import com.bytedesk.demo.kefu.fragment.StatusFragment;
+import com.bytedesk.demo.kefu.fragment.SupportFragment;
 import com.bytedesk.demo.kefu.fragment.ThreadFragment;
-import com.bytedesk.demo.kefu.fragment.TicketFragment;
 import com.bytedesk.demo.utils.BDDemoConst;
 import com.bytedesk.ui.api.BDUiApi;
 import com.orhanobut.logger.Logger;
@@ -160,16 +158,15 @@ public class ApiFragment extends BaseFragment {
                     startFragment(threadFragment);
                 })
                 .addItemView(ticketItem, view -> {
-                    TicketFragment ticketFragment = new TicketFragment();
-                    startFragment(ticketFragment);
+//                    startFragment(new TicketFragment());
+                    BDUiApi.startTicketActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
                 })
                 .addItemView(feedbackItem, view -> {
-                    FeedbackFragment feedbackFragment = new FeedbackFragment();
-                    startFragment(feedbackFragment);
+//                    startFragment(new FeedbackFragment());
+                    BDUiApi.startFeedbackActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
                 })
                 .addItemView(helpCenterItem, view -> {
-                    SupportFragment supportFragment = new SupportFragment();
-                    startFragment(supportFragment);
+                    startFragment(new SupportFragment());
                 })
                 .addItemView(wapChatItem, view -> {
                     // 注意: 登录后台->所有设置->所有客服->技能组->获取代码 获取相应URL

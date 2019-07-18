@@ -55,8 +55,9 @@ public class SupportFragment extends BaseFragment {
                     public void onClick(View view) {
                         // 替换：URL参数uid
                         // 注意: 登录后台->所有设置->所有客服->管理员唯一uid
-                        String url = "https://www.bytedesk.com/support?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&ph=ph";
-                        BDUiApi.startHtml5Chat(getContext(), url, "帮助中心");
+//                        String url = "https://www.bytedesk.com/support?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&ph=ph";
+//                        BDUiApi.startHtml5Chat(getContext(), url, "帮助中心");
+                        BDUiApi.startSupportURLActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
                     }
                 })
                 .addTo(mGroupListView);
@@ -69,8 +70,9 @@ public class SupportFragment extends BaseFragment {
                     @Override
                     public void onClick(View view) {
                         //
-                        SupportApiFragment apiFragment = new SupportApiFragment();
-                        startFragment(apiFragment);
+//                        SupportApiFragment apiFragment = new SupportApiFragment();
+//                        startFragment(apiFragment);
+                        BDUiApi.startSupportApiActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
                     }
                 })
                 .addTo(mGroupListView);

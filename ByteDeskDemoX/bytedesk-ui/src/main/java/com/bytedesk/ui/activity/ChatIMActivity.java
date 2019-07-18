@@ -50,6 +50,7 @@ import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.event.KickoffEvent;
+import com.bytedesk.core.event.LongClickEvent;
 import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.event.PreviewEvent;
 import com.bytedesk.core.repository.BDRepository;
@@ -105,7 +106,7 @@ import java.util.Map;
  *
  * @author bytedesk.com
  */
-public class ChatIMActivity extends AppCompatActivity
+public class ChatIMActivity extends ChatBaseActivity
         implements ChatItemClickListener,
         View.OnClickListener,
         View.OnTouchListener,

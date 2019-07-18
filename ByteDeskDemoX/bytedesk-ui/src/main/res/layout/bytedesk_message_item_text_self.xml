@@ -51,6 +51,7 @@
             android:autoLink="phone|email"
             android:background="@drawable/bytedesk_message_item_background_self"
             android:textColorLink="#0082CB"
+            android:gravity="center"
             />
 
         <!--阅后即焚-->

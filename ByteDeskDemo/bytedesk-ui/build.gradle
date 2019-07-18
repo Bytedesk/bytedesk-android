@@ -8,8 +8,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode 76
-        versionName "1.7.6"
+        versionCode 77
+        versionName "1.7.7"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -29,7 +29,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.bytedesk:core:1.7.6'
+    implementation 'com.bytedesk:core:1.7.7'
 
     // 腾讯QMUI界面库
     // http://qmuiteam.com/android/page/start.html

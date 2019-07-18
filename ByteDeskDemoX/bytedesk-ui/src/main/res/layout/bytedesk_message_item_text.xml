@@ -65,6 +65,7 @@
                 android:autoLink="phone|email"
                 android:background="@drawable/bytedesk_message_item_background"
                 android:textColorLink="#0082CB"
+                android:gravity="center"
                 />
 
             <com.qmuiteam.qmui.widget.QMUIProgressBar

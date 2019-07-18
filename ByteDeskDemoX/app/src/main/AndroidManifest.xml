@@ -24,6 +24,9 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!--聊天内容出现电话号码，可直接拨打-->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
 
     <application
         android:name="com.bytedesk.demo.BDApplication"

@@ -7,7 +7,7 @@
     android:background="@color/qmui_config_color_white">
 
     <com.qmuiteam.qmui.widget.QMUITopBarLayout
-        android:id="@+id/bytedesk_feedback_topbar"
+        android:id="@+id/bytedesk_ticket_topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"/>
@@ -20,7 +20,7 @@
         android:fitsSystemWindows="true">
 
         <com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView
-            android:id="@+id/bytedesk_feedback_groupListView"
+            android:id="@+id/bytedesk_ticket_groupListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 

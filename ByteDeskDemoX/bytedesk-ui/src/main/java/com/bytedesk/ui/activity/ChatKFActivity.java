@@ -3,6 +3,8 @@ package com.bytedesk.ui.activity;
 import android.Manifest;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,6 +30,7 @@ import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.event.KickoffEvent;
+import com.bytedesk.core.event.LongClickEvent;
 import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.event.PreviewEvent;
 import com.bytedesk.core.event.QueryAnswerEvent;
@@ -77,8 +80,9 @@ import java.util.Map;
  *
  * @author bytedesk.com
  */
-public class ChatKFActivity extends AppCompatActivity
-        implements ChatItemClickListener, View.OnClickListener {
+public class ChatKFActivity extends ChatBaseActivity
+        implements ChatItemClickListener,
+        View.OnClickListener {
 
     private QMUITopBarLayout mTopBar;
     private QMUIPullRefreshLayout mPullRefreshLayout;
@@ -1396,7 +1400,7 @@ public class ChatKFActivity extends AppCompatActivity
         // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
 
         // 1. 异步发送文字消息, TODO: 增加Future机制？
-//         BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
+//        BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
 
         // 2. 同步发送消息(推荐)
         BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType, new BaseCallback() {

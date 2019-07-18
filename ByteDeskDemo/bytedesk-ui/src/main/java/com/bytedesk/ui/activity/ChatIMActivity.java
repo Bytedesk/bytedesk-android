@@ -104,7 +104,7 @@ import java.util.Map;
  *
  * @author bytedesk.com
  */
-public class ChatIMActivity extends AppCompatActivity
+public class ChatIMActivity extends ChatBaseActivity
         implements ChatItemClickListener,
         View.OnClickListener,
         View.OnTouchListener,

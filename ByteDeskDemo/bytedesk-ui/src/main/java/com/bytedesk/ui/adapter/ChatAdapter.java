@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bytedesk.core.api.BDMqttApi;
+import com.bytedesk.core.event.LongClickEvent;
 import com.bytedesk.core.event.QueryAnswerEvent;
 import com.bytedesk.core.event.SendCommodityEvent;
 import com.bytedesk.core.repository.BDRepository;
@@ -326,6 +327,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     public void onWebUrlLinkClick(String url) {
                         // TODO:
                         Toast.makeText(mContext, "识别到网页链接是：" + url, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                // 长按
+                contentTextView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+
+                        Logger.d("mid:" + msgEntity.getMid());
+
+                        EventBus.getDefault().post(new LongClickEvent(msgEntity));
+
+                        return false;
                     }
                 });
             }

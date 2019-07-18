@@ -109,6 +109,21 @@
             android:name="com.bytedesk.ui.activity.BigImageViewActivity"
             android:screenOrientation="portrait"/>
 
+        <!--意见反馈-->
+        <activity
+            android:name="com.bytedesk.ui.activity.FeedbackActivity"
+            android:screenOrientation="portrait"/>
+
+        <!--提交工单-->
+        <activity
+            android:name="com.bytedesk.ui.activity.TicketActivity"
+            android:screenOrientation="portrait"/>
+
+        <!--帮助中心-->
+        <activity
+            android:name="com.bytedesk.ui.activity.SupportApiActivity"
+            android:screenOrientation="portrait"/>
+
         <!--长连接service-->
         <service android:name="com.bytedesk.paho.android.service.MqttService"/>
         <!--下载录音-->
