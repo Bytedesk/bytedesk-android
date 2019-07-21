@@ -209,7 +209,7 @@ public class FeedbackActivity extends AppCompatActivity {
 //        final String[] items = new String[]{"选项1", "选项2", "选项3"};
         final String[] items = mCategoryMap.keySet().toArray(new String[mCategoryMap.size()]);
 //        final int checkedIndex = 0;
-        new QMUIDialog.CheckableDialogBuilder(getApplicationContext())
+        new QMUIDialog.CheckableDialogBuilder(this)
 //                .setCheckedIndex(checkedIndex)
                 .addItems(items, new DialogInterface.OnClickListener() {
                     @Override
@@ -230,7 +230,7 @@ public class FeedbackActivity extends AppCompatActivity {
      */
     private void showEditContentDialog() {
 
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getApplicationContext());
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("工单内容")
                 .setPlaceholder("在此输入内容")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -289,7 +289,7 @@ public class FeedbackActivity extends AppCompatActivity {
      */
     private void showEditMobileDialog() {
 
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getApplicationContext());
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("手机号")
                 .setPlaceholder("在此输入手机号")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -318,7 +318,7 @@ public class FeedbackActivity extends AppCompatActivity {
      */
     private void showEditEmailDialog() {
 
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getApplicationContext());
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("邮箱")
                 .setPlaceholder("在此输入邮箱")
                 .setInputType(InputType.TYPE_CLASS_TEXT)

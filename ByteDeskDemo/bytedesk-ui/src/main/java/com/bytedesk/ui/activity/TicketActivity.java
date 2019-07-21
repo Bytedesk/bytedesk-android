@@ -20,6 +20,7 @@ import com.bytedesk.ui.util.BDUiConstant;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
+import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
@@ -213,22 +214,42 @@ public class TicketActivity extends AppCompatActivity {
      */
     private void showChooseUrgentDialog() {
 
-        final String[] items = new String[]{"一般", "紧急"};
-        final int checkedIndex = 0;
-        new QMUIDialog.CheckableDialogBuilder(getApplicationContext())
-                .setCheckedIndex(checkedIndex)
-                .addItems(items, (dialog, which) -> {
-                    dialog.dismiss();
+//        final String[] items = new String[]{"一般", "紧急"};
+//        final int checkedIndex = 0;
+//        new QMUIDialog.CheckableDialogBuilder(getApplicationContext())
+//                .setCheckedIndex(checkedIndex)
+//                .addItems(items, (dialog, which) -> {
+//                    dialog.dismiss();
+//
+//                    if (which == 0) {
+//                        urgentItem.setDetailText("一般");
+//                        mUrgent = "0";
+//                    } else {
+//                        urgentItem.setDetailText("紧急");
+//                        mUrgent = "1";
+//                    }
+//
+//                }).show();
 
-                    if (which == 0) {
-                        urgentItem.setDetailText("一般");
-                        mUrgent = "0";
-                    } else {
-                        urgentItem.setDetailText("紧急");
-                        mUrgent = "1";
+        new QMUIBottomSheet.BottomListSheetBuilder(this)
+                .addItem("一般")
+                .addItem("紧急")
+                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
+                    @Override
+                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
+                        dialog.dismiss();
+
+                        if (position == 0) {
+                            urgentItem.setDetailText("一般");
+                            mUrgent = "0";
+                        } else {
+                            urgentItem.setDetailText("紧急");
+                            mUrgent = "1";
+                        }
                     }
-
-                }).show();
+                })
+                .build()
+                .show();
     }
 
     /**
@@ -239,7 +260,7 @@ public class TicketActivity extends AppCompatActivity {
 //        final String[] items = new String[]{"选项1", "选项2", "选项3"};
         final String[] items = mCategoryMap.keySet().toArray(new String[mCategoryMap.size()]);
 //        final int checkedIndex = 0;
-        new QMUIDialog.CheckableDialogBuilder(getApplicationContext())
+        new QMUIDialog.CheckableDialogBuilder(this)
 //                .setCheckedIndex(checkedIndex)
                 .addItems(items, new DialogInterface.OnClickListener() {
                     @Override
@@ -260,7 +281,7 @@ public class TicketActivity extends AppCompatActivity {
      */
     private void showEditContentDialog() {
         //
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getApplicationContext());
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("工单内容")
                 .setPlaceholder("在此输入内容")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -317,7 +338,7 @@ public class TicketActivity extends AppCompatActivity {
      */
     private void showEditMobileDialog() {
         //
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getApplicationContext());
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("手机号")
                 .setPlaceholder("在此输入手机号")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -345,7 +366,7 @@ public class TicketActivity extends AppCompatActivity {
      */
     private void showEditEmailDialog() {
         //
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getApplicationContext());
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("邮箱")
                 .setPlaceholder("在此输入邮箱")
                 .setInputType(InputType.TYPE_CLASS_TEXT)

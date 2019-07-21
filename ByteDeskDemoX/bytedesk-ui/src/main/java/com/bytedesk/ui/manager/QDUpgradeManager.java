@@ -7,6 +7,7 @@ import android.content.Context;
  */
 
 public class QDUpgradeManager {
+
     public static final int INVALIDATE_VERSION_CODE = -1;
 
     private static final int VERSION_1_0_7 = 107;

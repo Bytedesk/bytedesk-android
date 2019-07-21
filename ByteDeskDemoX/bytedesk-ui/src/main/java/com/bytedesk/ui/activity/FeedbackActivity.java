@@ -196,7 +196,7 @@ public class FeedbackActivity extends AppCompatActivity {
 
             @Override
             public void onError(JSONObject object) {
-                Toast.makeText(getApplicationContext(), "加载意见反馈分类失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "加载意见反馈分类失败", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -209,7 +209,7 @@ public class FeedbackActivity extends AppCompatActivity {
 //        final String[] items = new String[]{"选项1", "选项2", "选项3"};
         final String[] items = mCategoryMap.keySet().toArray(new String[mCategoryMap.size()]);
 //        final int checkedIndex = 0;
-        new QMUIDialog.CheckableDialogBuilder(getApplicationContext())
+        new QMUIDialog.CheckableDialogBuilder(this)
 //                .setCheckedIndex(checkedIndex)
                 .addItems(items, new DialogInterface.OnClickListener() {
                     @Override
@@ -230,7 +230,7 @@ public class FeedbackActivity extends AppCompatActivity {
      */
     private void showEditContentDialog() {
 
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getApplicationContext());
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("工单内容")
                 .setPlaceholder("在此输入内容")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -247,7 +247,7 @@ public class FeedbackActivity extends AppCompatActivity {
 
 
                         } else {
-                            Toast.makeText(getApplicationContext(), "请填入内容", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "请填入内容", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -278,7 +278,7 @@ public class FeedbackActivity extends AppCompatActivity {
                 .onCancel(new Action<String>() {
                     @Override
                     public void onAction(@NonNull String result) {
-                        Toast.makeText(getApplicationContext(), "取消选择图片", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), "取消选择图片", Toast.LENGTH_LONG).show();
                     }
                 })
                 .start();
@@ -289,7 +289,7 @@ public class FeedbackActivity extends AppCompatActivity {
      */
     private void showEditMobileDialog() {
 
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getApplicationContext());
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("手机号")
                 .setPlaceholder("在此输入手机号")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -305,7 +305,7 @@ public class FeedbackActivity extends AppCompatActivity {
                             mobileItem.setDetailText(text.toString());
 
                         } else {
-                            Toast.makeText(getApplicationContext(), "请填入手机号", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "请填入手机号", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -318,7 +318,7 @@ public class FeedbackActivity extends AppCompatActivity {
      */
     private void showEditEmailDialog() {
 
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getApplicationContext());
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("邮箱")
                 .setPlaceholder("在此输入邮箱")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -334,7 +334,7 @@ public class FeedbackActivity extends AppCompatActivity {
                             emailItem.setDetailText(text.toString());
 
                         } else {
-                            Toast.makeText(getApplicationContext(), "请填入邮箱", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "请填入邮箱", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -360,12 +360,12 @@ public class FeedbackActivity extends AppCompatActivity {
                             int status_code = object.getInt("status_code");
                             if (status_code == 200) {
 
-                                Toast.makeText(getApplicationContext(), "提交意见反馈成功", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getBaseContext(), "提交意见反馈成功", Toast.LENGTH_LONG).show();
 
                             } else {
 
                                 String message = object.getString("message");
-                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
                             }
 
                         } catch (JSONException e) {
@@ -375,7 +375,7 @@ public class FeedbackActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(JSONObject object) {
-                        Toast.makeText(getApplicationContext(), "提交意见反馈失败", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), "提交意见反馈失败", Toast.LENGTH_LONG).show();
                     }
                 });
     }
