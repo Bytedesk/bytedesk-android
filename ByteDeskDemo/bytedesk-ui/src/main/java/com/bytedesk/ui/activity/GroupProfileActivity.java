@@ -175,12 +175,12 @@ public class GroupProfileActivity extends AppCompatActivity {
                             @Override
                             public void onError(JSONObject object) {
 
-                                Toast.makeText(getApplication(), "更新群昵称失败", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "更新群昵称失败", Toast.LENGTH_SHORT).show();
                             }
                         });
 
                     } else {
-                        Toast.makeText(getApplication(), "请填入群聊名称", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "请填入群聊名称", Toast.LENGTH_SHORT).show();
                     }
                     }
                 }).create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -191,7 +191,7 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                 //  TODO: 群二维码
                 Logger.i("群二维码");
-                Intent intent = new Intent(GroupProfileActivity.this, QRCodeActivity.class);
+                Intent intent = new Intent(context, QRCodeActivity.class);
                 intent.putExtra(BDUiConstant.EXTRA_GID, mGid);
                 startActivity(intent);
 
@@ -237,12 +237,12 @@ public class GroupProfileActivity extends AppCompatActivity {
                                         @Override
                                         public void onError(JSONObject object) {
 
-                                            Toast.makeText(getApplication(), "更新群简介失败", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(context, "更新群简介失败", Toast.LENGTH_SHORT).show();
                                         }
                                     });
 
                                 } else {
-                                    Toast.makeText(getApplication(), "请填入群公告", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "请填入群公告", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }).create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -289,12 +289,12 @@ public class GroupProfileActivity extends AppCompatActivity {
                             @Override
                             public void onError(JSONObject object) {
 
-                                Toast.makeText(getApplication(), "更新群公告失败", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "更新群公告失败", Toast.LENGTH_SHORT).show();
                             }
                         });
 
                     } else {
-                        Toast.makeText(getApplication(), "请填入群公告", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "请填入群公告", Toast.LENGTH_SHORT).show();
                     }
                     }
                 }).create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -411,13 +411,13 @@ public class GroupProfileActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(JSONObject object) {
 
-                                        Toast.makeText(getApplication(), "退群成功", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(context, "退群成功", Toast.LENGTH_SHORT).show();
                                     }
 
                                     @Override
                                     public void onError(JSONObject object) {
 
-                                        Toast.makeText(getApplication(), "退群失败", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(context, "退群失败", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -459,7 +459,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(JSONObject object) {
 
-                                    Toast.makeText(getApplication(), "解散成功", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "解散成功", Toast.LENGTH_SHORT).show();
 
                                     // TODO: 关闭当前页面
                                 }
@@ -467,7 +467,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                                 @Override
                                 public void onError(JSONObject object) {
 
-                                    Toast.makeText(getApplication(), "解散失败", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "解散失败", Toast.LENGTH_SHORT).show();
                                 }
                             });
 
@@ -481,6 +481,7 @@ public class GroupProfileActivity extends AppCompatActivity {
 
     private void addOtherItemToLayout() {
 
+        final Context context = this;
         clearMessageItem = mGroupListView.createItemView("清空聊天记录");
         makeTopItem = mGroupListView.createItemView("会话置顶");
         makeTopItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_SWITCH);
@@ -489,7 +490,7 @@ public class GroupProfileActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //
                 if (isChecked) {
-                    BDCoreApi.markTopThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+                    BDCoreApi.markTopThread(context, mTid, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -502,7 +503,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    BDCoreApi.unmarkTopThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+                    BDCoreApi.unmarkTopThread(context, mTid, new BaseCallback() {
                         @Override
                         public void onSuccess(JSONObject object) {
 
@@ -525,7 +526,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                 //
                 if (isChecked) {
                     //
-                    BDCoreApi.markNoDisturbThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+                    BDCoreApi.markNoDisturbThread(context, mTid, new BaseCallback() {
                         @Override
                         public void onSuccess(JSONObject object) {
 
@@ -538,7 +539,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                     });
                 } else {
                     //
-                    BDCoreApi.unmarkNoDisturbThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+                    BDCoreApi.unmarkNoDisturbThread(context, mTid, new BaseCallback() {
                         @Override
                         public void onSuccess(JSONObject object) {
 
@@ -553,7 +554,6 @@ public class GroupProfileActivity extends AppCompatActivity {
             }
         });
 
-        final Context context = this;
         QMUIGroupListView.newSection(this).addItemView(unDisturbItem, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -580,7 +580,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                     public void onClick(QMUIDialog dialog, int index) {
 
                         // FIXME: 传递threadId or groupId
-                        BDCoreApi.markClearGroupMessage(GroupProfileActivity.this, mGid, new BaseCallback() {
+                        BDCoreApi.markClearGroupMessage(context, mGid, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -604,7 +604,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                 Logger.d("会话置顶");
 
             // FIXME: 传递threadId or groupId
-            BDCoreApi.markTopThread(GroupProfileActivity.this, mTid, new BaseCallback() {
+            BDCoreApi.markTopThread(context, mTid, new BaseCallback() {
 
                 @Override
                 public void onSuccess(JSONObject object) {
@@ -624,7 +624,8 @@ public class GroupProfileActivity extends AppCompatActivity {
 
     private void addItemToFloatLayout(final String uid, final String nickname, final String avatarUrl) {
 
-        LinearLayout linearLayout = new LinearLayout(GroupProfileActivity.this);
+        final Context context = this;
+        LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         linearLayout.setLayoutParams(layoutParams);
@@ -646,7 +647,7 @@ public class GroupProfileActivity extends AppCompatActivity {
 
                 // 管理员操作
                 final String[] items = new String[]{"转交群", "踢出群"};
-                new QMUIDialog.CheckableDialogBuilder(GroupProfileActivity.this)
+                new QMUIDialog.CheckableDialogBuilder(context)
                     .addItems(items, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int index) {
@@ -655,14 +656,14 @@ public class GroupProfileActivity extends AppCompatActivity {
                                 // 转交群
                                 Logger.d("转交群");
 
-                                new QMUIDialog.MessageDialogBuilder(GroupProfileActivity.this)
+                                new QMUIDialog.MessageDialogBuilder(context)
                                         .setTitle("解散群")
                                         .setMessage("确定要转交群？")
                                         .addAction("取消", (dialog1, index1) -> dialog.dismiss())
                                         .addAction(0, "转交", QMUIDialogAction.ACTION_PROP_NEGATIVE, (dialog1, index1) -> {
 
                                             // 调用服务器接口
-                                            BDCoreApi.transferGroup(GroupProfileActivity.this, uid, mGid, false, new BaseCallback() {
+                                            BDCoreApi.transferGroup(context, uid, mGid, false, new BaseCallback() {
 
                                                 @Override
                                                 public void onSuccess(JSONObject object) {
@@ -683,7 +684,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                                 // 踢出群
                                 Logger.d("踢出群");
 
-                                new QMUIDialog.CheckBoxMessageDialogBuilder(GroupProfileActivity.this)
+                                new QMUIDialog.CheckBoxMessageDialogBuilder(context)
                                     .setTitle("提示")
                                     .setMessage("确定要踢出群？")
                                     .setChecked(true)
@@ -691,7 +692,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(QMUIDialog dialog, int index) {
 
-                                            BDCoreApi.kickGroupMember(GroupProfileActivity.this, uid, mGid, new BaseCallback() {
+                                            BDCoreApi.kickGroupMember(context, uid, mGid, new BaseCallback() {
                                                 @Override
                                                 public void onSuccess(JSONObject object) {
 
@@ -743,8 +744,8 @@ public class GroupProfileActivity extends AppCompatActivity {
     }
 
     private void addPlusItemToFloatLayout() {
-
         //
+        final Context context = this;
         QMUIRadiusImageView plusImageView = new QMUIRadiusImageView(this);
         ViewGroup.LayoutParams avatarLayoutParams = new LinearLayout.LayoutParams(100, 100);
         plusImageView.setLayoutParams(avatarLayoutParams);
@@ -754,7 +755,7 @@ public class GroupProfileActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Logger.d("plus clicked:");
                 //
-                Intent intent = new Intent(GroupProfileActivity.this, ContactSelectActivity.class);
+                Intent intent = new Intent(context, ContactSelectActivity.class);
                 intent.putExtra(BDUiConstant.EXTRA_UID, mGid);
                 startActivity(intent);
             }

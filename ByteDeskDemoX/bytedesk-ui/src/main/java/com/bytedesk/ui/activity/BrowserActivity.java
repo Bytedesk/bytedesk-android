@@ -158,6 +158,8 @@ public class BrowserActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        //
         if (requestCode == FILECHOOSER_RESULTCODE) {
             if (null == mUploadMessage)
                 return;

@@ -7,6 +7,7 @@ import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.JsonCustom;
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
+import com.bytedesk.demo.utils.BDDemoConst;
 import com.bytedesk.ui.api.BDUiApi;
 import com.google.gson.Gson;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
@@ -24,15 +25,6 @@ public class ChatFragment extends BaseFragment {
 
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
     @BindView(R.id.groupListView) QMUIGroupListView mGroupListView;
-
-    // 默认设置工作组wid
-    private String wId = "201807171659201";
-    // 指定坐席uid
-    private String agentUid = "201808221551193";
-    // 设置有前置选择的工作组: dxz测试组
-    private String preWid = "201808101819291";
-    // 机器人测试组
-    private String robotWid = "201809061716221";
 
     @Override
     protected View onCreateView() {
@@ -59,8 +51,8 @@ public class ChatFragment extends BaseFragment {
 
     private void initGroupListView() {
         //
-        QMUICommonListItemView workGroupChatItem = mGroupListView.createItemView("工作组会话:" + wId);
-        QMUICommonListItemView appointChatItem = mGroupListView.createItemView("指定客服会话:" + agentUid);
+        QMUICommonListItemView workGroupChatItem = mGroupListView.createItemView("工作组会话:" + BDDemoConst.wId);
+        QMUICommonListItemView appointChatItem = mGroupListView.createItemView("指定客服会话:" + BDDemoConst.agentUid);
         //
         QMUIGroupListView.newSection(getContext())
             .setTitle("默认会话接口")
@@ -69,20 +61,20 @@ public class ChatFragment extends BaseFragment {
                 @Override
                 public void onClick(View view) {
                     //
-                    BDUiApi.startWorkGroupChatActivity(getContext(), wId, "工作组客服");
+                    BDUiApi.startWorkGroupChatActivity(getContext(), BDDemoConst.wId, "工作组客服");
                 }
             })
             .addItemView(appointChatItem, new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //
-                    BDUiApi.startAppointChatActivity(getContext(), agentUid, "指定客服");
+                    BDUiApi.startAppointChatActivity(getContext(), BDDemoConst.agentUid, "指定客服");
                 }
             })
             .addTo(mGroupListView);
         //
-        QMUICommonListItemView shopWorkGroupChatItem = mGroupListView.createItemView("电商客服工作组:" + wId);
-        QMUICommonListItemView shopAppointedChatItem = mGroupListView.createItemView("指定客服会话:" + agentUid);
+        QMUICommonListItemView shopWorkGroupChatItem = mGroupListView.createItemView("电商客服工作组:" + BDDemoConst.wId);
+        QMUICommonListItemView shopAppointedChatItem = mGroupListView.createItemView("指定客服会话:" + BDDemoConst.agentUid);
         //
         QMUIGroupListView.newSection(getContext())
             .setTitle("电商客服")
@@ -102,7 +94,7 @@ public class ChatFragment extends BaseFragment {
                     jsonCustom.setCategoryCode("100010003");
                     //
                     String custom = new Gson().toJson(jsonCustom);
-                    BDUiApi.startWorkGroupChatActivity(getContext(), wId, "电商工作组客服", custom);
+                    BDUiApi.startWorkGroupChatActivity(getContext(), BDDemoConst.wId, "电商工作组客服", custom);
                 }
             })
             .addItemView(shopAppointedChatItem, new View.OnClickListener() {
@@ -118,12 +110,12 @@ public class ChatFragment extends BaseFragment {
                     jsonCustom.setImageUrl("https://m.360buyimg.com/mobilecms/s750x750_jfs/t4483/332/2284794111/122812/4bf353/58ed7f42Nf16d6b20.jpg!q80.dpg");
                     //
                     String custom = new Gson().toJson(jsonCustom);
-                    BDUiApi.startAppointChatActivity(getContext(), agentUid, "电商指定客服", custom);
+                    BDUiApi.startAppointChatActivity(getContext(), BDDemoConst.agentUid, "电商指定客服", custom);
                 }
             }).addTo(mGroupListView);
 
         //
-        QMUICommonListItemView preChoiceChatItem = mGroupListView.createItemView("前置选择:" +  preWid);
+        QMUICommonListItemView preChoiceChatItem = mGroupListView.createItemView("前置选择:" +  BDDemoConst.preWid);
         //
         QMUIGroupListView.newSection(getContext())
             .setTitle("前置选择")
@@ -132,18 +124,18 @@ public class ChatFragment extends BaseFragment {
                 @Override
                 public void onClick(View view) {
                     //
-                    BDUiApi.startWorkGroupChatActivity(getContext(), preWid, "前置选择");
+                    BDUiApi.startWorkGroupChatActivity(getContext(), BDDemoConst.preWid, "前置选择");
                 }
             }).addTo(mGroupListView);
 
         //
-        QMUICommonListItemView robotChatItem = mGroupListView.createItemView("默认机器人:" +  robotWid);
+        QMUICommonListItemView robotChatItem = mGroupListView.createItemView("默认机器人:" +  BDDemoConst.robotWid);
         //
         QMUIGroupListView.newSection(getContext())
                 .setTitle("默认机器人")
                 .setDescription("在后台设置默认机器人")
                 .addItemView(robotChatItem, v -> {
-                    BDUiApi.startWorkGroupChatActivity(getContext(), robotWid, "默认机器人");
+                    BDUiApi.startWorkGroupChatActivity(getContext(), BDDemoConst.robotWid, "默认机器人");
                 }).addTo(mGroupListView);
 
 

@@ -175,12 +175,12 @@ public class GroupProfileActivity extends AppCompatActivity {
                             @Override
                             public void onError(JSONObject object) {
 
-                                Toast.makeText(getApplication(), "更新群昵称失败", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "更新群昵称失败", Toast.LENGTH_SHORT).show();
                             }
                         });
 
                     } else {
-                        Toast.makeText(getApplication(), "请填入群聊名称", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "请填入群聊名称", Toast.LENGTH_SHORT).show();
                     }
                     }
                 }).create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -237,12 +237,12 @@ public class GroupProfileActivity extends AppCompatActivity {
                                         @Override
                                         public void onError(JSONObject object) {
 
-                                            Toast.makeText(getApplication(), "更新群简介失败", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(context, "更新群简介失败", Toast.LENGTH_SHORT).show();
                                         }
                                     });
 
                                 } else {
-                                    Toast.makeText(getApplication(), "请填入群公告", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "请填入群公告", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }).create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -289,12 +289,12 @@ public class GroupProfileActivity extends AppCompatActivity {
                             @Override
                             public void onError(JSONObject object) {
 
-                                Toast.makeText(getApplication(), "更新群公告失败", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "更新群公告失败", Toast.LENGTH_SHORT).show();
                             }
                         });
 
                     } else {
-                        Toast.makeText(getApplication(), "请填入群公告", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "请填入群公告", Toast.LENGTH_SHORT).show();
                     }
                     }
                 }).create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -411,13 +411,13 @@ public class GroupProfileActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(JSONObject object) {
 
-                                        Toast.makeText(getApplication(), "退群成功", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(context, "退群成功", Toast.LENGTH_SHORT).show();
                                     }
 
                                     @Override
                                     public void onError(JSONObject object) {
 
-                                        Toast.makeText(getApplication(), "退群失败", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(context, "退群失败", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -459,7 +459,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(JSONObject object) {
 
-                                    Toast.makeText(getApplication(), "解散成功", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "解散成功", Toast.LENGTH_SHORT).show();
 
                                     // TODO: 关闭当前页面
                                 }
@@ -467,7 +467,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                                 @Override
                                 public void onError(JSONObject object) {
 
-                                    Toast.makeText(getApplication(), "解散失败", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "解散失败", Toast.LENGTH_SHORT).show();
                                 }
                             });
 

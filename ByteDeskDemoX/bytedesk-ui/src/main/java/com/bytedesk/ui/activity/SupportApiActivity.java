@@ -72,7 +72,7 @@ public class SupportApiActivity extends AppCompatActivity {
 
     private void getCategories() {
 
-        BDCoreApi.getSupportCategories(getApplicationContext(), mUid, new BaseCallback() {
+        BDCoreApi.getSupportCategories(this, mUid, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -112,7 +112,7 @@ public class SupportApiActivity extends AppCompatActivity {
 
     private void getArticles() {
 
-        BDCoreApi.getSupportArticles(getApplicationContext(), mUid, new BaseCallback() {
+        BDCoreApi.getSupportArticles(this, mUid, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

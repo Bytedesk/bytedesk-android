@@ -26,8 +26,7 @@
 
     <!--聊天内容出现电话号码，可直接拨打-->
     <uses-permission android:name="android.permission.CALL_PHONE" />
-
-
+    
     <application
         android:name="com.bytedesk.demo.BDApplication"
         android:allowBackup="true"
@@ -71,7 +70,8 @@
         <!--对话页面-->
         <activity
             android:name="com.bytedesk.ui.activity.ChatKFActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <activity
             android:name="com.bytedesk.ui.activity.ChatIMActivity"

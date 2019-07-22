@@ -1,5 +1,6 @@
 package com.bytedesk.ui.activity;
 
+import android.content.Context;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Button;
@@ -61,6 +62,7 @@ public class LeaveMessageActivity extends AppCompatActivity {
      */
     private void submit() {
         //
+        final Context context = this;
         BDCoreApi.leaveMessageDxz(this, type, workGroupWid, agentUid,
                 "手机", "邮箱", "昵称", "所属区域", "意向国家", "content",
                 new BaseCallback() {
@@ -74,12 +76,12 @@ public class LeaveMessageActivity extends AppCompatActivity {
                             if (status_code == 200) {
 
                                 // 留言成功
-                                Toast.makeText(LeaveMessageActivity.this, message, Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 
                             } else {
 
                                 // 留言失败
-                                Toast.makeText(LeaveMessageActivity.this, message, Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -90,7 +92,7 @@ public class LeaveMessageActivity extends AppCompatActivity {
                     @Override
                     public void onError(JSONObject object) {
 
-                        Toast.makeText(LeaveMessageActivity.this, "留言失败", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "留言失败", Toast.LENGTH_LONG).show();
                     }
                 });
     }

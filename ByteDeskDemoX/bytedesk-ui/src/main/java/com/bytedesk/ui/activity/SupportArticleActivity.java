@@ -56,7 +56,7 @@ public class SupportArticleActivity extends AppCompatActivity {
 
     private void getArticles() {
 
-        BDCoreApi.getSupportArticles(getApplicationContext(), mUid, new BaseCallback() {
+        BDCoreApi.getSupportArticles(this, mUid, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

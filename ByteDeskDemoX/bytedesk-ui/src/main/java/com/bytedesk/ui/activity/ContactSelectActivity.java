@@ -2,6 +2,8 @@ package com.bytedesk.ui.activity;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
+import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -67,12 +69,13 @@ public class ContactSelectActivity extends AppCompatActivity implements SwipeIte
         //
         mTopBar = findViewById(R.id.bytedesk_contact_topbar);
         //
+        final Context context = this;
         mTopBar.addRightTextButton("邀请", R.mipmap.icon_topbar_overflow).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // 调用邀请入群接口
                 if (mSelectedEntities.size() < 1) {
-                    Toast.makeText(ContactSelectActivity.this, "至少选择1人及以上", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "至少选择1人及以上", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 //
@@ -82,7 +85,7 @@ public class ContactSelectActivity extends AppCompatActivity implements SwipeIte
                     selectedContactUids.add(contactEntity.getUid());
                 }
                 // 调用建群接口
-                BDCoreApi.inviteListToGroup(ContactSelectActivity.this, selectedContactUids, mGid, new BaseCallback() {
+                BDCoreApi.inviteListToGroup(context, selectedContactUids, mGid, new BaseCallback() {
                     @Override
                     public void onSuccess(JSONObject object) {
 

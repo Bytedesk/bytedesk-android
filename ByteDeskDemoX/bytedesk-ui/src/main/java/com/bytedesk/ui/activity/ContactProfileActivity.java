@@ -139,6 +139,7 @@ public class ContactProfileActivity extends AppCompatActivity {
 
     private void addOtherItemToLayout() {
 
+        final Context context = this;
         clearMessageItem = mGroupListView.createItemView("清空聊天记录");
         makeTopItem = mGroupListView.createItemView("会话置顶");
         makeTopItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_SWITCH);
@@ -147,7 +148,7 @@ public class ContactProfileActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //
                 if (isChecked) {
-                    BDCoreApi.markTopThread(ContactProfileActivity.this, mTid, new BaseCallback() {
+                    BDCoreApi.markTopThread(context, mTid, new BaseCallback() {
 
                         @Override
                         public void onSuccess(JSONObject object) {
@@ -160,7 +161,7 @@ public class ContactProfileActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    BDCoreApi.unmarkTopThread(ContactProfileActivity.this, mTid, new BaseCallback() {
+                    BDCoreApi.unmarkTopThread(context, mTid, new BaseCallback() {
                         @Override
                         public void onSuccess(JSONObject object) {
 
@@ -183,7 +184,7 @@ public class ContactProfileActivity extends AppCompatActivity {
                 //
                 if (isChecked) {
                     //
-                    BDCoreApi.markNoDisturbThread(ContactProfileActivity.this, mTid, new BaseCallback() {
+                    BDCoreApi.markNoDisturbThread(context, mTid, new BaseCallback() {
                         @Override
                         public void onSuccess(JSONObject object) {
 
@@ -196,7 +197,7 @@ public class ContactProfileActivity extends AppCompatActivity {
                     });
                 } else {
                     //
-                    BDCoreApi.unmarkNoDisturbThread(ContactProfileActivity.this, mTid, new BaseCallback() {
+                    BDCoreApi.unmarkNoDisturbThread(context, mTid, new BaseCallback() {
                         @Override
                         public void onSuccess(JSONObject object) {
 
@@ -219,7 +220,7 @@ public class ContactProfileActivity extends AppCompatActivity {
                 //
                 if (isChecked) {
                     // 屏蔽
-                    BDCoreApi.shield(ContactProfileActivity.this, mUid, new BaseCallback() {
+                    BDCoreApi.shield(context, mUid, new BaseCallback() {
                         @Override
                         public void onSuccess(JSONObject object) {
 
@@ -232,7 +233,7 @@ public class ContactProfileActivity extends AppCompatActivity {
                     });
                 } else {
                     // 取消屏蔽
-                    BDCoreApi.unshield(ContactProfileActivity.this, mUid, new BaseCallback() {
+                    BDCoreApi.unshield(context, mUid, new BaseCallback() {
                         @Override
                         public void onSuccess(JSONObject object) {
 
@@ -247,7 +248,6 @@ public class ContactProfileActivity extends AppCompatActivity {
             }
         });
 
-        final Context context = this;
         QMUIGroupListView.newSection(this).addItemView(unDisturbItem, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -261,7 +261,7 @@ public class ContactProfileActivity extends AppCompatActivity {
                 Logger.d("会话置顶");
 
                 //
-                BDCoreApi.markTopThread(ContactProfileActivity.this, mTid, new BaseCallback() {
+                BDCoreApi.markTopThread(context, mTid, new BaseCallback() {
 
                     @Override
                     public void onSuccess(JSONObject object) {
@@ -302,7 +302,7 @@ public class ContactProfileActivity extends AppCompatActivity {
                             public void onClick(QMUIDialog dialog, int index) {
 
                                 //
-                                BDCoreApi.markClearContactMessage(ContactProfileActivity.this, mUid, new BaseCallback() {
+                                BDCoreApi.markClearContactMessage(context, mUid, new BaseCallback() {
                                     @Override
                                     public void onSuccess(JSONObject object) {
 

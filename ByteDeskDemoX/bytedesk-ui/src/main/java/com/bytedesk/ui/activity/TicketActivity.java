@@ -1,6 +1,7 @@
 package com.bytedesk.ui.activity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -215,23 +216,6 @@ public class TicketActivity extends AppCompatActivity {
      */
     private void showChooseUrgentDialog() {
 
-//        final String[] items = new String[]{"一般", "紧急"};
-//        final int checkedIndex = 0;
-//        new QMUIDialog.CheckableDialogBuilder(this)
-//                .setCheckedIndex(checkedIndex)
-//                .addItems(items, (dialog, which) -> {
-//                    dialog.dismiss();
-//
-//                    if (which == 0) {
-//                        urgentItem.setDetailText("一般");
-//                        mUrgent = "0";
-//                    } else {
-//                        urgentItem.setDetailText("紧急");
-//                        mUrgent = "1";
-//                    }
-//
-//                }).show();
-
         new QMUIBottomSheet.BottomListSheetBuilder(this)
                 .addItem("一般")
                 .addItem("紧急")
@@ -282,6 +266,7 @@ public class TicketActivity extends AppCompatActivity {
      */
     private void showEditContentDialog() {
         //
+        final Context context = this;
         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("工单内容")
                 .setPlaceholder("在此输入内容")
@@ -298,7 +283,7 @@ public class TicketActivity extends AppCompatActivity {
                             contentItem.setDetailText(text.toString());
 
                         } else {
-                            Toast.makeText(getBaseContext(), "请填入内容", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "请填入内容", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -309,6 +294,7 @@ public class TicketActivity extends AppCompatActivity {
      * 选择图片
      */
     private void chooseImage() {
+        final Context context = this;
         // 目前仅允许一次选一张图片
         Album.image(this)
                 .singleChoice()
@@ -328,7 +314,7 @@ public class TicketActivity extends AppCompatActivity {
                 .onCancel(new Action<String>() {
                     @Override
                     public void onAction(@NonNull String result) {
-                        Toast.makeText(getBaseContext(), "取消选择图片", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "取消选择图片", Toast.LENGTH_LONG).show();
                     }
                 })
                 .start();
@@ -339,6 +325,7 @@ public class TicketActivity extends AppCompatActivity {
      */
     private void showEditMobileDialog() {
         //
+        final Context context = this;
         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("手机号")
                 .setPlaceholder("在此输入手机号")
@@ -355,7 +342,7 @@ public class TicketActivity extends AppCompatActivity {
                             mobileItem.setDetailText(text.toString());
 
                         } else {
-                            Toast.makeText(getBaseContext(), "请填入手机号", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "请填入手机号", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -367,6 +354,7 @@ public class TicketActivity extends AppCompatActivity {
      */
     private void showEditEmailDialog() {
         //
+        final Context context = this;
         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
         builder.setTitle("邮箱")
                 .setPlaceholder("在此输入邮箱")
@@ -383,7 +371,7 @@ public class TicketActivity extends AppCompatActivity {
                             emailItem.setDetailText(text.toString());
 
                         } else {
-                            Toast.makeText(getBaseContext(), "请填入邮箱", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "请填入邮箱", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }).create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -394,6 +382,7 @@ public class TicketActivity extends AppCompatActivity {
      */
     private void createTicket() {
         //
+        final Context context = this;
         BDCoreApi.createTicket(this, mUid,
                 mUrgent, mCategoryCid, mContent, mMobile, mEmail, mFileUrl,
                 new BaseCallback() {
@@ -406,12 +395,12 @@ public class TicketActivity extends AppCompatActivity {
                             int status_code = object.getInt("status_code");
                             if (status_code == 200) {
 
-                                Toast.makeText(getBaseContext(), "提交工单成功", Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, "提交工单成功", Toast.LENGTH_LONG).show();
 
                             } else {
 
                                 String message = object.getString("message");
-                                Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                             }
 
                         } catch (JSONException e) {
