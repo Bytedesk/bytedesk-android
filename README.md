@@ -31,7 +31,7 @@
 
 ## 开发文档
 
-- [在线客服开发文档](https://github.com/bytedesk/bytedesk-android/wiki/%E5%9C%A8%E7%BA%BF%E5%AE%A2%E6%9C%8D%E5%BC%80%E5%8F%91%E6%96%87%E6%A1%A3)
+- [在线客服开发文档](https://github.com/Bytedesk/bytedesk-android/wiki)
 - [IM开发文档](https://github.com/bytedesk/bytedesk-android/wiki/IM%E5%BC%80%E5%8F%91%E6%96%87%E6%A1%A3)
 
 ## 其他
