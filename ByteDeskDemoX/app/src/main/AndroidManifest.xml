@@ -26,7 +26,7 @@
 
     <!--聊天内容出现电话号码，可直接拨打-->
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    
+
     <application
         android:name="com.bytedesk.demo.BDApplication"
         android:allowBackup="true"
