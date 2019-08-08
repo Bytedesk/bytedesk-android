@@ -1,4 +1,4 @@
-# 5分钟集成意见反馈
+# 5分钟集成在线客服
 
 ## 准备工作
 
@@ -74,11 +74,17 @@ implementation 'com.qmuiteam:qmui:1.4.0'
 
 ```xml
 <!--萝卜丝bytedesk.com代码 开始-->
-<!--意见反馈-->
+<!--对话页面-->
 <activity
-    android:name="com.bytedesk.ui.activity.FeedbackActivity"
+    android:name="com.bytedesk.ui.activity.ChatKFActivity"
     android:screenOrientation="portrait"
     android:theme="@style/AppTheme.ByteDesk"/>
+<!--长连接service-->
+<service android:name="com.bytedesk.paho.android.service.MqttService"/>
+<!--下载录音-->
+<service android:name="com.bytedesk.core.service.BDDownloadService"/>
+<!--录音以及播放-->
+<service android:name="com.bytedesk.ui.recorder.KFRecorderService"/>
 <!--./萝卜丝bytedesk.com代码 结束-->
 ```
 
@@ -118,9 +124,8 @@ anonymousLogin();
 > 第八步：开始客服会话
 
 ```java
-// 打开意见反馈界面
-// 获取管理员adminUid, 登录后台->所有设置->客服账号->管理员账号(唯一ID(uid))列
-BDUiApi.startFeedbackActivity(context, adminUId);
+// 打开客服对话界面
+BDUiApi.startWorkGroupChatActivity(context, wId, "工作组客服");
 ```
 
 ## 集成完毕
