@@ -88,7 +88,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
         public ViewHolder(View itemView) {
             super(itemView);
 
-            mNicknameTextView = itemView.findViewById(R.id.bytedesk_feedback_item_content);
+            mNicknameTextView = itemView.findViewById(R.id.textview_firstitem_nickname);
             mContentTextView = itemView.findViewById(R.id.textview_content);
             mTimestampTextView = itemView.findViewById(R.id.textview_timestamp);
             mAvatarImageView = itemView.findViewById(R.id.imageview_avatar);
