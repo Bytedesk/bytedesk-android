@@ -63,7 +63,7 @@ public class FeedbackRecordAdapter extends RecyclerView.Adapter<FeedbackRecordAd
         public ViewHolder(View itemView) {
             super(itemView);
 
-            mContentTextView = itemView.findViewById(R.id.bytedesk_feedback_item_content);
+            mContentTextView = itemView.findViewById(R.id.textview_firstitem_nickname);
             mReplyTextView = itemView.findViewById(R.id.bytedesk_feedback_item_reply);
 
         }

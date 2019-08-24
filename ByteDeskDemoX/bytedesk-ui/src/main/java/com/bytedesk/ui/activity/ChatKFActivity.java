@@ -99,35 +99,28 @@ public class ChatKFActivity extends ChatBaseActivity
 
     private MessageViewModel mMessageViewModel;
 
-//    private String mImageCaptureFileName;
-//    private String mPicturePath;
-//    private Uri mPhotoUri;
-
-//    private Point mScreenSize;
-//    private ScaleImageView imagePreview;
-
     // 根据会话类型不同所代表意义不同：
     private String mUid;
     // 工作组wid
     private String mWorkGroupWid;
     // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
-    private String mTidOrUidOrGid;
-    // 指定坐席uid
-    private String mAgentUid;
-    private String mTitle;
-    // 是否访客端调用接口
-    private boolean mIsVisitor;
-    private boolean mIsRobot;
-    // 区分客服会话thread、同事会话contact、群组会话group
-    private String mThreadType;
-    // 区分工作组会话、指定客服会话
-    private String mRequestType;
-    // 分页加载聊天记录
-    private int mPage = 0;
-    private int mSize = 20;
-    // 本地存储信息
-    private BDPreferenceManager mPreferenceManager;
-    private BDRepository mRepository;
+//    private String mTidOrUidOrGid;
+//    // 指定坐席uid
+//    private String mAgentUid;
+//    private String mTitle;
+//    // 是否访客端调用接口
+//    private boolean mIsVisitor;
+//    private boolean mIsRobot;
+//    // 区分客服会话thread、同事会话contact、群组会话group
+//    private String mThreadType;
+//    // 区分工作组会话、指定客服会话
+//    private String mRequestType;
+//    // 分页加载聊天记录
+//    private int mPage = 0;
+//    private int mSize = 20;
+//    // 本地存储信息
+//    private BDPreferenceManager mPreferenceManager;
+//    private BDRepository mRepository;
     private final Handler mHandler = new Handler();
     //
     private String mCustom;
@@ -148,7 +141,6 @@ public class ChatKFActivity extends ChatBaseActivity
             mPreferenceManager = BDPreferenceManager.getInstance(this);
             mPreferenceManager.setVisitor(mIsVisitor);
             mRepository = BDRepository.getInstance(this);
-
             //
             if (mIsVisitor) {
                 Logger.i("访客会话");
@@ -762,8 +754,7 @@ public class ChatKFActivity extends ChatBaseActivity
     private void dealWithThread(JSONObject object) {
         //
         try {
-            Logger.d("request thread success message: " + object.get("message")
-                    + " status_code:" + object.get("status_code"));
+            Logger.d("request thread success message: " + object.get("message") + " status_code:" + object.get("status_code"));
 
             int status_code = object.getInt("status_code");
             if (status_code == 200 || status_code == 201) {
@@ -774,7 +765,7 @@ public class ChatKFActivity extends ChatBaseActivity
 
                 mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
 
-                String threadTopic = "thread/" + mTidOrUidOrGid;
+                String threadTopic = BDCoreConstant.BD_THREAD_PREFIX + mTidOrUidOrGid;
                 BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
@@ -1496,47 +1487,47 @@ public class ChatKFActivity extends ChatBaseActivity
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
 
                     // 1. 异步发送图片消息，TODO: 增加Future机制？
-                    // BDMqttApi.sendImageMessage(ChatKFActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
+                     BDMqttApi.sendImageMessage(ChatKFActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType);
 
                     // 2. 同步发送图片消息(推荐)
-                    BDCoreApi.sendImageMessage(ChatKFActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
-
-                        @Override
-                        public void onSuccess(JSONObject object) {
-                            //
-                            try {
-
-                                int status_code = object.getInt("status_code");
-                                if (status_code == 200) {
-
-                                    String localId = object.getJSONObject("data").getString("localId");
-                                    Logger.i("callback localId: " + localId);
-
-                                    // TODO: 更新消息发送状态为成功
-                                    mRepository.updateMessageStatusSuccess(localId);
-
-                                    // 发送成功
-                                } else {
-
-                                    // 修改本地消息发送状态为error
-                                    mRepository.updateMessageStatusError(localId);
-
-                                    // 发送消息失败
-                                    String message = object.getString("message");
-                                    Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onError(JSONObject object) {
-                            // 发送消息失败
-                            Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-                        }
-                    });
+//                    BDCoreApi.sendImageMessage(ChatKFActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
+//
+//                        @Override
+//                        public void onSuccess(JSONObject object) {
+//                            //
+//                            try {
+//
+//                                int status_code = object.getInt("status_code");
+//                                if (status_code == 200) {
+//
+//                                    String localId = object.getJSONObject("data").getString("localId");
+//                                    Logger.i("callback localId: " + localId);
+//
+//                                    // TODO: 更新消息发送状态为成功
+//                                    mRepository.updateMessageStatusSuccess(localId);
+//
+//                                    // 发送成功
+//                                } else {
+//
+//                                    // 修改本地消息发送状态为error
+//                                    mRepository.updateMessageStatusError(localId);
+//
+//                                    // 发送消息失败
+//                                    String message = object.getString("message");
+//                                    Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
+//                                }
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onError(JSONObject object) {
+//                            // 发送消息失败
+//                            Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+//                        }
+//                    });
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1548,33 +1539,6 @@ public class ChatKFActivity extends ChatBaseActivity
                 Toast.makeText(getApplicationContext(), "上传图片失败", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    /**
-     * 监听 EventBus 广播消息
-     *
-     * @param messageEvent
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent messageEvent) {
-        Logger.i("MessageEvent");
-
-        try {
-
-            JSONObject messageObject = messageEvent.getJsonObject();
-            JSONObject threadObject = messageObject.getJSONObject("thread");
-            String threadTid = threadObject.getString("tid");
-            if (threadTid == mTidOrUidOrGid) {
-
-                String mid = messageEvent.getJsonObject().getString("mid");
-                // 检查是否当前页面消息，如果是，则发送已读消息回执
-                BDMqttApi.sendReceiptReadMessage(this, mid);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
     }
 
     /**
@@ -1604,31 +1568,6 @@ public class ChatKFActivity extends ChatBaseActivity
         }, 3000);
     }
 
-    /**
-     * 账号异地登录通知提示，开发者可自行决定是否退出当前账号登录
-     *
-     * @param kickoffEvent
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onKickoffEvent(KickoffEvent kickoffEvent) {
-
-        String content = kickoffEvent.getContent();
-        Logger.w("onKickoffEvent: " + content);
-
-        // 弹窗提示
-        new QMUIDialog.MessageDialogBuilder(this)
-            .setTitle("异地登录提示")
-            .setMessage(content)
-            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
-                    dialog.dismiss();
-
-                    // TODO: 开发者可自行决定是否退出登录
-
-                }
-            }).show();
-    }
 
     /**
      * 监听 EventBus 广播消息: 发送商品信息
@@ -1831,20 +1770,18 @@ public class ChatKFActivity extends ChatBaseActivity
 
     @Override
     public void onKeyboardHidden() {
-        Logger.i("onKeyboardHidden");
+//        Logger.i("onKeyboardHidden");
 
     }
 
     @Override
     public void onKeyboardShown() {
-        Logger.i("onKeyboardShown");
+//        Logger.i("onKeyboardShown");
         mRecyclerView.scrollToPosition(mChatAdapter.getItemCount() - 1);
     }
 
-}
 
-
-//    private void requestQuestionnaire(String questionnaireItemItemQid) {
+    //    private void requestQuestionnaire(String questionnaireItemItemQid) {
 //
 //        BDCoreApi.requestQuestionnaire(this, mTidOrUidOrGid, questionnaireItemItemQid, new BaseCallback() {
 //
@@ -1887,3 +1824,7 @@ public class ChatKFActivity extends ChatBaseActivity
 //            }
 //        });
 //    }
+
+}
+
+

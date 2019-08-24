@@ -197,23 +197,23 @@ public class ChatIMActivity extends ChatBaseActivity
     private String mUid;
     // 工作组wid
     private String mWorkGroupWid;
-    // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
-    private String mTidOrUidOrGid;
-    // 指定坐席uid
-    private String mAgentUid;
-    private String mTitle;
-    // 是否访客端调用接口
-    private boolean mIsVisitor;
-    // 区分客服会话thread、同事会话contact、群组会话group
-    private String mThreadType;
-    // 区分工作组会话、指定客服会话
-    private String mRequestType;
-    // 分页加载聊天记录
-    private int mPage = 0;
-    private int mSize = 20;
+//    // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
+//    private String mTidOrUidOrGid;
+//    // 指定坐席uid
+//    private String mAgentUid;
+//    private String mTitle;
+//    // 是否访客端调用接口
+//    private boolean mIsVisitor;
+//    // 区分客服会话thread、同事会话contact、群组会话group
+//    private String mThreadType;
+//    // 区分工作组会话、指定客服会话
+//    private String mRequestType;
+//    // 分页加载聊天记录
+//    private int mPage = 0;
+//    private int mSize = 20;
     // 本地存储信息
-    private BDPreferenceManager mPreferenceManager;
-    private BDRepository mRepository;
+//    private BDPreferenceManager mPreferenceManager;
+//    private BDRepository mRepository;
     private final Handler mHandler = new Handler();
     //
     private String mCustom;
@@ -869,7 +869,7 @@ public class ChatIMActivity extends ChatBaseActivity
     /**
      * 从服务器加载聊天记录
      */
-    private void getMessages() {
+    protected void getMessages() {
 
         if (mIsVisitor) {
             Logger.i("访客端");
@@ -1619,23 +1619,6 @@ public class ChatIMActivity extends ChatBaseActivity
         }
     }
 
-
-    /**
-     * 监听 EventBus 广播消息
-     * TODO: 收到消息之后，如果消息属于当前页面，可处理阅后即焚消息
-     *
-     * @param messageEvent
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent messageEvent) {
-//        Logger.i("会话页面 MessageEvent");
-
-        // TODO: 检查是否当前页面消息，如果是，则发送已读消息回执
-
-        // TODO: 判断是否阅后即焚消息，如果是，则倒计时销毁
-
-    }
-
     /**
      * TODO: 区分是否当前会话
      *
@@ -1662,33 +1645,6 @@ public class ChatIMActivity extends ChatBaseActivity
             }
         }, 3000);
     }
-
-    /**
-     * 账号异地登录通知提示，开发者可自行决定是否退出当前账号登录
-     *
-     * @param kickoffEvent
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onKickoffEvent(KickoffEvent kickoffEvent) {
-
-        String content = kickoffEvent.getContent();
-        Logger.w("onKickoffEvent: " + content);
-
-        // 弹窗提示
-        new QMUIDialog.MessageDialogBuilder(this)
-                .setTitle("异地登录提示")
-                .setMessage(content)
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        dialog.dismiss();
-
-                        // TODO: 开发者可自行决定是否退出登录
-
-                    }
-                }).show();
-    }
-
 
     /**
      * 下拉刷新
@@ -2030,6 +1986,7 @@ public class ChatIMActivity extends ChatBaseActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == BDUiConstant.SELECT_FILE) {
             //
@@ -2153,47 +2110,47 @@ public class ChatIMActivity extends ChatBaseActivity
 
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
                     // 1. 异步发送图片消息
-                    // BDMqttApi.sendImageMessage(ChatIMActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
+                     BDMqttApi.sendImageMessage(ChatIMActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType);
 
                     // 2. 同步发送图片消息(推荐)
-                    BDCoreApi.sendImageMessage(ChatIMActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
-
-                        @Override
-                        public void onSuccess(JSONObject object) {
-                            //
-                            try {
-
-                                int status_code = object.getInt("status_code");
-                                if (status_code == 200) {
-
-                                    String localId = object.getJSONObject("data").getString("localId");
-                                    Logger.i("callback localId: " + localId);
-
-                                    // TODO: 更新消息发送状态为成功
-                                    mRepository.updateMessageStatusSuccess(localId);
-
-                                    // 发送成功
-                                } else {
-
-                                    // 修改本地消息发送状态为error
-                                    mRepository.updateMessageStatusError(localId);
-
-                                    // 发送消息失败
-                                    String message = object.getString("message");
-                                    Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onError(JSONObject object) {
-                            // 发送消息失败
-                            Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-                        }
-                    });
+//                    BDCoreApi.sendImageMessage(ChatIMActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
+//
+//                        @Override
+//                        public void onSuccess(JSONObject object) {
+//                            //
+//                            try {
+//
+//                                int status_code = object.getInt("status_code");
+//                                if (status_code == 200) {
+//
+//                                    String localId = object.getJSONObject("data").getString("localId");
+//                                    Logger.i("callback localId: " + localId);
+//
+//                                    // TODO: 更新消息发送状态为成功
+//                                    mRepository.updateMessageStatusSuccess(localId);
+//
+//                                    // 发送成功
+//                                } else {
+//
+//                                    // 修改本地消息发送状态为error
+//                                    mRepository.updateMessageStatusError(localId);
+//
+//                                    // 发送消息失败
+//                                    String message = object.getString("message");
+//                                    Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
+//                                }
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onError(JSONObject object) {
+//                            // 发送消息失败
+//                            Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+//                        }
+//                    });
 
                 } catch (JSONException e) {
                     e.printStackTrace();

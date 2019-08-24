@@ -84,7 +84,7 @@ android {
 ```java
 // 萝卜丝第三步
 // 加载萝卜丝核心库
-implementation 'com.bytedesk:core:2.0.3'
+implementation 'com.bytedesk:core:2.0.4'
 // 加载萝卜丝自定义UI库
 implementation project(':bytedesk-ui')
 

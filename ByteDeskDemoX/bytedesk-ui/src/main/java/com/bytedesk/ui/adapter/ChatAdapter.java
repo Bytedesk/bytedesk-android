@@ -302,8 +302,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         }
 
         public void setContent(boolean showTimestamp, final MessageEntity msgEntity) {
-            Logger.i("type: %s, content: %s, status: %s",
-                    msgEntity.getType(), msgEntity.getContent(), msgEntity.getStatus());
+//            Logger.i("type: %s, content: %s, status: %s", msgEntity.getType(), msgEntity.getContent(), msgEntity.getStatus());
 
             if (showTimestamp) {
                 timestampTextView.setVisibility(View.VISIBLE);
@@ -545,7 +544,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     progressBar.setVisibility(View.GONE);
                     errorImageView.setVisibility(View.GONE);
                     statusTextView.setVisibility(View.VISIBLE);
-                    statusTextView.setText(msgEntity.getStatus());
+                    statusTextView.setText(msgEntity.getStatus() == BDCoreConstant.MESSAGE_STATUS_RECEIVED ? "送达" : "已读");
                 } else {
 
                     progressBar.setVisibility(View.GONE);
@@ -554,19 +553,22 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 }
             }
 
-            // FIXME: 仅针对单聊和客服会话有效，群聊暂不发送已读状态
-            // 非自己发送的消息
-            if (!msgEntity.isSend() && !msgEntity.getSessionType().equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
-                // 且非系统消息
+//          // FIXME: 仅针对单聊和客服会话有效，群聊暂不发送已读状态
+            // 收到消息的时候，不在当前页，重新进入页面之后，发送已读回执
+//          // 非自己发送的消息
+            //  && !msgEntity.getSessionType().equals(BDCoreConstant.THREAD_TYPE_GROUP)
+            if (!msgEntity.isSend()) {
+                // 非系统消息类型
                 if (!msgEntity.getType().startsWith(BDCoreConstant.MESSAGE_TYPE_NOTIFICATION)) {
                     // 消息状态
                     if (msgEntity.getStatus() == null ||
-                            msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_STORED)) {
-                        // TODO: 更新本地消息为已读
+                            msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_STORED) ||
+                            msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_RECEIVED)) {
+                        // 更新本地消息为已读
                         msgEntity.setStatus(BDCoreConstant.MESSAGE_STATUS_READ);
                         BDRepository.getInstance(mContext).insertMessageEntity(msgEntity);
                         // 发送已读回执，通知服务器更新状态
-                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid());
+                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid(), msgEntity.getThreadTid());
                     }
                 }
             }
@@ -783,7 +785,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     // 本地销毁阅后即焚消息
                     BDRepository.getInstance(mContext).deleteMessage(mid);
                     // 通知服务器销毁
-                    BDMqttApi.sendReceiptReceivedMessage(mContext, mid);
+//                    BDMqttApi.sendReceiptReceivedMessage(mContext, mid);
                 case NEXT:
                     if (!Thread.currentThread().isInterrupted()) {
                         if (weakCircleProgressBar.get() != null) {
