@@ -35,8 +35,8 @@ ext {
     targetSdkVersion = 26
     compileSdkVersion = 28
 
-    versionCode = 204
-    versionName = '2.0.4'
+    versionCode = 205
+    versionName = '2.0.5'
 
     buildToolsVersion = '28.0.3'
     supportLibVersion = '28.0.0'
@@ -49,6 +49,6 @@ ext {
     archLifecycleVersion = "2.2.0-alpha02"
     archRoomVersion = "2.1.0"
 
-    bytedeskCoreVersion = "2.0.4"
-    bytedeskUIVersion = "2.0.4"
+    bytedeskCoreVersion = "2.0.5"
+    bytedeskUIVersion = "2.0.5"
 }

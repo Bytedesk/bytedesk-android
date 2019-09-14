@@ -234,24 +234,25 @@ public class ChatIMActivity extends ChatBaseActivity
             mPreferenceManager.setVisitor(mIsVisitor);
             mRepository = BDRepository.getInstance(this);
             //
-            if (mIsVisitor) {
-                Logger.i("访客会话");
-                //
-                mWorkGroupWid = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
-                mRequestType = getIntent().getStringExtra(BDUiConstant.EXTRA_REQUEST_TYPE);
-                // 判断是否指定客服会话
-                if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
-                    // 指定客服会话
-                    mAgentUid = getIntent().getStringExtra(BDUiConstant.EXTRA_AID);
-                } else {
-                    // 工作组会话
-                    mAgentUid = "";
-                }
-            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)) {
-                Logger.i("客服会话");
-
-                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
-            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+//            if (mIsVisitor) {
+//                Logger.i("访客会话");
+//                //
+//                mWorkGroupWid = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
+//                mRequestType = getIntent().getStringExtra(BDUiConstant.EXTRA_REQUEST_TYPE);
+//                // 判断是否指定客服会话
+//                if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
+//                    // 指定客服会话
+//                    mAgentUid = getIntent().getStringExtra(BDUiConstant.EXTRA_AID);
+//                } else {
+//                    // 工作组会话
+//                    mAgentUid = "";
+//                }
+//            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)) {
+//                Logger.i("客服会话");
+//
+//                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
+//            } else
+            if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
                 Logger.i("一对一会话");
 
                 mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
@@ -261,7 +262,7 @@ public class ChatIMActivity extends ChatBaseActivity
             } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
                 Logger.i("群组会话");
 
-                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
+                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_GID);
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
                 }
@@ -277,10 +278,10 @@ public class ChatIMActivity extends ChatBaseActivity
         initModel();
         initRecorder(savedInstanceState);
 
-        // 访客端请求会话
-        if (mIsVisitor) {
-            requestThread();
-        }
+//        // 访客端请求会话
+//        if (mIsVisitor) {
+//            requestThread();
+//        }
         // 从服务器端加载聊天记录，默认暂不加载
         // getMessages();
     }
@@ -620,17 +621,18 @@ public class ChatIMActivity extends ChatBaseActivity
             }
         });
 
-        // 客服会话
-        if (!mIsVisitor && mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_THREAD)) {
-            // 客服会话
-            mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
-                    .setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            showTopRightSheet();
-                        }
-                    });
-        } else if (mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_CONTACT)) {
+//        // 客服会话
+//        if (!mIsVisitor && mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_THREAD)) {
+//            // 客服会话
+//            mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
+//                    .setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View view) {
+//                            showTopRightSheet();
+//                        }
+//                    });
+//        } else
+        if (mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_CONTACT)) {
             // 一对一会话
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
                     .setOnClickListener(new View.OnClickListener() {
@@ -766,35 +768,36 @@ public class ChatIMActivity extends ChatBaseActivity
 
         // FIXME: 当工作组设置有值班工作组的情况下，则界面无法显示值班工作组新消息
 
-        if (mIsVisitor) {
-
-            // 判断是否指定客服会话
-            if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
-                Logger.i("访客会话: 指定客服聊天记录");
-                // 指定客服聊天记录
-                mMessageViewModel.getThreadMessages(mTidOrUidOrGid).observe(this, messageEntities -> {
-                    mChatAdapter.setMessages(messageEntities);
-                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                });
-            } else {
-                Logger.i("访客会话: 工作组聊天记录");
-                // 工作组聊天记录, TODO: 是否沿用此方式待定，转接会话聊天
-                mMessageViewModel.getWorkGroupMessages(mWorkGroupWid).observe(this, messageEntities -> {
-                    mChatAdapter.setMessages(messageEntities);
-                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                });
-            }
-
-        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
-            Logger.i("客服端：客服会话");
-
-            mMessageViewModel.getVisitorMessages(mUid).observe(this, messageEntities -> {
-                mChatAdapter.setMessages(messageEntities);
-                mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-            });
-            // 设置当前会话
-            updateCurrentThread();
-        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+//        if (mIsVisitor) {
+//
+//            // 判断是否指定客服会话
+//            if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
+//                Logger.i("访客会话: 指定客服聊天记录");
+//                // 指定客服聊天记录
+//                mMessageViewModel.getThreadMessages(mTidOrUidOrGid).observe(this, messageEntities -> {
+//                    mChatAdapter.setMessages(messageEntities);
+//                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
+//                });
+//            } else {
+//                Logger.i("访客会话: 工作组聊天记录");
+//                // 工作组聊天记录, TODO: 是否沿用此方式待定，转接会话聊天
+//                mMessageViewModel.getWorkGroupMessages(mWorkGroupWid).observe(this, messageEntities -> {
+//                    mChatAdapter.setMessages(messageEntities);
+//                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
+//                });
+//            }
+//
+//        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
+//            Logger.i("客服端：客服会话");
+//
+//            mMessageViewModel.getVisitorMessages(mUid).observe(this, messageEntities -> {
+//                mChatAdapter.setMessages(messageEntities);
+//                mRecyclerView.scrollToPosition(messageEntities.size() - 1);
+//            });
+//            // 设置当前会话
+//            updateCurrentThread();
+//        } else
+        if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
             Logger.i("客服端：一对一会话");
 
             mMessageViewModel.getContactMessages(mUid).observe(this, messageEntities -> {
@@ -813,135 +816,136 @@ public class ChatIMActivity extends ChatBaseActivity
     }
 
 
-    /**
-     * 请求会话
-     * 请求工作组会话和指定客服会话统一接口
-     */
-    private void requestThread() {
+//    /**
+//     * 请求会话
+//     * 请求工作组会话和指定客服会话统一接口
+//     */
+//    private void requestThread() {
+//
+//        BDCoreApi.requestThread(this, mWorkGroupWid, mRequestType, mAgentUid, new BaseCallback() {
+//
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//
+//                dealWithThread(object);
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//                try {
+//                    Logger.d("request thread message: " + object.get("message")
+//                            + " status_code:" + object.get("status_code")
+//                            + " data:" + object.get("data"));
+//                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
 
-        BDCoreApi.requestThread(this, mWorkGroupWid, mRequestType, mAgentUid, new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-
-                dealWithThread(object);
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-                try {
-                    Logger.d("request thread message: " + object.get("message")
-                            + " status_code:" + object.get("status_code")
-                            + " data:" + object.get("data"));
-                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    /**
-     * 更新当前会话
-     */
-    private void updateCurrentThread() {
-
-        String preTid = mPreferenceManager.getCurrentTid();
-        BDCoreApi.updateCurrentThread(this, preTid, mTidOrUidOrGid, new BaseCallback() {
-            @Override
-            public void onSuccess(JSONObject object) {
-                // 设置当前tid
-                mPreferenceManager.setCurrentTid(mTidOrUidOrGid);
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-                Logger.e("更新当前会话失败");
-                try {
-                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+//    /**
+//     * 更新当前会话
+//     */
+//    private void updateCurrentThread() {
+//
+//        String preTid = mPreferenceManager.getCurrentTid();
+//        BDCoreApi.updateCurrentThread(this, preTid, mTidOrUidOrGid, new BaseCallback() {
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//                // 设置当前tid
+//                mPreferenceManager.setCurrentTid(mTidOrUidOrGid);
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//                Logger.e("更新当前会话失败");
+//                try {
+//                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
 
     /**
      * 从服务器加载聊天记录
      */
     protected void getMessages() {
 
-        if (mIsVisitor) {
-            Logger.i("访客端");
+//        if (mIsVisitor) {
+//            Logger.i("访客端");
+//            //
+//            BDCoreApi.getMessagesWithUser(getBaseContext(), mPage, mSize, new BaseCallback() {
+//
+//                @Override
+//                public void onSuccess(JSONObject object) {
+//
+//                    try {
+//                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
+//                        for (int i = 0; i < jsonArray.length(); i++) {
+//                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
+//                        }
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    mPullRefreshLayout.finishRefresh();
+//                    mPage++;
+//                }
+//
+//                @Override
+//                public void onError(JSONObject object) {
+//
+//                    mPullRefreshLayout.finishRefresh();
+//
+//                    try {
+//                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            });
+//
+//        }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
+//            Logger.i("客服端：客服会话 uid:" + mUid);
+//
+//            // 客服端接口
+//            BDCoreApi.getMessagesWithUser(getBaseContext(), mUid, mPage, mSize, new BaseCallback() {
+//
+//                @Override
+//                public void onSuccess(JSONObject object) {
+//
+//                    try {
+//                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
+//                        for (int i = 0; i < jsonArray.length(); i++) {
+//                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
+//                        }
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    mPullRefreshLayout.finishRefresh();
+//                    mPage++;
+//                }
+//
+//                @Override
+//                public void onError(JSONObject object) {
+//
+//                    mPullRefreshLayout.finishRefresh();
+//
+//                    try {
+//                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            });
+//
+//        } else
 
-            //
-            BDCoreApi.getMessagesWithUser(getBaseContext(), mPage, mSize, new BaseCallback() {
-
-                @Override
-                public void onSuccess(JSONObject object) {
-
-                    try {
-                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    mPullRefreshLayout.finishRefresh();
-                    mPage++;
-                }
-
-                @Override
-                public void onError(JSONObject object) {
-
-                    mPullRefreshLayout.finishRefresh();
-
-                    try {
-                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-        }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
-            Logger.i("客服端：客服会话 uid:" + mUid);
-
-            // 客服端接口
-            BDCoreApi.getMessagesWithUser(getBaseContext(), mUid, mPage, mSize, new BaseCallback() {
-
-                @Override
-                public void onSuccess(JSONObject object) {
-
-                    try {
-                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    mPullRefreshLayout.finishRefresh();
-                    mPage++;
-                }
-
-                @Override
-                public void onError(JSONObject object) {
-
-                    mPullRefreshLayout.finishRefresh();
-
-                    try {
-                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
+        if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
             Logger.i("一对一会话 cid: " + mUid);
 
             BDCoreApi.getMessagesWithContact(getBaseContext(), mUid, mPage, mSize, new BaseCallback() {
@@ -1016,151 +1020,151 @@ public class ChatIMActivity extends ChatBaseActivity
      *
      * @param object
      */
-    private void dealWithThread(JSONObject object) {
-        //
-        try {
-            Logger.d("request thread success message: " + object.get("message")
-                    + " status_code:" + object.get("status_code"));
-
-            int status_code = object.getInt("status_code");
-            if (status_code == 200 || status_code == 201) {
-                // 创建新会话
-
-                JSONObject message = object.getJSONObject("data");
-                mMessageViewModel.insertMessageJson(message);
-
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
-                Logger.i("mTidOrUidOrGid:" + mTidOrUidOrGid);
-
-                String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
-
-                if (mCustom != null && mCustom.trim().length() > 0) {
-                    sendCommodityMessage(mCustom);
-                }
-
-            } else if (status_code == 202) {
-                // 提示排队中
-
-                JSONObject message = object.getJSONObject("data");
-                mMessageViewModel.insertMessageJson(message);
-
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
-
-                if (mCustom != null && mCustom.trim().length() > 0) {
-                    sendCommodityMessage(mCustom);
-                }
-
-            } else if (status_code == 203) {
-                // 当前非工作时间，请自助查询或留言
-
-                JSONObject message = object.getJSONObject("data");
-                mMessageViewModel.insertMessageJson(message);
-
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
-
-            } else if (status_code == 204) {
-                // 当前无客服在线，请自助查询或留言
-
-                JSONObject message = object.getJSONObject("data");
-                mMessageViewModel.insertMessageJson(message);
-
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
-
-            } else if (status_code == 205) {
-                // TODO: 咨询前问卷
-
-                String title = "";
-                JSONObject message = object.getJSONObject("data");
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
-                // 存储key/value: content/qid
-                final Map<String, String> questionMap = new HashMap<>();
-                // 存储key/value: content/workGroups
-                final Map<String, JSONArray> workGroupsMap = new HashMap<>();
-                //
-                List<String> questionContents = new ArrayList<>();
-
-                if (!message.isNull("questionnaire")) {
-                    //
-                    JSONObject questionnaireObject = message.getJSONObject("questionnaire");
-                    if (!questionnaireObject.isNull("questionnaireItems")) {
-                        //
-                        JSONArray questionItems = questionnaireObject.getJSONArray("questionnaireItems");
-                        //
-                        for (int i = 0; i < questionItems.length(); i++) {
-                            // TODO: 一个questionItem作为一条消息插入
-                            JSONObject questionItem = questionItems.getJSONObject(i);
-                            title = questionItem.getString("title");
-
-                            JSONArray questionnaireItemItems = questionItem.getJSONArray("questionnaireItemItems");
-                            for (int j = 0; j < questionnaireItemItems.length(); j++) {
-                                JSONObject questionnaireItemItem = questionnaireItemItems.getJSONObject(j);
-                                //
-//                                Logger.i("content " + questionnaireItemItem.getString("content"));
-                                questionMap.put(questionnaireItemItem.getString("content"), questionnaireItemItem.getString("qid"));
-                                workGroupsMap.put(questionnaireItemItem.getString("content"), questionnaireItemItem.getJSONArray("workGroups"));
-                                questionContents.add(questionnaireItemItem.getString("content"));
-                            }
-                        }
-                    }
-                }
-
-                // 1. 弹窗选择列表：类型、工作组
-                final String[] items = questionContents.toArray(new String[0]);
-                new QMUIDialog.MenuDialogBuilder(ChatIMActivity.this)
-                        .setTitle(title)
-                        .addItems(items, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                String questionnaireItemItemQid = questionMap.get(items[which]);
-                                Logger.i("qid:" + questionnaireItemItemQid + " content:" + items[which]);
-                                // 留学: 意向国家 qid = '201810061551181'
-                                // 移民：意向国家 qid = '201810061551183'
-                                // 语培：意向类别 qid = '201810061551182'
-                                // 其他：意向类别 qid = '201810061551184'
-                                // 院校：意向院校 qid = '201810061551185'
-
-                                if (questionnaireItemItemQid.equals("201810061551181")) {
-                                    // 单独处理 留学: 意向国家 qid = '201810061551181'
-//                                requestQuestionnaire(questionnaireItemItemQid);
-                                    showWorkGroupDialog(workGroupsMap.get(items[which]), true);
-                                } else {
-                                    //
-                                    showWorkGroupDialog(workGroupsMap.get(items[which]), false);
-                                }
-
-                                dialog.dismiss();
-                            }
-                        }).show();
-
-            } else if (status_code == 206) {
-
-
-
-
-            } else {
-                // 请求会话失败
-                String message = object.getString("message");
-                Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_SHORT).show();
-            }
-
-            //
-            if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
-                Logger.i("重新加载 指定客服聊天记录");
-                initModel();
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void dealWithThread(JSONObject object) {
+//        //
+//        try {
+//            Logger.d("request thread success message: " + object.get("message")
+//                    + " status_code:" + object.get("status_code"));
+//
+//            int status_code = object.getInt("status_code");
+//            if (status_code == 200 || status_code == 201) {
+//                // 创建新会话
+//
+//                JSONObject message = object.getJSONObject("data");
+//                mMessageViewModel.insertMessageJson(message);
+//
+//                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+//                Logger.i("mTidOrUidOrGid:" + mTidOrUidOrGid);
+//
+//                String threadTopic = "thread/" + mTidOrUidOrGid;
+//                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
+//
+//                if (mCustom != null && mCustom.trim().length() > 0) {
+//                    sendCommodityMessage(mCustom);
+//                }
+//
+//            } else if (status_code == 202) {
+//                // 提示排队中
+//
+//                JSONObject message = object.getJSONObject("data");
+//                mMessageViewModel.insertMessageJson(message);
+//
+//                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+//                String threadTopic = "thread/" + mTidOrUidOrGid;
+//                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
+//
+//                if (mCustom != null && mCustom.trim().length() > 0) {
+//                    sendCommodityMessage(mCustom);
+//                }
+//
+//            } else if (status_code == 203) {
+//                // 当前非工作时间，请自助查询或留言
+//
+//                JSONObject message = object.getJSONObject("data");
+//                mMessageViewModel.insertMessageJson(message);
+//
+//                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+//                String threadTopic = "thread/" + mTidOrUidOrGid;
+//                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
+//
+//            } else if (status_code == 204) {
+//                // 当前无客服在线，请自助查询或留言
+//
+//                JSONObject message = object.getJSONObject("data");
+//                mMessageViewModel.insertMessageJson(message);
+//
+//                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+//                String threadTopic = "thread/" + mTidOrUidOrGid;
+//                BDMqttApi.subscribeTopic(ChatIMActivity.this, threadTopic);
+//
+//            } else if (status_code == 205) {
+//                // TODO: 咨询前问卷
+//
+//                String title = "";
+//                JSONObject message = object.getJSONObject("data");
+//                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+//                // 存储key/value: content/qid
+//                final Map<String, String> questionMap = new HashMap<>();
+//                // 存储key/value: content/workGroups
+//                final Map<String, JSONArray> workGroupsMap = new HashMap<>();
+//                //
+//                List<String> questionContents = new ArrayList<>();
+//
+//                if (!message.isNull("questionnaire")) {
+//                    //
+//                    JSONObject questionnaireObject = message.getJSONObject("questionnaire");
+//                    if (!questionnaireObject.isNull("questionnaireItems")) {
+//                        //
+//                        JSONArray questionItems = questionnaireObject.getJSONArray("questionnaireItems");
+//                        //
+//                        for (int i = 0; i < questionItems.length(); i++) {
+//                            // TODO: 一个questionItem作为一条消息插入
+//                            JSONObject questionItem = questionItems.getJSONObject(i);
+//                            title = questionItem.getString("title");
+//
+//                            JSONArray questionnaireItemItems = questionItem.getJSONArray("questionnaireItemItems");
+//                            for (int j = 0; j < questionnaireItemItems.length(); j++) {
+//                                JSONObject questionnaireItemItem = questionnaireItemItems.getJSONObject(j);
+//                                //
+////                                Logger.i("content " + questionnaireItemItem.getString("content"));
+//                                questionMap.put(questionnaireItemItem.getString("content"), questionnaireItemItem.getString("qid"));
+//                                workGroupsMap.put(questionnaireItemItem.getString("content"), questionnaireItemItem.getJSONArray("workGroups"));
+//                                questionContents.add(questionnaireItemItem.getString("content"));
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                // 1. 弹窗选择列表：类型、工作组
+//                final String[] items = questionContents.toArray(new String[0]);
+//                new QMUIDialog.MenuDialogBuilder(ChatIMActivity.this)
+//                        .setTitle(title)
+//                        .addItems(items, new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//
+//                                String questionnaireItemItemQid = questionMap.get(items[which]);
+//                                Logger.i("qid:" + questionnaireItemItemQid + " content:" + items[which]);
+//                                // 留学: 意向国家 qid = '201810061551181'
+//                                // 移民：意向国家 qid = '201810061551183'
+//                                // 语培：意向类别 qid = '201810061551182'
+//                                // 其他：意向类别 qid = '201810061551184'
+//                                // 院校：意向院校 qid = '201810061551185'
+//
+//                                if (questionnaireItemItemQid.equals("201810061551181")) {
+//                                    // 单独处理 留学: 意向国家 qid = '201810061551181'
+////                                requestQuestionnaire(questionnaireItemItemQid);
+//                                    showWorkGroupDialog(workGroupsMap.get(items[which]), true);
+//                                } else {
+//                                    //
+//                                    showWorkGroupDialog(workGroupsMap.get(items[which]), false);
+//                                }
+//
+//                                dialog.dismiss();
+//                            }
+//                        }).show();
+//
+//            } else if (status_code == 206) {
+//
+//
+//
+//
+//            } else {
+//                // 请求会话失败
+//                String message = object.getString("message");
+//                Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_SHORT).show();
+//            }
+//
+//            //
+//            if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
+//                Logger.i("重新加载 指定客服聊天记录");
+//                initModel();
+//            }
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * 选择问卷答案
@@ -1211,118 +1215,118 @@ public class ChatIMActivity extends ChatBaseActivity
 //        });
 //    }
 
-    /**
-     * 显示选择工作组提示框
-     *
-     * @param workGroupsArray
-     */
-    private void showWorkGroupDialog(JSONArray workGroupsArray, boolean isLiuXue) {
+//    /**
+//     * 显示选择工作组提示框
+//     *
+//     * @param workGroupsArray
+//     */
+//    private void showWorkGroupDialog(JSONArray workGroupsArray, boolean isLiuXue) {
+//
+//        try {
+//
+//            final Map<String, String> workGroupMap = new HashMap<>();
+//            List<String> workGroupNames = new ArrayList<>();
+//
+//            for (int i = 0; i < workGroupsArray.length(); i++) {
+//
+//                JSONObject workGroupObject = workGroupsArray.getJSONObject(i);
+//                workGroupMap.put(workGroupObject.getString("nickname"), workGroupObject.getString("wid"));
+//                workGroupNames.add(workGroupObject.getString("nickname"));
+//            }
+//
+//            // 1. 弹窗选择列表：工作组
+//            final String[] items = workGroupNames.toArray(new String[0]);
+//            new QMUIDialog.MenuDialogBuilder(ChatIMActivity.this)
+//                    .setTitle("请选择")
+//                    .addItems(items, new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            //
+//                            String workGroupNickname = items[which];
+//                            String workGroupWid = workGroupMap.get(items[which]);
+//                            Logger.i("nickname:" + items[which] + " workGroupWid:" + workGroupWid);
+//                            //
+//                            if (isLiuXue) {
+//                                chooseWorkGroupLiuXue(workGroupWid, workGroupNickname);
+//                            } else {
+//                                chooseWorkGroup(workGroupWid);
+//                            }
+//
+//                            dialog.dismiss();
+//                        }
+//                    }).show();
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-        try {
+//    /**
+//     * 问卷答案中选择工作组
+//     *
+//     * @param workGroupWid
+//     */
+//    private void chooseWorkGroup(final String workGroupWid) {
+//
+//        BDCoreApi.chooseWorkGroup(this, workGroupWid,  new BaseCallback() {
+//
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//                // 重新选择工作组成功 old wid:201807171659201 new wid:201810201758121
+//                Logger.i("重新选择工作组成功 old wid:" + mWorkGroupWid + " new wid:" + workGroupWid);
+//                // 重新初始化model，根据新的wid加载聊天记录
+//                mWorkGroupWid = workGroupWid;
+//                Logger.i("mWorkGroupWid:" + mWorkGroupWid);
+//
+//                initModel();
+//                //
+//                dealWithThread(object);
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//                try {
+//                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
 
-            final Map<String, String> workGroupMap = new HashMap<>();
-            List<String> workGroupNames = new ArrayList<>();
-
-            for (int i = 0; i < workGroupsArray.length(); i++) {
-
-                JSONObject workGroupObject = workGroupsArray.getJSONObject(i);
-                workGroupMap.put(workGroupObject.getString("nickname"), workGroupObject.getString("wid"));
-                workGroupNames.add(workGroupObject.getString("nickname"));
-            }
-
-            // 1. 弹窗选择列表：工作组
-            final String[] items = workGroupNames.toArray(new String[0]);
-            new QMUIDialog.MenuDialogBuilder(ChatIMActivity.this)
-                    .setTitle("请选择")
-                    .addItems(items, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //
-                            String workGroupNickname = items[which];
-                            String workGroupWid = workGroupMap.get(items[which]);
-                            Logger.i("nickname:" + items[which] + " workGroupWid:" + workGroupWid);
-                            //
-                            if (isLiuXue) {
-                                chooseWorkGroupLiuXue(workGroupWid, workGroupNickname);
-                            } else {
-                                chooseWorkGroup(workGroupWid);
-                            }
-
-                            dialog.dismiss();
-                        }
-                    }).show();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 问卷答案中选择工作组
-     *
-     * @param workGroupWid
-     */
-    private void chooseWorkGroup(final String workGroupWid) {
-
-        BDCoreApi.chooseWorkGroup(this, workGroupWid,  new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-                // 重新选择工作组成功 old wid:201807171659201 new wid:201810201758121
-                Logger.i("重新选择工作组成功 old wid:" + mWorkGroupWid + " new wid:" + workGroupWid);
-                // 重新初始化model，根据新的wid加载聊天记录
-                mWorkGroupWid = workGroupWid;
-                Logger.i("mWorkGroupWid:" + mWorkGroupWid);
-
-                initModel();
-                //
-                dealWithThread(object);
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-                try {
-                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    /**
-     * 留学，针对大学长定制
-     *
-     * @param workGroupWid
-     * @param workGroupNickname
-     */
-    private void chooseWorkGroupLiuXue(final String workGroupWid, String workGroupNickname) {
-
-        BDCoreApi.chooseWorkGroupLiuXue(this, workGroupWid, workGroupNickname,  new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-                // 重新选择工作组成功 old wid:201807171659201 new wid:201810201758121
-                Logger.i("重新选择工作组成功 old wid:" + mWorkGroupWid + " new wid:" + workGroupWid);
-                // 重新初始化model，根据新的wid加载聊天记录
-                mWorkGroupWid = workGroupWid;
-                Logger.i("mWorkGroupWid:" + mWorkGroupWid);
-
-                initModel();
-                //
-                dealWithThread(object);
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-                try {
-                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+//    /**
+//     * 留学，针对大学长定制
+//     *
+//     * @param workGroupWid
+//     * @param workGroupNickname
+//     */
+//    private void chooseWorkGroupLiuXue(final String workGroupWid, String workGroupNickname) {
+//
+//        BDCoreApi.chooseWorkGroupLiuXue(this, workGroupWid, workGroupNickname,  new BaseCallback() {
+//
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//                // 重新选择工作组成功 old wid:201807171659201 new wid:201810201758121
+//                Logger.i("重新选择工作组成功 old wid:" + mWorkGroupWid + " new wid:" + workGroupWid);
+//                // 重新初始化model，根据新的wid加载聊天记录
+//                mWorkGroupWid = workGroupWid;
+//                Logger.i("mWorkGroupWid:" + mWorkGroupWid);
+//
+//                initModel();
+//                //
+//                dealWithThread(object);
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//                try {
+//                    Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
 
     /**
      * 从相册中选择图片

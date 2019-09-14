@@ -16,8 +16,8 @@
 
 ```bash
 # androidx版, 参考demo：ByteDeskDemoX
-- 核心库：com.bytedesk:core: 2.0.4
-- 界面库，完全开源(Demo中的bytedesk-ui模块)，方便开发者自定义界面：com.bytedesk:ui: 2.0.4
+- 核心库：com.bytedesk:core: 2.0.5
+- 界面库，完全开源(Demo中的bytedesk-ui模块)，方便开发者自定义界面：com.bytedesk:ui: 2.0.5
 ```
 
 ```bash

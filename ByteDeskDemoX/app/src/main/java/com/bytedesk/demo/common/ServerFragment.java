@@ -4,10 +4,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.bytedesk.core.api.BDConfig;
+import com.bytedesk.core.api.BDCoreApi;
+import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.demo.R;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
+
+import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,6 +31,7 @@ public class ServerFragment extends BaseFragment {
 
         initTopBar();
         initGroupListView();
+//        testProto();
 
         return root;
     }
@@ -132,5 +137,46 @@ public class ServerFragment extends BaseFragment {
     }
 
 
+    private void testProto() {
+
+//        BDCoreApi.getProto(getContext(), new BaseCallback() {
+//
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//
+//            }
+//        });
+
+//        BDCoreApi.getProto2(getContext(), "android test get proto content", new BaseCallback() {
+//
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//
+//            }
+//        });
+//
+//        BDCoreApi.postProto(getContext(), "android test post proto content", new BaseCallback() {
+//
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//
+//            }
+//        });
+    }
 
 }

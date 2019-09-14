@@ -53,7 +53,7 @@ public class BDUiApi {
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
-        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_UID, "");
         intent.putExtra(BDUiConstant.EXTRA_WID, wId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_WORK_GROUP);
@@ -67,7 +67,7 @@ public class BDUiApi {
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
-        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_UID, "");
         intent.putExtra(BDUiConstant.EXTRA_WID, wId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_WORK_GROUP);
@@ -91,8 +91,8 @@ public class BDUiApi {
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
-        intent.putExtra(BDUiConstant.EXTRA_UID, "");
-        intent.putExtra(BDUiConstant.EXTRA_WID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_WID, "");
         intent.putExtra(BDUiConstant.EXTRA_AID, aId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED);
@@ -106,8 +106,8 @@ public class BDUiApi {
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
-        intent.putExtra(BDUiConstant.EXTRA_UID, "");
-        intent.putExtra(BDUiConstant.EXTRA_WID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_WID, "");
         intent.putExtra(BDUiConstant.EXTRA_AID, aId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED);
@@ -213,7 +213,7 @@ public class BDUiApi {
         //
         Intent intent = new Intent(context, ChatIMActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_UID, gId);
+        intent.putExtra(BDUiConstant.EXTRA_GID, gId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
         context.startActivity(intent);
@@ -225,7 +225,7 @@ public class BDUiApi {
         //
         Intent intent = new Intent(context, ChatIMActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_UID, gId);
+        intent.putExtra(BDUiConstant.EXTRA_GID, gId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
         intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
