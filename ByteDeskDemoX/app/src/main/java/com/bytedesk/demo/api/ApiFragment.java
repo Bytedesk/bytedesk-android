@@ -6,10 +6,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bytedesk.core.api.BDCoreApi;
+import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.callback.LoginCallback;
 import com.bytedesk.core.event.ConnectionEvent;
 import com.bytedesk.core.event.KickoffEvent;
+import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDPreferenceManager;
 import com.bytedesk.demo.R;
@@ -525,6 +527,28 @@ public class ApiFragment extends BaseFragment {
         mTopBar.setTitle(title);
     }
 
+    /**
+     * 监听 EventBus 广播消息
+     *
+     * @param messageEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent messageEvent) {
+        Logger.i("MessageEvent");
+
+        try {
+
+            JSONObject messageObject = messageEvent.getJsonObject();
+            String type = messageObject.getString("type");
+            String content = messageObject.getString("content");
+            Logger.i("type %s,  content %s ", type, content);
+            // TODO: 收到新信息，开发者可自行决定处理，如：通知栏显示消息提示
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 监听账号异地登录通知
