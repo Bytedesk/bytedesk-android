@@ -2,9 +2,10 @@ package com.bytedesk.ui.activity;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CompoundButton;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
@@ -54,12 +55,7 @@ public class ContactProfileActivity extends AppCompatActivity {
         mTopBar = findViewById(R.id.bytedesk_contact_profile_topbarlayout);
         mTopBar.setTitle("个人详情");
         mTopBar.setBackgroundColor(getResources().getColor(R.color.albumColorPrimary));
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> finish());
         //
         QMUIStatusBarHelper.translucent(this);
     }
@@ -82,13 +78,7 @@ public class ContactProfileActivity extends AppCompatActivity {
         profileItem.setImageDrawable(avatarImageView.getDrawable());
         profileItem.setDetailText("");
 
-        QMUIGroupListView.newSection(this).addItemView(profileItem, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Logger.d("profile item clicked");
-            }
-        }).addTo(mGroupListView);
-
+        QMUIGroupListView.newSection(this).addItemView(profileItem, view -> Logger.d("profile item clicked")).addTo(mGroupListView);
         //
         addOtherItemToLayout();
     }

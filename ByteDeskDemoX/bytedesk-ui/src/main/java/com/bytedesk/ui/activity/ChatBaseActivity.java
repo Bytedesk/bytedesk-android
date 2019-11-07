@@ -126,7 +126,7 @@ public class ChatBaseActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent messageEvent) {
-        Logger.i("MessageEvent");
+//        Logger.i("MessageEvent");
 
         // TODO: 判断是否阅后即焚消息，如果是，则倒计时销毁
 

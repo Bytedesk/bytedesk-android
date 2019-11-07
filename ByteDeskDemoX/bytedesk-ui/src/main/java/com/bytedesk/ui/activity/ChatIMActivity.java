@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,14 +20,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
-
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
@@ -45,12 +36,18 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
-import com.bytedesk.core.event.KickoffEvent;
-import com.bytedesk.core.event.LongClickEvent;
-import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.event.PreviewEvent;
 import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.util.BDCoreConstant;
@@ -93,9 +90,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  用途：
@@ -412,7 +406,7 @@ public class ChatIMActivity extends ChatBaseActivity
             }
         }
         else if (view.getId() == R.id.bytedesk_chat_input_plus_button) {
-            BDUiUtils.showSysSoftKeybord(this, false);
+            BDUiUtils.showSysSoftKeybord(this, mInputEditText, false);
             if (mExtensionLayout.getVisibility() == View.VISIBLE) {
                 mExtensionLayout.setVisibility(View.GONE);
             } else {
@@ -421,7 +415,7 @@ public class ChatIMActivity extends ChatBaseActivity
             }
 
         } else if (view.getId() == R.id.bytedesk_chat_input_emotion_button) {
-            BDUiUtils.showSysSoftKeybord(this, false);
+            BDUiUtils.showSysSoftKeybord(this, mInputEditText, false);
             if (mEmotionLayout.getVisibility() == View.VISIBLE) {
                 mEmotionLayout.setVisibility(View.GONE);
             } else {
@@ -432,7 +426,7 @@ public class ChatIMActivity extends ChatBaseActivity
             }
 
         } else if (view.getId() == R.id.bytedesk_chat_input_voice_button) {
-            BDUiUtils.showSysSoftKeybord(this, false);
+            BDUiUtils.showSysSoftKeybord(this, mInputEditText, false);
             if (mRecordVoiceButton.getVisibility() == View.VISIBLE) {
                 mRecordVoiceButton.setVisibility(View.GONE);
                 mInputEditText.setVisibility(View.VISIBLE);
@@ -463,7 +457,8 @@ public class ChatIMActivity extends ChatBaseActivity
                     .setInputType(InputType.TYPE_CLASS_TEXT)
                     .addAction("取消", new QMUIDialogAction.ActionListener() {
                         @Override
-                        public void onClick(QMUIDialog dialog, int index) {dialog.dismiss();
+                        public void onClick(QMUIDialog dialog, int index) {
+                            dialog.dismiss();
                         }
                     })
                     .addAction("确定", new QMUIDialogAction.ActionListener() {
@@ -2040,6 +2035,7 @@ public class ChatIMActivity extends ChatBaseActivity
 
         // 1. 异步发送文字消息
         BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
+//        BDMqttApi.sendTextMessageProtobuf(this, mTidOrUidOrGid, content, localId, mThreadType);
 
         // 同步发送消息(推荐)
 //        BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType, new BaseCallback() {
@@ -2079,6 +2075,7 @@ public class ChatIMActivity extends ChatBaseActivity
 //                Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
 //            }
 //        });
+
     }
 
     /**

@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.bytedesk.core.api.BDConfig;
 import com.bytedesk.core.util.BDCoreConstant;
+import com.bytedesk.core.util.MMKVUtils;
 import com.bytedesk.ui.activity.BrowserActivity;
 import com.bytedesk.ui.activity.ChatIMActivity;
 import com.bytedesk.ui.activity.ChatKFActivity;
@@ -37,6 +38,8 @@ public class BDUiApi {
             .setLocale(Locale.getDefault())
             .build()
         );
+        // key-value存储库,替代sharedPreference
+        MMKVUtils.init(context);
     }
 
     /**

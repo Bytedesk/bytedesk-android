@@ -30,7 +30,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.bytedesk:core:2.0.5'// + rootProject.bytedeskCoreVersion
+    implementation 'com.bytedesk:libcore:2.0.7'
 
     // 腾讯QMUI界面库
     // http://qmuiteam.com/android/page/start.html

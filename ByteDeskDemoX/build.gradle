@@ -7,7 +7,7 @@ buildscript {
         
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:3.5.0'
         
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -31,19 +31,19 @@ task clean(type: Delete) {
 
 ext {
     // Sdk and tools
-    minSdkVersion = 18
-    targetSdkVersion = 26
+    minSdkVersion = 19
+    targetSdkVersion = 28
     compileSdkVersion = 28
 
-    versionCode = 205
-    versionName = '2.0.5'
+    versionCode = 206
+    versionName = '2.0.6'
 
     buildToolsVersion = '28.0.3'
     supportLibVersion = '28.0.0'
 
-    appcompatVersion= '1.1.0-rc01'
+    appcompatVersion= '1.1.0'
     butterknifeVersion = '10.1.0'
-    recyleviewxVersion = '1.1.0-beta01'
+    recyleviewxVersion = '1.1.0-beta04'
     stethoVersion = '1.5.1'
 
     archLifecycleVersion = "2.2.0-alpha02"

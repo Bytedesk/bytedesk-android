@@ -678,7 +678,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         }
         playMusic(voiceUrl);
         // 隐藏键盘
-        BDUiUtils.showSysSoftKeybord(mContext, false);
+//        BDUiUtils.showSysSoftKeybord(mContext, false);
 //        ((ChatIMActivity) mContext).mEmotionLayout.setVisibility(View.GONE);
 //        ((ChatIMActivity) mContext).mExtensionLayout.setVisibility(View.GONE);
     }
