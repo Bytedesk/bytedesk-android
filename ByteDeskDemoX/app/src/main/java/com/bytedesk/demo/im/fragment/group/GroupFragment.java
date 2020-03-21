@@ -1,13 +1,12 @@
 package com.bytedesk.demo.im.fragment.group;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
@@ -111,26 +110,20 @@ public class GroupFragment extends BaseFragment implements SwipeItemClickListene
     private void initModel() {
         //
         mGroupViewModel = ViewModelProviders.of(this).get(GroupViewModel.class);
-        mGroupViewModel.getGroups().observe(this, new Observer<List<GroupEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<GroupEntity> groupEntities) {
-                mGroupEntities = groupEntities;
-                mGroupAdapter.setGroups(groupEntities);
-            }
+        mGroupViewModel.getGroups().observe(this, groupEntities -> {
+            mGroupEntities = groupEntities;
+            mGroupAdapter.setGroups(groupEntities);
         });
     }
 
     private void showTopRightSheet() {
         new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
                 .addItem("建群")
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
-                        //
-                        SelectFragment selectFragment = new SelectFragment();
-                        startFragment(selectFragment);
-                    }
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
+                    //
+                    SelectFragment selectFragment = new SelectFragment();
+                    startFragment(selectFragment);
                 })
                 .build()
                 .show();
@@ -186,48 +179,45 @@ public class GroupFragment extends BaseFragment implements SwipeItemClickListene
         new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
                 .addItem("建群")
                 .addItem("加群")
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
 
-                        if (position == 0) {
+                    if (position == 0) {
 
-                            SelectFragment selectFragment = new SelectFragment();
-                            startFragment(selectFragment);
-                        } else {
+                        SelectFragment selectFragment = new SelectFragment();
+                        startFragment(selectFragment);
+                    } else {
 
-                            BDCoreApi.joinGroup(getContext(), "201904231608313", new BaseCallback() {
+                        BDCoreApi.joinGroup(getContext(), "201904231608313", new BaseCallback() {
 
-                                @Override
-                                public void onSuccess(JSONObject object) {
+                            @Override
+                            public void onSuccess(JSONObject object) {
 
-                                    try {
+                                try {
 
-                                        int status_code = object.getInt("status_code");
-                                        if (status_code == 200) {
+                                    int status_code = object.getInt("status_code");
+                                    if (status_code == 200) {
 
-                                            Logger.d("加群成功");
+                                        Logger.d("加群成功");
 
-                                        } else {
-                                            // 发送消息失败
-                                            String message = object.getString("message");
-                                            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-                                        }
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
+                                    } else {
+                                        // 发送消息失败
+                                        String message = object.getString("message");
+                                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
                                     }
 
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
 
-                                @Override
-                                public void onError(JSONObject object) {
-                                    Logger.e("加群失败");
-                                }
+                            }
 
-                            });
-                        }
+                            @Override
+                            public void onError(JSONObject object) {
+                                Logger.e("加群失败");
+                            }
+
+                        });
                     }
                 })
                 .build()

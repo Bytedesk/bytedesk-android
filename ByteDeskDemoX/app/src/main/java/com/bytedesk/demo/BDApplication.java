@@ -11,7 +11,6 @@ import com.qmuiteam.qmui.arch.QMUISwipeBackActivityManager;
 /**
  * @author bytedesk.com on 2017/9/20.
  */
-
 public class BDApplication extends Application{
 
     public void onCreate() {
@@ -35,7 +34,7 @@ public class BDApplication extends Application{
         QMUISwipeBackActivityManager.init(this);
 
         // 初始化萝卜丝UI界面库
-        BDUiApi.init(getApplicationContext());
+        BDUiApi.init(this);
     }
 
 }

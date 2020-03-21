@@ -1,14 +1,12 @@
 package com.bytedesk.demo.im.fragment.social;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
@@ -108,12 +106,9 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
     private void initModel() {
         //
         mFriendViewModel = ViewModelProviders.of(this).get(FriendViewModel.class);
-        mFriendViewModel.getFriends().observe(this, new Observer<List<FriendEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<FriendEntity> friendEntities) {
-                mFriendEntities = friendEntities;
-                mFriendAdapter.setFriends(friendEntities);
-            }
+        mFriendViewModel.getFriends().observe(this, friendEntities -> {
+            mFriendEntities = friendEntities;
+            mFriendAdapter.setFriends(friendEntities);
         });
     }
 
@@ -172,22 +167,19 @@ public class FriendFragment extends BaseFragment implements SwipeItemClickListen
 //        final int checkedIndex = 0;
         new QMUIDialog.CheckableDialogBuilder(getActivity())
 //                .setCheckedIndex(checkedIndex)
-                .addItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int index) {
+                .addItems(items, (dialog, index) -> {
 
-                        Toast.makeText(getActivity(), "你选择了 " + items[index], Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
+                    Toast.makeText(getActivity(), "你选择了 " + items[index], Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
 
-                        if (index == 0) {
-                            // 拉黑
-                            addBlock(friendEntity.getUid());
+                    if (index == 0) {
+                        // 拉黑
+                        addBlock(friendEntity.getUid());
 
-                        } else if (index == 1) {
-                            // 删除好友
-                            removeFriend(friendEntity.getUid());
+                    } else if (index == 1) {
+                        // 删除好友
+                        removeFriend(friendEntity.getUid());
 
-                        }
                     }
                 }).show();
     }

@@ -51,11 +51,8 @@ public class StatusFragment extends BaseFragment {
         QMUIGroupListView.newSection(getContext())
                 .setTitle("工作组在线状态接口")
 //                .setDescription("默认描述")
-                .addItemView(workGroupStatusItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
+                .addItemView(workGroupStatusItem, view -> {
+                    //
                 })
                 .addTo(mGroupListView);
 
@@ -65,11 +62,8 @@ public class StatusFragment extends BaseFragment {
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服账号在线状态接口")
 //                .setDescription("自定义描述")
-                .addItemView(agentStatusItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
+                .addItemView(agentStatusItem, view -> {
+                    //
                 })
                 .addTo(mGroupListView);
 

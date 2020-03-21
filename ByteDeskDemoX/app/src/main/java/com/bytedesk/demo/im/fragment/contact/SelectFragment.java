@@ -1,16 +1,15 @@
 package com.bytedesk.demo.im.fragment.contact;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
@@ -76,47 +75,39 @@ public class SelectFragment extends BaseFragment implements SwipeItemClickListen
      */
     protected void initTopBar() {
         //
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         //
-        mTopBar.addRightTextButton(getResources().getString(R.string.bytedesk_ok), R.id.topbar_right_about_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // 调用建群接口
-                if (mSelectedEntities.size() < 2) {
-                    Toast.makeText(getContext(), "至少选择2人及以上", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                //
-                List<String> selectedContactUids = new ArrayList<>();
-                String nickname = mPreferenceManager.getNickname();
-                for (int i = 0; i < mSelectedEntities.size(); i++) {
-                    ContactEntity contactEntity = mSelectedEntities.get(i);
-                    if (i < 4) {
-                        nickname += "," + contactEntity.getRealName();
-                    }
-                    selectedContactUids.add(contactEntity.getUid());
-                }
-                // 调用建群接口
-                BDCoreApi.createGroup(getContext(), nickname, selectedContactUids, new BaseCallback() {
-                    @Override
-                    public void onSuccess(JSONObject object) {
-
-                        // TODO: 本地存储group
-
-                        popBackStack();
-                    }
-
-                    @Override
-                    public void onError(JSONObject object) {
-                        Logger.e("创建群组失败");
-                    }
-                });
+        mTopBar.addRightTextButton(getResources().getString(R.string.bytedesk_ok), R.id.topbar_right_about_button).setOnClickListener(view -> {
+            // 调用建群接口
+            if (mSelectedEntities.size() < 2) {
+                Toast.makeText(getContext(), "至少选择2人及以上", Toast.LENGTH_SHORT).show();
+                return;
             }
+            //
+            List<String> selectedContactUids = new ArrayList<>();
+            String nickname = mPreferenceManager.getNickname();
+            for (int i = 0; i < mSelectedEntities.size(); i++) {
+                ContactEntity contactEntity = mSelectedEntities.get(i);
+                if (i < 4) {
+                    nickname += "," + contactEntity.getRealName();
+                }
+                selectedContactUids.add(contactEntity.getUid());
+            }
+            // 调用建群接口
+            BDCoreApi.createGroup(getContext(), nickname, selectedContactUids, new BaseCallback() {
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    // TODO: 本地存储group
+
+                    popBackStack();
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+                    Logger.e("创建群组失败");
+                }
+            });
         });
         mTopBar.setTitle(getResources().getString(R.string.bytedesk_select));
     }
@@ -148,22 +139,16 @@ public class SelectFragment extends BaseFragment implements SwipeItemClickListen
         mSelectedEntities = new ArrayList<>();
         //
         mContactViewModel = ViewModelProviders.of(this).get(ContactViewModel.class);
-        mContactViewModel.getContacts().observe(this, new Observer<List<ContactEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<ContactEntity> contactEntities) {
-                mContactEntities = contactEntities;
-                mSelectAdapter.setContacts(contactEntities);
-            }
+        mContactViewModel.getContacts().observe(this, contactEntities -> {
+            mContactEntities = contactEntities;
+            mSelectAdapter.setContacts(contactEntities);
         });
     }
 
     private void searchModel(String search) {
-        mContactViewModel.searchContacts(search).observe(this, new Observer<List<ContactEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<ContactEntity> contactEntities) {
-                mContactEntities = contactEntities;
-                mSelectAdapter.setContacts(contactEntities);
-            }
+        mContactViewModel.searchContacts(search).observe(this, contactEntities -> {
+            mContactEntities = contactEntities;
+            mSelectAdapter.setContacts(contactEntities);
         });
     }
 

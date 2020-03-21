@@ -96,59 +96,23 @@ public class KeFuController extends BaseController {
         QMUICommonListItemView wapChatItem = mGroupListView.createItemView("7.网页会话演示");
 
         QMUIGroupListView.newSection(getContext())
-                .addItemView(introItem, new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        IntroFragment introFragment = new IntroFragment();
-                        startFragment(introFragment);
+                .addItemView(introItem, view -> startFragment(new IntroFragment()))
+                .addItemView(loginItem, view -> {
+                    // 如果已经连接，则调用登出接口，否则调用登录接口
+                    if (BDMqttApi.isConnected(getContext())) {
+                        logout();
+                    } else {
+                        login();
                     }
                 })
-                .addItemView(loginItem, new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // 如果已经连接，则调用登出接口，否则调用登录接口
-                        if (BDMqttApi.isConnected(getContext())) {
-                            logout();
-                        } else {
-                            login();
-                        }
-                    }
-                })
-                .addItemView(chatItem, new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ChatFragment chatFragment = new ChatFragment();
-                        startFragment(chatFragment);
-                    }
-                })
-                .addItemView(userInfoItem, new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ProfileFragment profileFragment = new ProfileFragment();
-                        startFragment(profileFragment);
-                    }
-                })
-                .addItemView(statusItem, new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        StatusFragment statusFragment = new StatusFragment();
-                        startFragment(statusFragment);
-                    }
-                })
-                .addItemView(sessionHistoryItem, new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ThreadFragment threadFragment = new ThreadFragment();
-                        startFragment(threadFragment);
-                    }
-                })
-                .addItemView(wapChatItem, new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
-                        String url = "https://vip.bytedesk.com/visitor/chat?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
-                        BDUiApi.startHtml5Chat(getContext(), url, "在线客服");
-                    }
+                .addItemView(chatItem, view -> startFragment(new ChatFragment()))
+                .addItemView(userInfoItem, view -> startFragment(new ProfileFragment()))
+                .addItemView(statusItem, view -> startFragment(new StatusFragment()))
+                .addItemView(sessionHistoryItem, view -> startFragment(new ThreadFragment()))
+                .addItemView(wapChatItem, view -> {
+                    // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
+                    String url = "https://vip.bytedesk.com/visitor/chat?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
+                    BDUiApi.startHtml5Chat(getContext(), url, "在线客服");
                 })
                 .addTo(mGroupListView);
     }

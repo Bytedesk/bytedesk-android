@@ -50,15 +50,12 @@ public class SupportFragment extends BaseFragment {
         QMUICommonListItemView webViewItem = mGroupListView.createItemView("嵌入网页");
         QMUIGroupListView.newSection(getContext())
                 .setTitle("方式一")
-                .addItemView(webViewItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // 替换：URL参数uid
-                        // 注意: 登录后台->所有设置->所有客服->管理员唯一uid
+                .addItemView(webViewItem, view -> {
+                    // 替换：URL参数uid
+                    // 注意: 登录后台->所有设置->所有客服->管理员唯一uid
 //                        String url = "https://www.bytedesk.com/support?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&ph=ph";
 //                        BDUiApi.startHtml5Chat(getContext(), url, "帮助中心");
-                        BDUiApi.startSupportURLActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
-                    }
+                    BDUiApi.startSupportURLActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
                 })
                 .addTo(mGroupListView);
 
@@ -66,11 +63,9 @@ public class SupportFragment extends BaseFragment {
         QMUICommonListItemView apiItem = mGroupListView.createItemView("调用API接口");
         QMUIGroupListView.newSection(getContext())
                 .setTitle("方式二")
-                .addItemView(apiItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        BDUiApi.startSupportApiActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
-                    }
+                .addItemView(apiItem, view -> {
+                    //
+                    BDUiApi.startSupportApiActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
                 })
                 .addTo(mGroupListView);
 

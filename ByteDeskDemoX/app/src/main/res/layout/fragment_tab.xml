@@ -12,10 +12,10 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="@dimen/home_tab_height"/>
 
-    <com.qmuiteam.qmui.widget.QMUITabSegment
+<!--    android:background="?attr/qmui_list_item_bg_with_border_top"-->
+    <com.qmuiteam.qmui.widget.tab.QMUITabSegment
         android:id="@+id/tabs"
         android:layout_gravity="bottom"
-        android:background="?attr/qmui_list_item_bg_with_border_top"
         android:textSize="12sp"
         app:qmui_tab_icon_position="top"
         android:layout_width="match_parent"

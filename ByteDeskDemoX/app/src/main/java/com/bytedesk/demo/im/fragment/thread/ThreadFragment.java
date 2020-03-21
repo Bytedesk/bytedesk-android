@@ -1,12 +1,7 @@
 package com.bytedesk.demo.im.fragment.thread;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Color;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -15,8 +10,11 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.bytedesk.core.api.BDCoreApi;
-import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.event.ConnectionEvent;
 import com.bytedesk.core.event.ThreadEvent;
@@ -89,12 +87,7 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
      */
     protected void initTopBar() {
         //
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle(getResources().getString(R.string.bytedesk_thread));
     }
 
@@ -126,12 +119,9 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
         //
         mThreadViewModel = ViewModelProviders.of(this).get(ThreadViewModel.class);
         //
-        mThreadViewModel.getIMThreads().observe(this, new Observer<List<ThreadEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<ThreadEntity> threadEntities) {
-                mThreadEntities = threadEntities;
-                mThreadAdapter.setThreads(threadEntities);
-            }
+        mThreadViewModel.getIMThreads().observe(this, threadEntities -> {
+            mThreadEntities = threadEntities;
+            mThreadAdapter.setThreads(threadEntities);
         });
     }
 
@@ -141,12 +131,9 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
      */
     private void searchModel(String search) {
         //
-        mThreadViewModel.searchThreads(search).observe(this, new Observer<List<ThreadEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<ThreadEntity> threadEntities) {
-                mThreadEntities = threadEntities;
-                mThreadAdapter.setThreads(threadEntities);
-            }
+        mThreadViewModel.searchThreads(search).observe(this, threadEntities -> {
+            mThreadEntities = threadEntities;
+            mThreadAdapter.setThreads(threadEntities);
         });
     }
 
@@ -161,31 +148,27 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
             @Override
             public void onSuccess(JSONObject object) {
 
-//                BDRepository.getInstance(getContext()).deleteAllThreads();
-
                 try {
 
                     JSONArray agentThreadJsonArray = object.getJSONObject("data").getJSONArray("agentThreads");
                     for (int i = 0; i < agentThreadJsonArray.length(); i++) {
                         mThreadViewModel.insertThreadJson(agentThreadJsonArray.getJSONObject(i));
 
-                        // 添加订阅
-                        String threadTopic = "thread/" + agentThreadJsonArray.getJSONObject(i).getString("tid");
-                        BDMqttApi.subscribeTopic(getContext(), threadTopic);
+//                        // 添加订阅
+//                        String threadTopic = "thread/" + agentThreadJsonArray.getJSONObject(i).getString("tid");
+//                        BDMqttApi.subscribeTopic(getContext(), threadTopic);
                     }
 
                     //
                     JSONArray contactThreadJsonArray = object.getJSONObject("data").getJSONArray("contactThreads");
                     for (int i = 0; i < contactThreadJsonArray.length(); i++) {
                         mThreadViewModel.insertThreadJson(contactThreadJsonArray.getJSONObject(i));
-
                     }
 
                     //
                     JSONArray groupThreadJsonArray = object.getJSONObject("data").getJSONArray("groupThreads");
                     for (int i = 0; i < groupThreadJsonArray.length(); i++) {
                         mThreadViewModel.insertThreadJson(groupThreadJsonArray.getJSONObject(i));
-
                     }
 
                 } catch (JSONException e) {
@@ -219,25 +202,8 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
         ThreadEntity threadEntity = mThreadEntities.get(position);
         Logger.d("thread item clicked " + position + " string: " + threadEntity.toString());
 
-        if (threadEntity.getType().equals(BDCoreConstant.THREAD_TYPE_THREAD)) {
-
-            BDUiApi.startThreadChatActivity(getContext(),
-                    threadEntity.getTid(),
-                    threadEntity.getVisitorUid(),
-                    threadEntity.getNickname());
-
-        } else if (threadEntity.getType().equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
-
-            BDUiApi.startContactChatActivity(getContext(),
-                    threadEntity.getContactUid(),
-                    threadEntity.getNickname());
-
-        } else if (threadEntity.getType().equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
-
-            BDUiApi.startGroupChatActivity(getContext(),
-                    threadEntity.getGroupGid(),
-                    threadEntity.getNickname());
-        }
+        BDUiApi.startThreadChatActivity(getContext(), threadEntity.getTid(),
+                threadEntity.getTopic(), threadEntity.getType(), threadEntity.getNickname(), threadEntity.getAvatar());
 
         // 清空本地未读数目
         threadEntity.setUnreadCount(0);

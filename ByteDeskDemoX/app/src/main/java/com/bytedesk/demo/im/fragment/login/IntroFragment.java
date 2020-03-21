@@ -32,12 +32,7 @@ public class IntroFragment extends BaseFragment {
 
     private void initTopBar() {
         //
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle("IM接口说明");
     }
 

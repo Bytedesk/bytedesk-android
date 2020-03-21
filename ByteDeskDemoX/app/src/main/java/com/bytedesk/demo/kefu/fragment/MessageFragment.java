@@ -40,12 +40,7 @@ public class MessageFragment extends BaseFragment {
 
     private void initTopBar() {
         //
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle("聊天记录");
     }
 

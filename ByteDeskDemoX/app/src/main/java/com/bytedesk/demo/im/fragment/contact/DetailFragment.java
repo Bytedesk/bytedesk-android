@@ -4,8 +4,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.bumptech.glide.Glide;
-import com.bytedesk.demo.R;
 import com.bytedesk.core.event.MessageEvent;
+import com.bytedesk.demo.R;
 import com.bytedesk.ui.api.BDUiApi;
 import com.bytedesk.ui.base.BaseFragment;
 import com.orhanobut.logger.Logger;
@@ -17,8 +17,6 @@ import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,13 +72,7 @@ public class DetailFragment extends BaseFragment {
      */
     protected void initTopBar() {
         //
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
-        //
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle("个人详情");
     }
 
@@ -97,22 +89,14 @@ public class DetailFragment extends BaseFragment {
         profileItem.setImageDrawable(avatarImageView.getDrawable());
         profileItem.setDetailText(description);
 
-        QMUIGroupListView.newSection(getContext()).addItemView(profileItem, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Logger.d("profile item clicked");
-            }
-        }).addTo(mGroupListView);
+        QMUIGroupListView.newSection(getContext()).addItemView(profileItem, view -> Logger.d("profile item clicked")).addTo(mGroupListView);
 
         QMUICommonListItemView chatItem = mGroupListView.createItemView("开始对话");
-        QMUIGroupListView.newSection(getContext()).addItemView(chatItem, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        QMUIGroupListView.newSection(getContext()).addItemView(chatItem, view -> {
 
-            // TODO：区分一对一，群组会话
-            BDUiApi.startContactChatActivity(getContext(), uid, realName);
+        // TODO：区分一对一，群组会话
+        BDUiApi.startContactChatActivity(getContext(), uid, realName);
 
-            }
         }).addTo(mGroupListView);
     }
 

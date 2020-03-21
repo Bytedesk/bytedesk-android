@@ -39,13 +39,10 @@ public class AboutFragment extends BaseFragment {
         mVersionTextView.setText(QMUIPackageHelper.getAppVersion(getContext()));
 
         QMUIGroupListView.newSection(getContext())
-                .addItemView(mAboutGroupListView.createItemView(getResources().getString(R.string.about_item_homepage)), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(getResources().getString(R.string.about_url)));
-                        startActivity(intent);
-                    }
+                .addItemView(mAboutGroupListView.createItemView(getResources().getString(R.string.about_item_homepage)), v -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(getResources().getString(R.string.about_url)));
+                    startActivity(intent);
                 })
                 .addTo(mAboutGroupListView);
 
@@ -57,13 +54,7 @@ public class AboutFragment extends BaseFragment {
     }
 
     private void initTopBar() {
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
-
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle(getResources().getString(R.string.about_title));
     }
 

@@ -1,7 +1,5 @@
 package com.bytedesk.ui.activity;
 
-import android.view.View;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bytedesk.core.api.BDCoreApi;
@@ -11,12 +9,12 @@ import com.bytedesk.core.event.KickoffEvent;
 import com.bytedesk.core.event.LongClickEvent;
 import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.repository.BDRepository;
+import com.bytedesk.core.room.entity.ThreadEntity;
 import com.bytedesk.core.util.BDCoreUtils;
 import com.bytedesk.core.util.BDPreferenceManager;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -31,7 +29,8 @@ import org.json.JSONObject;
 public class ChatBaseActivity extends AppCompatActivity {
 
     // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
-    protected String mTidOrUidOrGid;
+    protected String mUUID;
+    protected ThreadEntity mThreadEntity = new ThreadEntity();
     // 指定坐席uid
     protected String mAgentUid;
     protected String mTitle;
@@ -69,51 +68,47 @@ public class ChatBaseActivity extends AppCompatActivity {
             .addItem("复制")
             .addItem("删除")
             .addItem("撤回")
-            .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
+            .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                switch (position) {
+                    case 0:
+                        String content = longClickEvent.getMessageEntity().getContent();
+                        Logger.d("copy:" + content);
+                        BDCoreUtils.copy(getBaseContext(), content);
 
-                @Override
-                public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                    switch (position) {
-                        case 0:
-                            String content = longClickEvent.getMessageEntity().getContent();
-                            Logger.d("copy:" + content);
-                            BDCoreUtils.copy(getBaseContext(), content);
+                        break;
+                    case 1:
+                        String deleteMid = longClickEvent.getMessageEntity().getMid();
+                        Logger.d("delete:" + deleteMid);
 
-                            break;
-                        case 1:
-                            String deleteMid = longClickEvent.getMessageEntity().getMid();
-                            Logger.d("delete:" + deleteMid);
+                        // 删除消息
+                        BDCoreApi.markDeletedMessage(getBaseContext(), deleteMid, new BaseCallback() {
 
-                            // 删除消息
-                            BDCoreApi.markDeletedMessage(getBaseContext(), deleteMid, new BaseCallback() {
+                            @Override
+                            public void onSuccess(JSONObject object) {
 
-                                @Override
-                                public void onSuccess(JSONObject object) {
+                            }
 
-                                }
+                            @Override
+                            public void onError(JSONObject object) {
 
-                                @Override
-                                public void onError(JSONObject object) {
+                            }
+                        });
 
-                                }
-                            });
+                        break;
+                    case 2:
+                        String withDrawMid = longClickEvent.getMessageEntity().getMid();
+                        String withDrawTid = longClickEvent.getMessageEntity().getThreadTid();
+                        Logger.d("withDraw: " + withDrawMid);
 
-                            break;
-                        case 2:
-                            String withDrawMid = longClickEvent.getMessageEntity().getMid();
-                            String withDrawTid = longClickEvent.getMessageEntity().getThreadTid();
-                            Logger.d("withDraw: " + withDrawMid);
+                        // 撤回消息
+                        BDMqttApi.sendRecallMessage(getBaseContext(), withDrawMid, withDrawTid);
 
-                            // 撤回消息
-                            BDMqttApi.sendRecallMessage(getBaseContext(), withDrawMid, withDrawTid);
+                        // 删除本地消息
+                        BDRepository.getInstance(getBaseContext()).deleteMessage(withDrawMid);
 
-                            // 删除本地消息
-                            BDRepository.getInstance(getBaseContext()).deleteMessage(withDrawMid);
-
-                            break;
-                    }
-                    dialog.dismiss();
+                        break;
                 }
+                dialog.dismiss();
             })
             .build().show();
     }
@@ -135,8 +130,8 @@ public class ChatBaseActivity extends AppCompatActivity {
             JSONObject messageObject = messageEvent.getJsonObject();
             JSONObject threadObject = messageObject.getJSONObject("thread");
             String tid = threadObject.getString("tid");
-            Logger.i("tid %s, mTidOrUidOrGid %s ", tid, mTidOrUidOrGid);
-            if (tid.equals(mTidOrUidOrGid)) {
+            Logger.i("tid %s, mUUID %s ", tid, mUUID);
+            if (tid.equals(mUUID)) {
                 Logger.i("发送已读回执");
 
                 if (!messageObject.isNull("user")) {
@@ -150,7 +145,7 @@ public class ChatBaseActivity extends AppCompatActivity {
                     }
                 }
             } else {
-                Logger.i(" tid != mTidOrUidOrGid");
+                Logger.i(" tid != mUUID");
             }
 
         } catch (JSONException e) {
@@ -175,14 +170,11 @@ public class ChatBaseActivity extends AppCompatActivity {
         new QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("异地登录提示")
                 .setMessage(content)
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        dialog.dismiss();
+                .addAction("确定", (dialog, index) -> {
+                    dialog.dismiss();
 
-                        // TODO: 开发者可自行决定是否退出登录
+                    // TODO: 开发者可自行决定是否退出登录
 
-                    }
                 }).show();
     }
 

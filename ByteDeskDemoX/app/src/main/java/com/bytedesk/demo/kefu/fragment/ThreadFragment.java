@@ -1,12 +1,12 @@
 package com.bytedesk.demo.kefu.fragment;
 
+import android.view.LayoutInflater;
+import android.view.View;
+
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import android.view.LayoutInflater;
-import android.view.View;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
@@ -98,7 +98,7 @@ public class ThreadFragment extends BaseFragment {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
 
                         ThreadEntity threadEntity = new ThreadEntity();
-                        threadEntity.setId(jsonObject.getLong("id"));
+//                        threadEntity.setId(jsonObject.getLong("id"));
                         threadEntity.setTid(jsonObject.getString("tid"));
                         threadEntity.setUnreadCount(jsonObject.getInt("unreadCount"));
                         threadEntity.setToken(jsonObject.getString("token"));

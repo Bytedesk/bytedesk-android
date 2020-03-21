@@ -32,13 +32,7 @@ public class LoginFragment extends BaseFragment {
     }
 
     private void initTopBar() {
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
-
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle("登录接口");
     }
 
@@ -50,11 +44,8 @@ public class LoginFragment extends BaseFragment {
         QMUIGroupListView.newSection(getContext())
                 .setTitle("登录接口")
 //                .setDescription("默认描述")
-                .addItemView(loginItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
+                .addItemView(loginItem, view -> {
+                    //
                 })
                 .addTo(mGroupListView);
 

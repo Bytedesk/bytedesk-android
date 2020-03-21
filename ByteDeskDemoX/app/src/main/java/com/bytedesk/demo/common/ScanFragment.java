@@ -11,7 +11,6 @@ import com.bytedesk.ui.util.BDUiConstant;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -91,12 +90,7 @@ public class ScanFragment extends BaseFragment implements QRCodeView.Delegate {
             new QMUIDialog.MessageDialogBuilder(getActivity())
                     .setTitle("扫描结果")
                     .setMessage(result)
-                    .addAction("确定", new QMUIDialogAction.ActionListener() {
-                        @Override
-                        public void onClick(QMUIDialog dialog, int index) {
-                            dialog.dismiss();
-                        }
-                    })
+                    .addAction("确定", (dialog, index) -> dialog.dismiss())
                     .create(com.qmuiteam.qmui.R.style.QMUI_Dialog)
                     .show();
         }

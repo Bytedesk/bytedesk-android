@@ -3,7 +3,6 @@ package com.bytedesk.ui.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import androidx.core.content.ContextCompat;
@@ -56,6 +55,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * TODO: 一对一聊天隐藏左侧昵称
  *
  * @author bytedesk.com on 2017/8/23.
  */
@@ -87,10 +87,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             notifyDataSetChanged();
         }
     }
-
-//    public List<MessageEntity> getmMessages() {
-//        return mMessages;
-//    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -353,14 +349,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     }
                 });
                 // 长按
-                contentTextView.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        Logger.d("mid:" + msgEntity.getMid());
-                        EventBus.getDefault().post(new LongClickEvent(msgEntity));
+                contentTextView.setOnLongClickListener(v -> {
+                    Logger.d("mid:" + msgEntity.getMid());
+                    EventBus.getDefault().post(new LongClickEvent(msgEntity));
 
-                        return false;
-                    }
+                    return false;
                 });
             }
             // 图片消息
@@ -369,11 +362,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 loadAvatar(msgEntity);
                 //
                 Glide.with(mContext).load(msgEntity.getImageUrl()).into(imageImageView);
-                imageImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("image clicked:" + msgEntity.getImageUrl());
-                        if (null != itemClickListener) {
+                imageImageView.setOnClickListener(view -> {
+                    Logger.d("image clicked:" + msgEntity.getImageUrl());
+                    if (null != itemClickListener) {
 //                            int[] location = new int[2];
 //                            // 获取在整个屏幕内的绝对坐标
 //                            imageImageView.getLocationOnScreen(location);
@@ -384,8 +375,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
 //                            viewData.setTargetWidth(imageImageView.getWidth());
 //                            viewData.setTargetHeight(imageImageView.getHeight());
 //                            itemClickListener.onMessageImageItemClick(viewData, msgEntity.getImageUrl());
-                            itemClickListener.onMessageImageItemClick(msgEntity.getImageUrl());
-                        }
+                        itemClickListener.onMessageImageItemClick(msgEntity.getImageUrl());
                     }
                 });
             }

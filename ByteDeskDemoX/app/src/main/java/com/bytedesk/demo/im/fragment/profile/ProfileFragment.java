@@ -1,6 +1,5 @@
 package com.bytedesk.demo.im.fragment.profile;
 
-import androidx.annotation.NonNull;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,10 +19,8 @@ import com.qmuiteam.qmui.widget.QMUIRadiusImageView;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
-import com.yanzhenjie.album.Action;
 import com.yanzhenjie.album.Album;
 import com.yanzhenjie.album.AlbumFile;
 
@@ -32,8 +29,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,12 +69,7 @@ public class ProfileFragment extends BaseFragment {
      */
     protected void initTopBar() {
         //
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle("个人资料");
     }
 
@@ -102,12 +92,9 @@ public class ProfileFragment extends BaseFragment {
         profileItem.setImageDrawable(avatarImageView.getDrawable());
         profileItem.setDetailText(mPreferenceManager.getDescription() + "：" + mPreferenceManager.getUid());
 
-        QMUIGroupListView.newSection(getContext()).addItemView(profileItem, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Logger.d("profile item clicked");
-                showProfileSheet();
-            }
+        QMUIGroupListView.newSection(getContext()).addItemView(profileItem, view -> {
+            Logger.d("profile item clicked");
+            showProfileSheet();
         }).addTo(mGroupListView);
 
         ///////
@@ -123,18 +110,12 @@ public class ProfileFragment extends BaseFragment {
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服端相关接口")
                 .setDescription("可用于开发者自行开发客服端(用于客服接待访客)，注意: 非访客端")
-                .addItemView(autoItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("autoItem item clicked");
-                        showAutoReplySheet();
-                    }
-                }).addItemView(acceptStatusItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("acceptStatusItem item clicked");
-                        showAcceptStatusSheet();
-                    }
+                .addItemView(autoItem, view -> {
+                    Logger.d("autoItem item clicked");
+                    showAutoReplySheet();
+                }).addItemView(acceptStatusItem, view -> {
+                    Logger.d("acceptStatusItem item clicked");
+                    showAcceptStatusSheet();
                 }).addTo(mGroupListView);
     }
 
@@ -147,27 +128,24 @@ public class ProfileFragment extends BaseFragment {
                 .addItem("修改头像TODO")
                 .addItem("修改昵称TODO")
                 .addItem("修改签名TODO")
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
 
-                        if (position == 0) {
+                    if (position == 0) {
 
-                            // 选取头像
-                            chooseImage();
+                        // 选取头像
+                        chooseImage();
 
-                        } else if (position == 1) {
+                    } else if (position == 1) {
 
-                            // 弹出输入框，修改昵称
-                            showEditNicknameDialog();
+                        // 弹出输入框，修改昵称
+                        showEditNicknameDialog();
 
-                        } else if (position == 2) {
+                    } else if (position == 2) {
 
-                            // 弹出输入框，修改签名
-                            showEditDescriptionDialog();
+                        // 弹出输入框，修改签名
+                        showEditDescriptionDialog();
 
-                        }
                     }
                 })
                 .build()
@@ -186,31 +164,28 @@ public class ProfileFragment extends BaseFragment {
                 .addItem(BDConstants.AUTO_REPLY_BACK)
                 .addItem(BDConstants.AUTO_REPLY_PHONE)
                 .addItem(BDConstants.AUTO_REPLY_SELF)
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
 
-                        //
-                        boolean isAutoReply = position == 0 ? false : true;
-                        final String content = tag;
-                        BDCoreApi.updateAutoReply(getContext(), isAutoReply, content, new BaseCallback() {
-                            @Override
-                            public void onSuccess(JSONObject object) {
+                    //
+                    boolean isAutoReply = position == 0 ? false : true;
+                    final String content = tag;
+                    BDCoreApi.updateAutoReply(getContext(), isAutoReply, content, new BaseCallback() {
+                        @Override
+                        public void onSuccess(JSONObject object) {
 
-                                autoItem.setDetailText(content);
-                                mPreferenceManager.setAutoReplyContent(content);
-                            }
+                            autoItem.setDetailText(content);
+                            mPreferenceManager.setAutoReplyContent(content);
+                        }
 
-                            @Override
-                            public void onError(JSONObject object) {
+                        @Override
+                        public void onError(JSONObject object) {
 
-                                // TODO: 报错提示
-                                Toast.makeText(getActivity(), "设置自动回复错误", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                            // TODO: 报错提示
+                            Toast.makeText(getActivity(), "设置自动回复错误", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-                    }
                 })
                 .build()
                 .show();
@@ -224,37 +199,34 @@ public class ProfileFragment extends BaseFragment {
                 .addItem(BDConstants.STATUS_ONLINE)
                 .addItem(BDConstants.STATUS_BUSY)
                 .addItem(BDConstants.STATUS_REST)
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
 
-                        String status;
-                        final String statusText = tag;
-                        if (statusText.equals(BDConstants.STATUS_ONLINE)) {
-                            status = BDConstants.USER_STATUS_ONLINE;
-                        } else if (statusText.equals(BDConstants.STATUS_BUSY)) {
-                            status = BDConstants.USER_STATUS_BUSY;
-                        } else {
-                            status = BDConstants.USER_STATUS_REST;
-                        }
-                        //
-                        BDCoreApi.setAcceptStatus(getContext(), status, new BaseCallback() {
-                            @Override
-                            public void onSuccess(JSONObject object) {
-
-                                acceptStatusItem.setDetailText(statusText);
-                                mPreferenceManager.setAcceptStatus(statusText);
-                            }
-
-                            @Override
-                            public void onError(JSONObject object) {
-
-                                // TODO: 报错提示
-                                Toast.makeText(getActivity(), "设置在线状态错误", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                    String status;
+                    final String statusText = tag;
+                    if (statusText.equals(BDConstants.STATUS_ONLINE)) {
+                        status = BDConstants.USER_STATUS_ONLINE;
+                    } else if (statusText.equals(BDConstants.STATUS_BUSY)) {
+                        status = BDConstants.USER_STATUS_BUSY;
+                    } else {
+                        status = BDConstants.USER_STATUS_REST;
                     }
+                    //
+                    BDCoreApi.setAcceptStatus(getContext(), status, new BaseCallback() {
+                        @Override
+                        public void onSuccess(JSONObject object) {
+
+                            acceptStatusItem.setDetailText(statusText);
+                            mPreferenceManager.setAcceptStatus(statusText);
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+
+                            // TODO: 报错提示
+                            Toast.makeText(getActivity(), "设置在线状态错误", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 })
                 .build()
                 .show();
@@ -271,18 +243,15 @@ public class ProfileFragment extends BaseFragment {
                 .setPlaceholder("在此输入昵称")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
                 .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        final CharSequence text = builder.getEditText().getText();
-                        if (text != null && text.length() > 0) {
+                .addAction("确定", (dialog, index) -> {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
 
-                            dialog.dismiss();
+                        dialog.dismiss();
 
 
-                        } else {
-                            Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -298,18 +267,15 @@ public class ProfileFragment extends BaseFragment {
             .setPlaceholder("在此输入签名")
             .setInputType(InputType.TYPE_CLASS_TEXT)
             .addAction("取消", (dialog, index) -> dialog.dismiss())
-            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
-                    final CharSequence text = builder.getEditText().getText();
-                    if (text != null && text.length() > 0) {
+            .addAction("确定", (dialog, index) -> {
+                final CharSequence text = builder.getEditText().getText();
+                if (text != null && text.length() > 0) {
 
-                        dialog.dismiss();
+                    dialog.dismiss();
 
 
-                    } else {
-                        Toast.makeText(getActivity(), "请填入签名", Toast.LENGTH_SHORT).show();
-                    }
+                } else {
+                    Toast.makeText(getActivity(), "请填入签名", Toast.LENGTH_SHORT).show();
                 }
             })
             .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -324,23 +290,15 @@ public class ProfileFragment extends BaseFragment {
         Album.image(this)
                 .singleChoice()
                 .camera(false)
-                .onResult(new Action<ArrayList<AlbumFile>>() {
-                    @Override
-                    public void onAction(@NonNull ArrayList<AlbumFile> result) {
+                .onResult(result -> {
 
-                        if (result.size() > 0) {
-                            AlbumFile albumFile = result.get(0);
+                    if (result.size() > 0) {
+                        AlbumFile albumFile = result.get(0);
 
-                            uploadAvatar(albumFile.getPath());
-                        }
+                        uploadAvatar(albumFile.getPath());
                     }
                 })
-                .onCancel(new Action<String>() {
-                    @Override
-                    public void onAction(@NonNull String result) {
-                        Toast.makeText(getContext(), "取消选择图片", Toast.LENGTH_LONG).show();
-                    }
-                })
+                .onCancel(result -> Toast.makeText(getContext(), "取消选择图片", Toast.LENGTH_LONG).show())
                 .start();
     }
 

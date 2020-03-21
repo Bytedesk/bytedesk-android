@@ -35,20 +35,25 @@ ext {
     targetSdkVersion = 28
     compileSdkVersion = 28
 
-    versionCode = 206
-    versionName = '2.0.6'
+    versionCode = 227
+    versionName = '2.2.7'
 
     buildToolsVersion = '28.0.3'
     supportLibVersion = '28.0.0'
 
-    appcompatVersion= '1.1.0'
+    appcompatVersion= '1.2.0-alpha02'
     butterknifeVersion = '10.1.0'
     recyleviewxVersion = '1.1.0-beta04'
     stethoVersion = '1.5.1'
 
+    qmuiVersion = '2.0.0-alpha04'
+    qmuiArchVersion = '2.0.0-alpha04'
+    eventbusVersion = '3.2.0'
+    glideVersion = '4.11.0'
+
     archLifecycleVersion = "2.2.0-alpha02"
     archRoomVersion = "2.1.0"
 
-    bytedeskCoreVersion = "2.0.5"
-    bytedeskUIVersion = "2.0.5"
+    bytedeskCoreVersion = "2.2.7"
+    bytedeskUIVersion = "2.2.7"
 }

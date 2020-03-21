@@ -1,11 +1,11 @@
 package com.bytedesk.demo.im.fragment.social;
 
-import android.content.DialogInterface;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
@@ -155,38 +155,35 @@ public class TestUserFragment extends BaseFragment implements SwipeItemClickList
 //        final int checkedIndex = 0;
         new QMUIDialog.CheckableDialogBuilder(getActivity())
 //                .setCheckedIndex(checkedIndex)
-                .addItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int index) {
+                .addItems(items, (dialog, index) -> {
 
-                        Toast.makeText(getActivity(), "你选择了 " + items[index], Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
+                    Toast.makeText(getActivity(), "你选择了 " + items[index], Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
 
-                        if (index == 0) {
-                            // 添加关注
-                            addFollow(contactEntity.getUid());
+                    if (index == 0) {
+                        // 添加关注
+                        addFollow(contactEntity.getUid());
 
-                        } else if (index == 1) {
-                            // 取消关注
-                            unFollow(contactEntity.getUid());
+                    } else if (index == 1) {
+                        // 取消关注
+                        unFollow(contactEntity.getUid());
 
-                        } else if (index == 2) {
-                            // 拉黑
-                            addBlock(contactEntity.getUid());
+                    } else if (index == 2) {
+                        // 拉黑
+                        addBlock(contactEntity.getUid());
 
-                        } else if (index == 3) {
-                            // 取消拉黑
-                            unBlock(contactEntity.getUid());
+                    } else if (index == 3) {
+                        // 取消拉黑
+                        unBlock(contactEntity.getUid());
 
-                        } else if (index == 4) {
-                            // 添加好友之后，不需要对方同意，直接成为双向好友
-                            addFriend(contactEntity.getUid());
+                    } else if (index == 4) {
+                        // 添加好友之后，不需要对方同意，直接成为双向好友
+                        addFriend(contactEntity.getUid());
 
-                        } else if (index == 5) {
-                            // 删除好友
-                            removeFriend(contactEntity.getUid());
+                    } else if (index == 5) {
+                        // 删除好友
+                        removeFriend(contactEntity.getUid());
 
-                        }
                     }
                 }).show();
     }

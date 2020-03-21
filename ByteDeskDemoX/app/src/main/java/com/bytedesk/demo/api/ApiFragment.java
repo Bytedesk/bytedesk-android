@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bytedesk.core.api.BDCoreApi;
-import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.callback.LoginCallback;
 import com.bytedesk.core.event.ConnectionEvent;
@@ -38,7 +37,6 @@ import com.qmuiteam.qmui.util.QMUIPackageHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
@@ -143,33 +141,16 @@ public class ApiFragment extends BaseFragment {
         upgrateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
-                .addItemView(chatItem, view -> {
-                    ChatFragment chatFragment = new ChatFragment();
-                    startFragment(chatFragment);
-                })
+                .addItemView(chatItem, view -> startFragment(new ChatFragment()))
                 .addItemView(userInfoItem, view -> {
                     com.bytedesk.demo.kefu.fragment.ProfileFragment profileFragment = new com.bytedesk.demo.kefu.fragment.ProfileFragment();
                     startFragment(profileFragment);
                 })
-                .addItemView(statusItem, view -> {
-                    StatusFragment statusFragment = new StatusFragment();
-                    startFragment(statusFragment);
-                })
-                .addItemView(sessionHistoryItem, view -> {
-                    ThreadFragment threadFragment = new ThreadFragment();
-                    startFragment(threadFragment);
-                })
-                .addItemView(ticketItem, view -> {
-//                    startFragment(new TicketFragment());
-                    BDUiApi.startTicketActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
-                })
-                .addItemView(feedbackItem, view -> {
-//                    startFragment(new FeedbackFragment());
-                    BDUiApi.startFeedbackActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
-                })
-                .addItemView(helpCenterItem, view -> {
-                    startFragment(new SupportFragment());
-                })
+                .addItemView(statusItem, view -> startFragment(new StatusFragment()))
+                .addItemView(sessionHistoryItem, view -> startFragment(new ThreadFragment()))
+                .addItemView(ticketItem, view -> BDUiApi.startTicketActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
+                .addItemView(feedbackItem, view -> BDUiApi.startFeedbackActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
+                .addItemView(helpCenterItem, view -> startFragment(new SupportFragment()))
                 .addItemView(wapChatItem, view -> {
                     // 注意: 登录后台->所有设置->所有客服->技能组->获取代码 获取相应URL
                     String url = "https://www.bytedesk.com/chatvue?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
@@ -177,13 +158,11 @@ public class ApiFragment extends BaseFragment {
                 })
                 .addItemView(rateItem,  view -> {
                     // TODO: 引导应用商店好评
-                    AppRateFragment appRateFragment = new AppRateFragment();
-                    startFragment(appRateFragment);
+                    startFragment(new AppRateFragment());
                 })
                 .addItemView(upgrateItem,  view -> {
                     // TODO: 引导新版本升级
-                    AppUpgradeFragment appUpgradeFragment = new AppUpgradeFragment();
-                    startFragment(appUpgradeFragment);
+                    startFragment(new AppUpgradeFragment());
                 })
                 .addTo(mGroupListView);
 
@@ -296,52 +275,44 @@ public class ApiFragment extends BaseFragment {
         builder.setTitle("自定义用户名登录")
             .setPlaceholder("在此输入自定义用户名")
             .setInputType(InputType.TYPE_CLASS_TEXT)
-            .addAction("取消", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
+            .addAction("取消", (dialog, index) -> dialog.dismiss())
+            .addAction("确定", (dialog, index) -> {
+
+                final CharSequence text = builder.getEditText().getText();
+                if (text != null && text.length() > 0) {
+                    //
+                    final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
+                            .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                            .setTipWord(getResources().getString(R.string.bytedesk_logining))
+                            .create();
+                    loadingDialog.show();
+
+                    //
+                    String username = text.toString();
+                    String password = "123456";
+
+                    // 调用登录接口
+                    BDCoreApi.login(getContext(), username, password, BDDemoConst.DEFAULT_TEST_APPKEY, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new BaseCallback() {
+
+                        @Override
+                        public void onSuccess(JSONObject object) {
+                            loadingDialog.dismiss();
+
+                            Toast.makeText(getContext(), "登录成功", Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onError(JSONObject object) {
+                            Logger.e("login failed message");
+                            loadingDialog.dismiss();
+
+                            Toast.makeText(getContext(), "登录失败", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
                     dialog.dismiss();
-                }
-            })
-            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
-
-                    final CharSequence text = builder.getEditText().getText();
-                    if (text != null && text.length() > 0) {
-                        //
-                        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
-                                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                                .setTipWord(getResources().getString(R.string.bytedesk_logining))
-                                .create();
-                        loadingDialog.show();
-
-                        //
-                        String username = text.toString();
-                        String password = "123456";
-
-                        // 调用登录接口
-                        BDCoreApi.login(getContext(), username, password, BDDemoConst.DEFAULT_TEST_APPKEY, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new BaseCallback() {
-
-                            @Override
-                            public void onSuccess(JSONObject object) {
-                                loadingDialog.dismiss();
-
-                                Toast.makeText(getContext(), "登录成功", Toast.LENGTH_LONG).show();
-                            }
-
-                            @Override
-                            public void onError(JSONObject object) {
-                                Logger.e("login failed message");
-                                loadingDialog.dismiss();
-
-                                Toast.makeText(getContext(), "登录失败", Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                        dialog.dismiss();
-                    } else {
-                        Toast.makeText(getActivity(), "请填入自定义用户名", Toast.LENGTH_SHORT).show();
-                    }
+                } else {
+                    Toast.makeText(getActivity(), "请填入自定义用户名", Toast.LENGTH_SHORT).show();
                 }
             })
             .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -395,42 +366,34 @@ public class ApiFragment extends BaseFragment {
         new QMUIDialog.MessageDialogBuilder(getContext())
                 .setTitle("提示")
                 .setMessage("确定要退出登录吗？")
-                .addAction("取消", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        dialog.dismiss();
-                    }
-                })
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        dialog.dismiss();
+                .addAction("取消", (dialog, index) -> dialog.dismiss())
+                .addAction("确定", (dialog, index) -> {
+                    dialog.dismiss();
 
-                        ///
-                        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
-                                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                                .setTipWord(getResources().getString(R.string.bytedesk_logouting))
-                                .create();
-                        loadingDialog.show();
-                        //
-                        BDCoreApi.logout(getContext(), new BaseCallback() {
-                            @Override
-                            public void onSuccess(JSONObject object) {
-                                loadingDialog.dismiss();
+                    ///
+                    final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
+                            .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                            .setTipWord(getResources().getString(R.string.bytedesk_logouting))
+                            .create();
+                    loadingDialog.show();
+                    //
+                    BDCoreApi.logout(getContext(), new BaseCallback() {
+                        @Override
+                        public void onSuccess(JSONObject object) {
+                            loadingDialog.dismiss();
 
-                                Toast.makeText(getContext(), "退出登录成功", Toast.LENGTH_SHORT).show();
-                            }
+                            Toast.makeText(getContext(), "退出登录成功", Toast.LENGTH_SHORT).show();
+                        }
 
-                            @Override
-                            public void onError(JSONObject object) {
-                                loadingDialog.dismiss();
+                        @Override
+                        public void onError(JSONObject object) {
+                            loadingDialog.dismiss();
 
-                                Logger.e("退出登录失败");
-                                Toast.makeText(getContext(), "退出登录失败", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                            Logger.e("退出登录失败");
+                            Toast.makeText(getContext(), "退出登录失败", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-                    }
                 })
                 .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
 
@@ -447,54 +410,46 @@ public class ApiFragment extends BaseFragment {
         builder.setTitle("自定义用户登录名")
             .setPlaceholder("在此输入您的用户名(只能包含字母和数字)")
             .setInputType(InputType.TYPE_CLASS_TEXT)
-            .addAction("取消", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
-                    dialog.dismiss();
-                }
-            })
-            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
-                    final CharSequence text = builder.getEditText().getText();
-                    if (text != null && text.length() > 0) {
+            .addAction("取消", (dialog, index) -> dialog.dismiss())
+            .addAction("确定", (dialog, index) -> {
+                final CharSequence text = builder.getEditText().getText();
+                if (text != null && text.length() > 0) {
 
-                        //
-                        String username = text.toString();
-                        String nickname = "自定义测试账号"+username;
-                        String password = "123456";
-                        //
-                        BDCoreApi.registerUser(getContext(), username, nickname, password, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new BaseCallback() {
+                    //
+                    String username = text.toString();
+                    String nickname = "自定义测试账号"+username;
+                    String password = "123456";
+                    //
+                    BDCoreApi.registerUser(getContext(), username, nickname, password, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new BaseCallback() {
 
-                            @Override
-                            public void onSuccess(JSONObject object) {
+                        @Override
+                        public void onSuccess(JSONObject object) {
 
-                                try {
-                                    //
-                                    String message = object.getString("message");
-                                    int status_code = object.getInt("status_code");
-                                    //
-                                    if (status_code == 200) {
-                                        Toast.makeText(getContext(), "注册成功", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-                                    }
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                            try {
+                                //
+                                String message = object.getString("message");
+                                int status_code = object.getInt("status_code");
+                                //
+                                if (status_code == 200) {
+                                    Toast.makeText(getContext(), "注册成功", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
                                 }
-                            }
 
-                            @Override
-                            public void onError(JSONObject object) {
-                                Toast.makeText(getContext(), "注册失败", Toast.LENGTH_LONG).show();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        });
+                        }
 
-                        dialog.dismiss();
-                    } else {
-                        Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
-                    }
+                        @Override
+                        public void onError(JSONObject object) {
+                            Toast.makeText(getContext(), "注册失败", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
                 }
             })
             .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -565,16 +520,13 @@ public class ApiFragment extends BaseFragment {
         new QMUIDialog.MessageDialogBuilder(getActivity())
             .setTitle("异地登录提示")
             .setMessage(content)
-            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
-                    dialog.dismiss();
+            .addAction("确定", (dialog, index) -> {
+                dialog.dismiss();
 
-                    // 开发者可自行决定是否退出登录
-                    // 注意: 同一账号同时登录多个客户端不影响正常会话
-                    logout();
+                // 开发者可自行决定是否退出登录
+                // 注意: 同一账号同时登录多个客户端不影响正常会话
+                logout();
 
-                }
             }).show();
     }
 

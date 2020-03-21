@@ -1,8 +1,9 @@
 package com.bytedesk.demo.im.fragment.login;
 
-import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.core.content.ContextCompat;
 
 import com.bytedesk.demo.R;
 import com.bytedesk.demo.common.BaseFragment;
@@ -34,13 +35,7 @@ public class LoginFragment extends BaseFragment {
 
     private void initTopBar() {
         mTopBar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.app_color_blue));
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
-
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle("登录接口");
     }
 

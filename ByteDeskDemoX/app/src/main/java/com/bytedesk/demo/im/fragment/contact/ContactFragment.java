@@ -1,16 +1,15 @@
 package com.bytedesk.demo.im.fragment.contact;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
@@ -116,36 +115,27 @@ public class ContactFragment extends BaseFragment implements SwipeItemClickListe
     private void initModel() {
         //
         mContactViewModel = ViewModelProviders.of(this).get(ContactViewModel.class);
-        mContactViewModel.getContacts().observe(this, new Observer<List<ContactEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<ContactEntity> contactEntities) {
-                mContactEntities = contactEntities;
-                mContactAdapter.setContacts(contactEntities);
-            }
+        mContactViewModel.getContacts().observe(this, contactEntities -> {
+            mContactEntities = contactEntities;
+            mContactAdapter.setContacts(contactEntities);
         });
     }
 
     private void searchModel(String search) {
-        mContactViewModel.searchContacts(search).observe(this, new Observer<List<ContactEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<ContactEntity> contactEntities) {
-                mContactEntities = contactEntities;
-                mContactAdapter.setContacts(contactEntities);
-            }
+        mContactViewModel.searchContacts(search).observe(this, contactEntities -> {
+            mContactEntities = contactEntities;
+            mContactAdapter.setContacts(contactEntities);
         });
     }
 
     private void showTopRightSheet() {
         new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
                 .addItem("建群")
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
-                        //
-                        SelectFragment selectFragment = new SelectFragment();
-                        startFragment(selectFragment);
-                    }
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
+                    //
+                    SelectFragment selectFragment = new SelectFragment();
+                    startFragment(selectFragment);
                 })
                 .build()
                 .show();

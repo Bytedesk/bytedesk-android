@@ -11,9 +11,9 @@ import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.demo.common.TabEvent;
 import com.bytedesk.demo.im.adapter.TabAdapter;
 import com.orhanobut.logger.Logger;
-import com.qmuiteam.qmui.widget.QMUITabSegment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
-import com.qmuiteam.qmui.widget.QMUIViewPager;
+import com.qmuiteam.qmui.widget.tab.QMUITabBuilder;
+import com.qmuiteam.qmui.widget.tab.QMUITabSegment;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -83,11 +83,12 @@ public class TabFragment extends BaseFragment {
      */
     private void initTabs() {
         //
-        mTabSegment.addTab(new QMUITabSegment.Tab("测试用户"));
-        mTabSegment.addTab(new QMUITabSegment.Tab("关注"));
-        mTabSegment.addTab(new QMUITabSegment.Tab("粉丝"));
-        mTabSegment.addTab(new QMUITabSegment.Tab("好友"));
-        mTabSegment.addTab(new QMUITabSegment.Tab("黑名单"));
+        QMUITabBuilder builder = mTabSegment.tabBuilder();
+        mTabSegment.addTab(builder.setText("测试用户").build(getContext()));
+        mTabSegment.addTab(builder.setText("关注").build(getContext()));
+        mTabSegment.addTab(builder.setText("粉丝").build(getContext()));
+        mTabSegment.addTab(builder.setText("好友").build(getContext()));
+        mTabSegment.addTab(builder.setText("黑名单").build(getContext()));
         mTabSegment.setMode(QMUITabSegment.MODE_FIXED);
     }
 
@@ -112,12 +113,9 @@ public class TabFragment extends BaseFragment {
         mQMUIViewPager.setAdapter(tabAdapter);
         //
         mTabSegment.setupWithViewPager(mQMUIViewPager, false);
-        mTabSegment.setOnTabClickListener(new QMUITabSegment.OnTabClickListener() {
-            @Override
-            public void onTabClick(int index) {
-                Logger.i("tab " + index + " clicked");
-                EventBus.getDefault().post(new TabEvent(index));
-            }
+        mTabSegment.setOnTabClickListener(index -> {
+            Logger.i("tab " + index + " clicked");
+            EventBus.getDefault().post(new TabEvent(index));
         });
     }
 

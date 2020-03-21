@@ -1,13 +1,12 @@
 package com.bytedesk.demo.im.fragment.notice;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
@@ -83,13 +82,7 @@ public class NoticeFragment extends BaseFragment implements SwipeItemClickListen
      */
     protected void initTopBar() {
         //
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
-        //
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle(getResources().getString(R.string.bytedesk_notice));
     }
 
@@ -116,17 +109,14 @@ public class NoticeFragment extends BaseFragment implements SwipeItemClickListen
     private void initModel() {
         //
         mNoticeViewModel = ViewModelProviders.of(this).get(NoticeViewModel.class);
-        mNoticeViewModel.getNotices().observe(this, new Observer<List<NoticeEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<NoticeEntity> noticeEntities) {
-                mNoticeEntities = noticeEntities;
-                mNoticeAdapter.setNotices(noticeEntities);
+        mNoticeViewModel.getNotices().observe(this, noticeEntities -> {
+            mNoticeEntities = noticeEntities;
+            mNoticeAdapter.setNotices(noticeEntities);
 
-                if (mNoticeEntities.size() == 0) {
-                    mEmptyView.setVisibility(View.VISIBLE);
-                } else {
-                    mEmptyView.setVisibility(View.GONE);
-                }
+            if (mNoticeEntities.size() == 0) {
+                mEmptyView.setVisibility(View.VISIBLE);
+            } else {
+                mEmptyView.setVisibility(View.GONE);
             }
         });
     }

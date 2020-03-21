@@ -65,22 +65,12 @@ public class SettingFragment extends BaseFragment {
         QMUICommonListItemView receiveVoiceItem = mGroupListView.createItemView("收到消息播放提示音");
         receiveVoiceItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_SWITCH);
         receiveVoiceItem.getSwitch().setChecked(preferenceManager.shouldRingWhenReceiveMessage());
-        receiveVoiceItem.getSwitch().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                preferenceManager.setRingWhenReceiveMessage(isChecked);
-            }
-        });
+        receiveVoiceItem.getSwitch().setOnCheckedChangeListener((buttonView, isChecked) -> preferenceManager.setRingWhenReceiveMessage(isChecked));
         ///////
         QMUICommonListItemView vibrateItem = mGroupListView.createItemView("收到消息振动");
         vibrateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_SWITCH);
          vibrateItem.getSwitch().setChecked(preferenceManager.shouldVibrateWhenSendMessage());
-        vibrateItem.getSwitch().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                preferenceManager.setVibrateWhenReceiveMessage(isChecked);
-            }
-        });
+        vibrateItem.getSwitch().setOnCheckedChangeListener((buttonView, isChecked) -> preferenceManager.setVibrateWhenReceiveMessage(isChecked));
         //
         QMUIGroupListView.newSection(getContext())
                 .addItemView(sendVoiceItem, new View.OnClickListener() {

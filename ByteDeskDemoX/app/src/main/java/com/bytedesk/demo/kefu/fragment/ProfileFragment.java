@@ -1,10 +1,11 @@
 package com.bytedesk.demo.kefu.fragment;
 
-import androidx.core.content.ContextCompat;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
@@ -14,7 +15,6 @@ import com.bytedesk.ui.util.BDUiUtils;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 
@@ -87,19 +87,16 @@ public class ProfileFragment extends BaseFragment {
                 .setPlaceholder("在此输入您的昵称")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
                 .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        final CharSequence text = builder.getEditText().getText();
-                        if (text != null && text.length() > 0) {
+                .addAction("确定", (dialog, index) -> {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
 
-                            dialog.dismiss();
-                            mDefaultNickname = text.toString();
-                            setNickname();
+                        dialog.dismiss();
+                        mDefaultNickname = text.toString();
+                        setNickname();
 
-                        } else {
-                            Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -113,20 +110,17 @@ public class ProfileFragment extends BaseFragment {
                 .setPlaceholder("在此输入自定义标签")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
                 .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        final CharSequence text = builder.getEditText().getText();
-                        if (text != null && text.length() > 0) {
+                .addAction("确定", (dialog, index) -> {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
 
-                            dialog.dismiss();
-                            // 调用接口设置自定义标签
-                            mTagValue = text.toString();
-                            setTag();
+                        dialog.dismiss();
+                        // 调用接口设置自定义标签
+                        mTagValue = text.toString();
+                        setTag();
 
-                        } else {
-                            Toast.makeText(getActivity(), "请填入自定义标签值", Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Toast.makeText(getActivity(), "请填入自定义标签值", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();

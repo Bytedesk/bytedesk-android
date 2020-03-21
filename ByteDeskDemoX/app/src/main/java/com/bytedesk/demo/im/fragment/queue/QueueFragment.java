@@ -1,13 +1,12 @@
 package com.bytedesk.demo.im.fragment.queue;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
@@ -87,13 +86,7 @@ public class QueueFragment extends BaseFragment implements SwipeItemClickListene
      */
     protected void initTopBar() {
         //
-        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
-        //
+        mTopBar.addLeftBackImageButton().setOnClickListener(v -> popBackStack());
         mTopBar.setTitle(getResources().getString(R.string.bytedesk_queue));
     }
 
@@ -120,17 +113,14 @@ public class QueueFragment extends BaseFragment implements SwipeItemClickListene
     private void initModel() {
         //
         mQueueViewModel = ViewModelProviders.of(this).get(QueueViewModel.class);
-        mQueueViewModel.getQueues().observe(this, new Observer<List<QueueEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<QueueEntity> queueEntities) {
-                mQueueEntities = queueEntities;
-                mQueueAdapter.setQueues(queueEntities);
+        mQueueViewModel.getQueues().observe(this, queueEntities -> {
+            mQueueEntities = queueEntities;
+            mQueueAdapter.setQueues(queueEntities);
 
-                if (mQueueEntities.size() == 0) {
-                    mEmptyView.setVisibility(View.VISIBLE);
-                } else {
-                    mEmptyView.setVisibility(View.GONE);
-                }
+            if (mQueueEntities.size() == 0) {
+                mEmptyView.setVisibility(View.VISIBLE);
+            } else {
+                mEmptyView.setVisibility(View.GONE);
             }
         });
         //
@@ -143,12 +133,9 @@ public class QueueFragment extends BaseFragment implements SwipeItemClickListene
      */
     private void searchModel(String search) {
 
-        mQueueViewModel.searchQueues(search).observe(this, new Observer<List<QueueEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<QueueEntity> queueEntities) {
-                mQueueEntities = queueEntities;
-                mQueueAdapter.setQueues(queueEntities);
-            }
+        mQueueViewModel.searchQueues(search).observe(this, queueEntities -> {
+            mQueueEntities = queueEntities;
+            mQueueAdapter.setQueues(queueEntities);
         });
     }
 
