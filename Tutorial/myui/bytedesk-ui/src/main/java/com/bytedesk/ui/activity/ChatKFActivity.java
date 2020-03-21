@@ -1,24 +1,11 @@
 package com.bytedesk.ui.activity;
 
 import android.Manifest;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
-import android.content.ClipData;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -26,17 +13,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
-import com.bytedesk.core.event.KickoffEvent;
-import com.bytedesk.core.event.LongClickEvent;
-import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.event.PreviewEvent;
 import com.bytedesk.core.event.QueryAnswerEvent;
 import com.bytedesk.core.event.SendCommodityEvent;
 import com.bytedesk.core.repository.BDRepository;
-import com.bytedesk.core.room.entity.MessageEntity;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDCoreUtils;
 import com.bytedesk.core.util.BDPreferenceManager;
@@ -46,15 +37,15 @@ import com.bytedesk.ui.adapter.ChatAdapter;
 import com.bytedesk.ui.listener.ChatItemClickListener;
 import com.bytedesk.ui.util.BDPermissionUtils;
 import com.bytedesk.ui.util.BDUiConstant;
+import com.bytedesk.ui.widget.InputAwareLayout;
+import com.bytedesk.ui.widget.KeyboardAwareLinearLayout;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.util.QMUIViewHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
-import com.yanzhenjie.album.Action;
 import com.yanzhenjie.album.Album;
 import com.yanzhenjie.album.AlbumFile;
 
@@ -80,10 +71,12 @@ import java.util.Map;
  *
  * @author bytedesk.com
  */
-public class ChatKFActivity extends ChatBaseActivity
-        implements ChatItemClickListener,
+public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickListener,
+        KeyboardAwareLinearLayout.OnKeyboardShownListener,
+        KeyboardAwareLinearLayout.OnKeyboardHiddenListener,
         View.OnClickListener {
 
+    private InputAwareLayout mInputAwaireLayout;
     private QMUITopBarLayout mTopBar;
     private QMUIPullRefreshLayout mPullRefreshLayout;
     private RecyclerView mRecyclerView;
@@ -95,35 +88,11 @@ public class ChatKFActivity extends ChatBaseActivity
 
     private MessageViewModel mMessageViewModel;
 
-//    private String mImageCaptureFileName;
-//    private String mPicturePath;
-//    private Uri mPhotoUri;
-
-//    private Point mScreenSize;
-//    private ScaleImageView imagePreview;
-
     // 根据会话类型不同所代表意义不同：
     private String mUid;
     // 工作组wid
     private String mWorkGroupWid;
-    // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
-    private String mTidOrUidOrGid;
-    // 指定坐席uid
-    private String mAgentUid;
-    private String mTitle;
-    // 是否访客端调用接口
-    private boolean mIsVisitor;
-    private boolean mIsRobot;
-    // 区分客服会话thread、同事会话contact、群组会话group
-    private String mThreadType;
-    // 区分工作组会话、指定客服会话
-    private String mRequestType;
-    // 分页加载聊天记录
-    private int mPage = 0;
-    private int mSize = 20;
-    // 本地存储信息
-    private BDPreferenceManager mPreferenceManager;
-    private BDRepository mRepository;
+    //
     private final Handler mHandler = new Handler();
     //
     private String mCustom;
@@ -131,7 +100,7 @@ public class ChatKFActivity extends ChatBaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bytedesk_activity_chat);
+        setContentView(R.layout.bytedesk_activity_chat_kf);
 
         //
         if (null != getIntent()) {
@@ -144,7 +113,6 @@ public class ChatKFActivity extends ChatBaseActivity
             mPreferenceManager = BDPreferenceManager.getInstance(this);
             mPreferenceManager.setVisitor(mIsVisitor);
             mRepository = BDRepository.getInstance(this);
-
             //
             if (mIsVisitor) {
                 Logger.i("访客会话");
@@ -159,24 +127,10 @@ public class ChatKFActivity extends ChatBaseActivity
                     // 工作组会话
                     mAgentUid = "";
                 }
-            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)) {
+            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_WORKGROUP)) {
                 Logger.i("客服会话");
 
-                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
-            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
-                Logger.i("一对一会话");
-
-                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
-                if (mCustom != null && mCustom.trim().length() > 0) {
-                    sendCommodityMessage(mCustom);
-                }
-            } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
-                Logger.i("群组会话");
-
-                mTidOrUidOrGid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
-                if (mCustom != null && mCustom.trim().length() > 0) {
-                    sendCommodityMessage(mCustom);
-                }
+                mUUID = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
             }
             //
             mUid = getIntent().getStringExtra(BDUiConstant.EXTRA_UID);
@@ -192,8 +146,8 @@ public class ChatKFActivity extends ChatBaseActivity
         if (mIsVisitor) {
             requestThread();
         }
-        // 从服务器端加载聊天记录
-        getMessages();
+        // 从服务器端加载聊天记录，默认暂不加载
+        // getMessages();
     }
 
     @Override
@@ -251,25 +205,22 @@ public class ChatKFActivity extends ChatBaseActivity
             // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
             new QMUIBottomSheet.BottomListSheetBuilder(this)
-                    .addItem("相册")
-                    .addItem("拍照")
-                    .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                        @Override
-                        public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                            switch (position) {
-                                case 0:
-                                    Logger.d("album");
-                                    requestAlbumPermission();
-                                    break;
-                                case 1:
-                                    Logger.d("camera");
-                                    requestCameraPermission();
-                                    break;
-                            }
-                            dialog.dismiss();
-                        }
-                    })
-                    .build().show();
+                .addItem("相册")
+                .addItem("拍照")
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    switch (position) {
+                        case 0:
+                            Logger.d("album");
+                            requestAlbumPermission();
+                            break;
+                        case 1:
+                            Logger.d("camera");
+                            requestCameraPermission();
+                            break;
+                    }
+                    dialog.dismiss();
+                })
+                .build().show();
         }
 
     }
@@ -292,36 +243,11 @@ public class ChatKFActivity extends ChatBaseActivity
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
                     .setOnClickListener(view -> visitorTopRightSheet());
         }
-        else if (!mIsVisitor && mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_THREAD)) {
+        else if (!mIsVisitor && mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_WORKGROUP)) {
             // 客服会话
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
                     .setOnClickListener(view -> showTopRightSheet());
-        } else if (mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_CONTACT)) {
-            // 一对一会话
-            mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
-                    .setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            //
-                            Intent intent = new Intent(ChatKFActivity.this, ContactProfileActivity.class);
-                            intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
-                            startActivity(intent);
-                        }
-                    });
-        } else if (mThreadType.equals(BDCoreConstant.MESSAGE_SESSION_TYPE_GROUP)) {
-            // 群组
-            mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
-                    .setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            //
-                            Intent intent = new Intent(ChatKFActivity.this, GroupProfileActivity.class);
-                            intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
-                            startActivity(intent);
-                        }
-                    });
         }
-
         QMUIStatusBarHelper.translucent(this);
     }
 
@@ -329,6 +255,10 @@ public class ChatKFActivity extends ChatBaseActivity
      * 界面初始化
      */
     private void initView () {
+        //
+        mInputAwaireLayout = findViewById(R.id.bytedesk_activity_chat_kf);
+        mInputAwaireLayout.addOnKeyboardShownListener(this);
+        mInputAwaireLayout.addOnKeyboardHiddenListener(this);
         //
         mPullRefreshLayout = findViewById(R.id.bytedesk_chat_pulltorefresh);
         mPullRefreshLayout.setOnPullListener(pullListener);
@@ -377,58 +307,28 @@ public class ChatKFActivity extends ChatBaseActivity
             if (mRequestType.equals(BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED)) {
                 Logger.i("访客会话: 指定客服聊天记录");
                 // 指定客服聊天记录
-                mMessageViewModel.getThreadMessages(mTidOrUidOrGid).observe(this, new Observer<List<MessageEntity>>() {
-                    @Override
-                    public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                        mChatAdapter.setMessages(messageEntities);
-                        mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                    }
+                mMessageViewModel.getThreadMessages(mUUID).observe(this, messageEntities -> {
+                    mChatAdapter.setMessages(messageEntities);
+                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
                 });
             } else {
                 Logger.i("访客会话: 工作组聊天记录");
                 // 工作组聊天记录, TODO: 是否沿用此方式待定，转接会话聊天
-                mMessageViewModel.getWorkGroupMessages(mWorkGroupWid).observe(this, new Observer<List<MessageEntity>>() {
-                    @Override
-                    public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                        mChatAdapter.setMessages(messageEntities);
-                        mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                    }
+                mMessageViewModel.getWorkGroupMessages(mWorkGroupWid).observe(this, messageEntities -> {
+                    mChatAdapter.setMessages(messageEntities);
+                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
                 });
             }
 
-        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
+        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_WORKGROUP)){
             Logger.i("客服端：客服会话");
 
-            mMessageViewModel.getVisitorMessages(mUid).observe(this, new Observer<List<MessageEntity>>() {
-                @Override
-                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                    mChatAdapter.setMessages(messageEntities);
-                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                }
+            mMessageViewModel.getVisitorMessages(mUid).observe(this, messageEntities -> {
+                mChatAdapter.setMessages(messageEntities);
+                mRecyclerView.scrollToPosition(messageEntities.size() - 1);
             });
             // 设置当前会话
             updateCurrentThread();
-        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
-            Logger.i("客服端：一对一会话");
-
-            mMessageViewModel.getContactMessages(mUid).observe(this, new Observer<List<MessageEntity>>() {
-                @Override
-                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                    mChatAdapter.setMessages(messageEntities);
-                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                }
-            });
-
-        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
-            Logger.i("客服端：群组会话");
-
-            mMessageViewModel.getGroupMessages(mUid).observe(this, new Observer<List<MessageEntity>>() {
-                @Override
-                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                    mChatAdapter.setMessages(messageEntities);
-                    mRecyclerView.scrollToPosition(messageEntities.size() - 1);
-                }
-            });
         }
     }
 
@@ -498,19 +398,18 @@ public class ChatKFActivity extends ChatBaseActivity
         });
     }
 
-
     /**
      * 请求机器人会话
      * @param content 关键词
      */
     private void sendRobotMessage(String content) {
-        Logger.i("tid: %s, wid %s, type %s, content %s", mTidOrUidOrGid, mWorkGroupWid, mRequestType, content);
+        Logger.i("tid: %s, wid %s, type %s, content %s", mUUID, mWorkGroupWid, mRequestType, content);
 
         // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
         final String localId = BDCoreUtils.uuid();
 
         // 插入本地消息
-        mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
+        mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
 
         BDCoreApi.messageAnswer(this, mRequestType, mWorkGroupWid, mAgentUid, content, new BaseCallback() {
 
@@ -582,11 +481,11 @@ public class ChatKFActivity extends ChatBaseActivity
     private void updateCurrentThread() {
 
         String preTid = mPreferenceManager.getCurrentTid();
-        BDCoreApi.updateCurrentThread(this, preTid, mTidOrUidOrGid, new BaseCallback() {
+        BDCoreApi.updateCurrentThread(this, preTid, mUUID, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
                 // 设置当前tid
-                mPreferenceManager.setCurrentTid(mTidOrUidOrGid);
+                mPreferenceManager.setCurrentTid(mUUID);
             }
 
             @Override
@@ -641,7 +540,7 @@ public class ChatKFActivity extends ChatBaseActivity
                 }
             });
 
-        }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_THREAD)){
+        }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_WORKGROUP)){
             Logger.i("客服端：客服会话 uid:" + mUid);
 
             // 客服端接口
@@ -677,74 +576,8 @@ public class ChatKFActivity extends ChatBaseActivity
                     }
                 }
             });
-
-        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
-            Logger.i("一对一会话 cid: " + mUid);
-
-            BDCoreApi.getMessagesWithContact(getBaseContext(), mUid, mPage, mSize, new BaseCallback() {
-
-                @Override
-                public void onSuccess(JSONObject object) {
-
-                    try {
-                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    mPullRefreshLayout.finishRefresh();
-                    mPage++;
-                }
-
-                @Override
-                public void onError(JSONObject object) {
-
-                    mPullRefreshLayout.finishRefresh();
-
-                    try {
-                        Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-        } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
-            Logger.i("群组会话 gid: " + mUid);
-
-            BDCoreApi.getMessagesWithGroup(getBaseContext(), mUid, mPage, mSize, new BaseCallback() {
-                @Override
-                public void onSuccess(JSONObject object) {
-
-                    try {
-                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    mPullRefreshLayout.finishRefresh();
-                    mPage++;
-                }
-
-                @Override
-                public void onError(JSONObject object) {
-
-                    mPullRefreshLayout.finishRefresh();
-
-                    try {
-                        Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
         }
+
     }
 
     /**
@@ -755,8 +588,7 @@ public class ChatKFActivity extends ChatBaseActivity
     private void dealWithThread(JSONObject object) {
         //
         try {
-            Logger.d("request thread success message: " + object.get("message")
-                    + " status_code:" + object.get("status_code"));
+            Logger.d("request thread success message: " + object.get("message") + " status_code:" + object.get("status_code"));
 
             int status_code = object.getInt("status_code");
             if (status_code == 200 || status_code == 201) {
@@ -765,10 +597,16 @@ public class ChatKFActivity extends ChatBaseActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                JSONObject thread = message.getJSONObject("thread");
+                mUUID = thread.getString("tid");
+                mThreadEntity.setTid(thread.getString("tid"));
+                mThreadEntity.setType(thread.getString("type"));
+                mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
+                mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
-                String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
+//                String threadTopic = BDCoreConstant.BD_THREAD_PREFIX + mUUID;
+//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
@@ -780,10 +618,10 @@ public class ChatKFActivity extends ChatBaseActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                mUUID = message.getJSONObject("thread").getString("tid");
 
-                String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
+//                String threadTopic = "thread/" + mUUID;
+//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
@@ -795,9 +633,9 @@ public class ChatKFActivity extends ChatBaseActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
+                mUUID = message.getJSONObject("thread").getString("tid");
+//                String threadTopic = "thread/" + mUUID;
+//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else if (status_code == 204) {
                 // 当前无客服在线，请自助查询或留言
@@ -805,16 +643,16 @@ public class ChatKFActivity extends ChatBaseActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
+                mUUID = message.getJSONObject("thread").getString("tid");
+//                String threadTopic = "thread/" + mUUID;
+//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else if (status_code == 205) {
                 // 咨询前问卷
 
                 String title = "";
                 JSONObject message = object.getJSONObject("data");
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
+                mUUID = message.getJSONObject("thread").getString("tid");
                 // 存储key/value: content/qid
                 final Map<String, String> questionMap = new HashMap<>();
                 // 存储key/value: content/workGroups
@@ -851,29 +689,26 @@ public class ChatKFActivity extends ChatBaseActivity
                 final String[] items = questionContents.toArray(new String[0]);
                 new QMUIDialog.MenuDialogBuilder(ChatKFActivity.this)
                     .setTitle(title)
-                    .addItems(items, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                    .addItems(items, (dialog, which) -> {
 
-                            String questionnaireItemItemQid = questionMap.get(items[which]);
-                            Logger.i("qid:" + questionnaireItemItemQid + " content:" + items[which]);
-                            // 留学: 意向国家 qid = '201810061551181'
-                            // 移民：意向国家 qid = '201810061551183'
-                            // 语培：意向类别 qid = '201810061551182'
-                            // 其他：意向类别 qid = '201810061551184'
-                            // 院校：意向院校 qid = '201810061551185'
+                        String questionnaireItemItemQid = questionMap.get(items[which]);
+                        Logger.i("qid:" + questionnaireItemItemQid + " content:" + items[which]);
+                        // 留学: 意向国家 qid = '201810061551181'
+                        // 移民：意向国家 qid = '201810061551183'
+                        // 语培：意向类别 qid = '201810061551182'
+                        // 其他：意向类别 qid = '201810061551184'
+                        // 院校：意向院校 qid = '201810061551185'
 
-                            if (questionnaireItemItemQid.equals("201810061551181")) {
-                                // 单独处理 留学: 意向国家 qid = '201810061551181'
+                        if (questionnaireItemItemQid.equals("201810061551181")) {
+                            // 单独处理 留学: 意向国家 qid = '201810061551181'
 //                                requestQuestionnaire(questionnaireItemItemQid);
-                                showWorkGroupDialog(workGroupsMap.get(items[which]), true);
-                            } else {
-                                //
-                                showWorkGroupDialog(workGroupsMap.get(items[which]), false);
-                            }
-
-                            dialog.dismiss();
+                            showWorkGroupDialog(workGroupsMap.get(items[which]), true);
+                        } else {
+                            //
+                            showWorkGroupDialog(workGroupsMap.get(items[which]), false);
                         }
+
+                        dialog.dismiss();
                     }).show();
 
             } else if (status_code == 206) {
@@ -883,9 +718,9 @@ public class ChatKFActivity extends ChatBaseActivity
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mTidOrUidOrGid = message.getJSONObject("thread").getString("tid");
-                String threadTopic = "thread/" + mTidOrUidOrGid;
-                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
+                mUUID = message.getJSONObject("thread").getString("tid");
+//                String threadTopic = "thread/" + mUUID;
+//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else {
                 // 请求会话失败
@@ -928,22 +763,19 @@ public class ChatKFActivity extends ChatBaseActivity
             final String[] items = workGroupNames.toArray(new String[0]);
             new QMUIDialog.MenuDialogBuilder(ChatKFActivity.this)
                     .setTitle("请选择")
-                    .addItems(items, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //
-                            String workGroupNickname = items[which];
-                            String workGroupWid = workGroupMap.get(items[which]);
-                            Logger.i("nickname:" + items[which] + " workGroupWid:" + workGroupWid);
-                            //
-                            if (isLiuXue) {
-                                chooseWorkGroupLiuXue(workGroupWid, workGroupNickname);
-                            } else {
-                                chooseWorkGroup(workGroupWid);
-                            }
-
-                            dialog.dismiss();
+                    .addItems(items, (dialog, which) -> {
+                        //
+                        String workGroupNickname = items[which];
+                        String workGroupWid = workGroupMap.get(items[which]);
+                        Logger.i("nickname:" + items[which] + " workGroupWid:" + workGroupWid);
+                        //
+                        if (isLiuXue) {
+                            chooseWorkGroupLiuXue(workGroupWid, workGroupNickname);
+                        } else {
+                            chooseWorkGroup(workGroupWid);
                         }
+
+                        dialog.dismiss();
                     }).show();
 
         } catch (JSONException e) {
@@ -1042,23 +874,18 @@ public class ChatKFActivity extends ChatBaseActivity
         Album.image(this)
                 .singleChoice()
                 .camera(false)
-                .onResult(new Action<ArrayList<AlbumFile>>() {
-                    @Override
-                    public void onAction(@NonNull ArrayList<AlbumFile> result) {
+                .onResult(result -> {
 
-                        if (result.size() > 0) {
-                            AlbumFile albumFile = result.get(0);
+                    if (result.size() > 0) {
+                        AlbumFile albumFile = result.get(0);
 
-                            String imageName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp();
-                            uploadImage(albumFile.getPath(), imageName);
-                        }
+                        String imageName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp();
+                        uploadImage(albumFile.getPath(), imageName);
                     }
                 })
-                .onCancel(new Action<String>() {
-                    @Override
-                    public void onAction(@NonNull String result) {
-                        Toast.makeText(ChatKFActivity.this, "取消发送图片", Toast.LENGTH_LONG).show();
-                    }
+                .onCancel(result -> {
+                    //
+                    Toast.makeText(ChatKFActivity.this, "取消发送图片", Toast.LENGTH_LONG).show();
                 })
                 .start();
 
@@ -1073,7 +900,6 @@ public class ChatKFActivity extends ChatBaseActivity
 //        startActivityForResult(intent, BDUiConstant.SELECT_PIC_BY_PICK_PHOTO);
     }
 
-
     /**
      * 摄像头拍摄图片
      *
@@ -1086,19 +912,14 @@ public class ChatKFActivity extends ChatBaseActivity
         // 调用第三方库album
         Album.camera(this)
                 .image()
-                .onResult(new Action<String>() {
-                    @Override
-                    public void onAction(@NonNull String result) {
+                .onResult(result -> {
 
-                        String imageFileName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp();
-                        uploadImage(result, imageFileName);
-                    }
+                    String imageFileName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp();
+                    uploadImage(result, imageFileName);
                 })
-                .onCancel(new Action<String>() {
-                    @Override
-                    public void onAction(@NonNull String result) {
-                        Toast.makeText(ChatKFActivity.this, "取消拍照", Toast.LENGTH_LONG).show();
-                    }
+                .onCancel(result -> {
+                    //
+                    Toast.makeText(ChatKFActivity.this, "取消拍照", Toast.LENGTH_LONG).show();
                 })
                 .start();
 
@@ -1132,7 +953,7 @@ public class ChatKFActivity extends ChatBaseActivity
                     if (position == 0) {
 
                         // TODO: 暂未增加评价页面，开发者可自行设计。具体参数意思可跟进函数定义查看
-                        BDCoreApi.rate(ChatKFActivity.this, mTidOrUidOrGid, 5, "附言", false, new BaseCallback() {
+                        BDCoreApi.rate(ChatKFActivity.this, mUUID, 5, "附言", false, new BaseCallback() {
 
                             @Override
                             public void onSuccess(JSONObject object) {
@@ -1175,7 +996,6 @@ public class ChatKFActivity extends ChatBaseActivity
                 .show();
     }
 
-
     /**
      * 客服端点击右上角按钮
      */
@@ -1183,30 +1003,26 @@ public class ChatKFActivity extends ChatBaseActivity
         new QMUIBottomSheet.BottomListSheetBuilder(this)
                 .addItem("关闭会话")
 //                .addItem("访客资料") // TODO: 查看访客资料
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
-                        //
-                        BDCoreApi.agentCloseThread(getApplication(), mTidOrUidOrGid, new BaseCallback() {
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
+                    //
+                    BDCoreApi.agentCloseThread(getApplication(), mUUID, new BaseCallback() {
 
-                            @Override
-                            public void onSuccess(JSONObject object) {
-                                // 关闭页面
-                                finish();
-                            }
+                        @Override
+                        public void onSuccess(JSONObject object) {
+                            // 关闭页面
+                            finish();
+                        }
 
-                            @Override
-                            public void onError(JSONObject object) {
-                                Toast.makeText(getApplication(), "关闭会话错误", Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
+                        @Override
+                        public void onError(JSONObject object) {
+                            Toast.makeText(getApplication(), "关闭会话错误", Toast.LENGTH_LONG).show();
+                        }
+                    });
                 })
                 .build()
                 .show();
     }
-
 
     /**
      * 请求相册读取权限
@@ -1225,22 +1041,14 @@ public class ChatKFActivity extends ChatBaseActivity
                 new QMUIDialog.MessageDialogBuilder(this)
                         .setTitle("请求授权")
                         .setMessage("相册需要授权，请授权")
-                        .addAction("取消", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .addAction("确定", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                                // 请求授权
-                                ActivityCompat.requestPermissions(ChatKFActivity.this,
-                                        new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
-                                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        BDUiConstant.PERMISSION_REQUEST_ALBUM);
-                            }
+                        .addAction("取消", (dialog, index) -> dialog.dismiss())
+                        .addAction("确定", (dialog, index) -> {
+                            dialog.dismiss();
+                            // 请求授权
+                            ActivityCompat.requestPermissions(ChatKFActivity.this,
+                                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    BDUiConstant.PERMISSION_REQUEST_ALBUM);
                         }).show();
             }
             else {
@@ -1269,22 +1077,14 @@ public class ChatKFActivity extends ChatBaseActivity
                 new QMUIDialog.MessageDialogBuilder(this)
                         .setTitle("请求授权")
                         .setMessage("拍照需要授权，请授权")
-                        .addAction("取消", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .addAction("确定", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                                // 请求授权
-                                ActivityCompat.requestPermissions(ChatKFActivity.this,
-                                        new String[] { Manifest.permission.CAMERA,
-                                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        BDUiConstant.PERMISSION_REQUEST_CAMERA);
-                            }
+                        .addAction("取消", (dialog, index) -> dialog.dismiss())
+                        .addAction("确定", (dialog, index) -> {
+                            dialog.dismiss();
+                            // 请求授权
+                            ActivityCompat.requestPermissions(ChatKFActivity.this,
+                                    new String[] { Manifest.permission.CAMERA,
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    BDUiConstant.PERMISSION_REQUEST_CAMERA);
                         }).show();
             }
             else {
@@ -1392,56 +1192,21 @@ public class ChatKFActivity extends ChatBaseActivity
      */
     private void sendTextMessage(String content) {
 
+        if (!BDMqttApi.isConnected(this)) {
+            Toast.makeText(this, "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
         final String localId = BDCoreUtils.uuid();
 
         // 插入本地消息
-        mRepository.insertTextMessageLocal(mTidOrUidOrGid, mWorkGroupWid, content, localId, mThreadType);
+        mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
         // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
 
-        // 1. 异步发送文字消息, TODO: 增加Future机制？
-//        BDMqttApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType);
-
-        // 2. 同步发送消息(推荐)
-        BDCoreApi.sendTextMessage(this, mTidOrUidOrGid, content, localId, mThreadType, new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-                //
-                try {
-
-                    int status_code = object.getInt("status_code");
-                    if (status_code == 200) {
-
-                        String localId = object.getJSONObject("data").getString("localId");
-                        Logger.i("callback localId: " + localId);
-
-                        // TODO: 更新消息发送状态为成功
-                        mRepository.updateMessageStatusSuccess(localId);
-
-                        // 发送成功
-                    } else {
-
-                        // 修改本地消息发送状态为error
-                        mRepository.updateMessageStatusError(localId);
-
-                        // 发送消息失败
-                        String message = object.getString("message");
-                        Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-                // 发送消息失败
-                Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-            }
-        });
-
+        //
+        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
+                mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
     }
 
     /**
@@ -1479,52 +1244,12 @@ public class ChatKFActivity extends ChatBaseActivity
                     String imageUrl = object.getString("data");
 
                     // 插入本地消息
-                    mRepository.insertImageMessageLocal(mTidOrUidOrGid, mWorkGroupWid, imageUrl, localId, mThreadType);
+                    mRepository.insertImageMessageLocal(mUUID, mWorkGroupWid, mUid, imageUrl, localId, mThreadType);
 
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
 
-                    // 1. 异步发送图片消息，TODO: 增加Future机制？
-                    // BDMqttApi.sendImageMessage(ChatKFActivity.this, mTidOrUidOrGid, image_url, localId, mThreadType);
-
-                    // 2. 同步发送图片消息(推荐)
-                    BDCoreApi.sendImageMessage(ChatKFActivity.this, mTidOrUidOrGid, imageUrl, localId, mThreadType, new BaseCallback() {
-
-                        @Override
-                        public void onSuccess(JSONObject object) {
-                            //
-                            try {
-
-                                int status_code = object.getInt("status_code");
-                                if (status_code == 200) {
-
-                                    String localId = object.getJSONObject("data").getString("localId");
-                                    Logger.i("callback localId: " + localId);
-
-                                    // TODO: 更新消息发送状态为成功
-                                    mRepository.updateMessageStatusSuccess(localId);
-
-                                    // 发送成功
-                                } else {
-
-                                    // 修改本地消息发送状态为error
-                                    mRepository.updateMessageStatusError(localId);
-
-                                    // 发送消息失败
-                                    String message = object.getString("message");
-                                    Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onError(JSONObject object) {
-                            // 发送消息失败
-                            Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    BDMqttApi.sendImageMessageProtobuf(ChatKFActivity.this, localId, imageUrl,
+                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1536,20 +1261,6 @@ public class ChatKFActivity extends ChatBaseActivity
                 Toast.makeText(getApplicationContext(), "上传图片失败", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    /**
-     * 监听 EventBus 广播消息
-     *
-     * @param messageEvent
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent messageEvent) {
-        Logger.i("MessageEvent");
-
-        // TODO: 检查是否当前页面消息，如果是，则发送已读消息回执
-        
-
     }
 
     /**
@@ -1571,38 +1282,10 @@ public class ChatKFActivity extends ChatBaseActivity
             mTopBar.setTitle("对方正在输入:" + previewEvent.getContent());
         }
         //
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mTopBar.setTitle(mTitle);
-            }
+        mHandler.postDelayed(() -> {
+            //
+            mTopBar.setTitle(mTitle);
         }, 3000);
-    }
-
-    /**
-     * 账号异地登录通知提示，开发者可自行决定是否退出当前账号登录
-     *
-     * @param kickoffEvent
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onKickoffEvent(KickoffEvent kickoffEvent) {
-
-        String content = kickoffEvent.getContent();
-        Logger.w("onKickoffEvent: " + content);
-
-        // 弹窗提示
-        new QMUIDialog.MessageDialogBuilder(this)
-            .setTitle("异地登录提示")
-            .setMessage(content)
-            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
-                    dialog.dismiss();
-
-                    // TODO: 开发者可自行决定是否退出登录
-
-                }
-            }).show();
     }
 
     /**
@@ -1631,8 +1314,8 @@ public class ChatKFActivity extends ChatBaseActivity
         if (queryAnswerEvent.getAid().equals("00001")) {
 
             // 请求人工客服
-            // TODO: mTidOrUidOrGid 替换为 agentUid, agentUid不能为空
-            BDCoreApi.requestAgent(this, mWorkGroupWid, mRequestType, mTidOrUidOrGid, new BaseCallback() {
+            // TODO: mUUID 替换为 agentUid, agentUid不能为空
+            BDCoreApi.requestAgent(this, mWorkGroupWid, mRequestType, mUUID, new BaseCallback() {
 
                 @Override
                 public void onSuccess(JSONObject object) {
@@ -1656,7 +1339,7 @@ public class ChatKFActivity extends ChatBaseActivity
         } else {
 
             // 请求服务器答案
-            BDCoreApi.queryAnswer(this, mTidOrUidOrGid, queryAnswerEvent.getAid(), new BaseCallback() {
+            BDCoreApi.queryAnswer(this, mUUID, queryAnswerEvent.getAid(), new BaseCallback() {
 
                 @Override
                 public void onSuccess(JSONObject object) {
@@ -1701,7 +1384,6 @@ public class ChatKFActivity extends ChatBaseActivity
             });
         }
 
-
     }
 
     /**
@@ -1733,23 +1415,21 @@ public class ChatKFActivity extends ChatBaseActivity
 
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
         }
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            String content = charSequence.toString();
-            // Logger.i("input content: ", content);
-
-            // TODO: 输入框文字变化时，发送消息输入状态消息
-
             // TODO: 查询常见问题，并高亮提示
-
         }
 
         @Override
         public void afterTextChanged(Editable editable) {
 
+            String content = editable.toString();
+            if (content != null) {
+                // 输入框文字变化时，发送消息输入状态消息
+//                BDMqttApi.sendPreviewMessage(ChatKFActivity.this, mUUID, content, mThreadType);
+            }
         }
     };
 
@@ -1763,10 +1443,10 @@ public class ChatKFActivity extends ChatBaseActivity
         final String localId = BDCoreUtils.uuid();
 
         // 插入本地消息
-        mRepository.insertCommodityMessageLocal(mTidOrUidOrGid, mWorkGroupWid, custom, localId, mThreadType);
+        mRepository.insertCommodityMessageLocal(mUUID, mWorkGroupWid, mUid, custom, localId, mThreadType);
 
         // 发送商品
-        BDCoreApi.sendCommodityMessage(this, mTidOrUidOrGid, custom, localId, mThreadType, new BaseCallback() {
+        BDCoreApi.sendCommodityMessage(this, mUUID, custom, localId, mThreadType, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
                 //
@@ -1805,12 +1485,21 @@ public class ChatKFActivity extends ChatBaseActivity
         });
     }
 
-}
+    @Override
+    public void onKeyboardHidden() {
+//        Logger.i("onKeyboardHidden");
 
+    }
 
-//    private void requestQuestionnaire(String questionnaireItemItemQid) {
+    @Override
+    public void onKeyboardShown() {
+//        Logger.i("onKeyboardShown");
+        mRecyclerView.scrollToPosition(mChatAdapter.getItemCount() - 1);
+    }
+
+    //    private void requestQuestionnaire(String questionnaireItemItemQid) {
 //
-//        BDCoreApi.requestQuestionnaire(this, mTidOrUidOrGid, questionnaireItemItemQid, new BaseCallback() {
+//        BDCoreApi.requestQuestionnaire(this, mUUID, questionnaireItemItemQid, new BaseCallback() {
 //
 //            @Override
 //            public void onSuccess(JSONObject object) {
@@ -1851,3 +1540,7 @@ public class ChatKFActivity extends ChatBaseActivity
 //            }
 //        });
 //    }
+
+}
+
+

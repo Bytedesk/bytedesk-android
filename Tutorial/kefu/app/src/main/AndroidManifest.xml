@@ -35,7 +35,6 @@
         <!--对话页面-->
         <activity
             android:name="com.bytedesk.ui.activity.ChatKFActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--长连接service-->

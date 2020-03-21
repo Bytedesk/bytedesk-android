@@ -3,7 +3,6 @@ package com.bytedesk.ui.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import androidx.core.content.ContextCompat;
@@ -56,6 +55,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * TODO: 一对一聊天隐藏左侧昵称
  *
  * @author bytedesk.com on 2017/8/23.
  */
@@ -148,8 +148,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        MessageEntity message = mMessages.get(position);
-        viewHolder.setContent(message);
+        MessageEntity beforeEntity = position > 0 ? mMessages.get(position - 1) : null;
+        MessageEntity messageEntity = mMessages.get(position);
+        //
+        boolean showTimestamp = true;
+        if (beforeEntity != null) {
+            showTimestamp = BDUiUtils.showTime(messageEntity.getCreatedAt(), beforeEntity.getCreatedAt());
+        }
+        viewHolder.setContent(showTimestamp, messageEntity);
 
         if (null != mChatItemClickListener) {
             viewHolder.setItemClickListener(this.mChatItemClickListener);
@@ -196,6 +202,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         private ProgressBar progressBar;
         // 发送错误
         private ImageView errorImageView;
+        // 送达、已读状态
+        private TextView statusTextView;
         //
         private ChatItemClickListener itemClickListener;
 
@@ -285,13 +293,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     || messageViewType == MessageEntity.TYPE_ROBOT_SELF_ID) {
                 progressBar = itemView.findViewById(R.id.bytedesk_message_item_loading);
                 errorImageView = itemView.findViewById(R.id.bytedesk_message_item_error);
+                statusTextView = itemView.findViewById(R.id.bytedesk_message_item_status);
             }
-
         }
 
-        public void setContent(final MessageEntity msgEntity) {
-//            Logger.i("type: " + msgEntity.getType() + " content:" + msgEntity.getContent());
-            timestampTextView.setText(BDUiUtils.friendlyTime(msgEntity.getCreatedAt(), mContext));
+        public void setContent(boolean showTimestamp, final MessageEntity msgEntity) {
+//            Logger.i("type: %s, content: %s, status: %s", msgEntity.getType(), msgEntity.getContent(), msgEntity.getStatus());
+
+            if (showTimestamp) {
+                timestampTextView.setVisibility(View.VISIBLE);
+                timestampTextView.setText(BDUiUtils.friendlyTime(msgEntity.getCreatedAt(), mContext));
+            } else {
+                timestampTextView.setVisibility(View.GONE);
+            }
 
             // 文字消息
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
@@ -317,7 +331,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     public void onTelLinkClick(String phoneNumber) {
                         // TODO:
                         Toast.makeText(mContext, "识别到电话号码是：" + phoneNumber, Toast.LENGTH_SHORT).show();
-
 //                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
 //                        mContext.startActivity(intent);
                     }
@@ -326,28 +339,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     public void onMailLinkClick(String mailAddress) {
                         // TODO:
                         Toast.makeText(mContext, "识别到邮件地址是：" + mailAddress, Toast.LENGTH_SHORT).show();
-
                     }
 
                     @Override
                     public void onWebUrlLinkClick(String url) {
                         // TODO:
                         Toast.makeText(mContext, "识别到网页链接是：" + url, Toast.LENGTH_SHORT).show();
-
                         BDUiApi.startHtml5Chat(mContext, url, "打开网址");
                     }
                 });
                 // 长按
-                contentTextView.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
+                contentTextView.setOnLongClickListener(v -> {
+                    Logger.d("mid:" + msgEntity.getMid());
+                    EventBus.getDefault().post(new LongClickEvent(msgEntity));
 
-                        Logger.d("mid:" + msgEntity.getMid());
-
-                        EventBus.getDefault().post(new LongClickEvent(msgEntity));
-
-                        return false;
-                    }
+                    return false;
                 });
             }
             // 图片消息
@@ -356,11 +362,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 loadAvatar(msgEntity);
                 //
                 Glide.with(mContext).load(msgEntity.getImageUrl()).into(imageImageView);
-                imageImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("image clicked:" + msgEntity.getImageUrl());
-                        if (null != itemClickListener) {
+                imageImageView.setOnClickListener(view -> {
+                    Logger.d("image clicked:" + msgEntity.getImageUrl());
+                    if (null != itemClickListener) {
 //                            int[] location = new int[2];
 //                            // 获取在整个屏幕内的绝对坐标
 //                            imageImageView.getLocationOnScreen(location);
@@ -371,8 +375,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
 //                            viewData.setTargetWidth(imageImageView.getWidth());
 //                            viewData.setTargetHeight(imageImageView.getHeight());
 //                            itemClickListener.onMessageImageItemClick(viewData, msgEntity.getImageUrl());
-                            itemClickListener.onMessageImageItemClick(msgEntity.getImageUrl());
-                        }
+                        itemClickListener.onMessageImageItemClick(msgEntity.getImageUrl());
                     }
                 });
             }
@@ -518,30 +521,44 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
 
                     progressBar.setVisibility(View.VISIBLE);
                     errorImageView.setVisibility(View.GONE);
+                    statusTextView.setVisibility(View.GONE);
                 } else if (msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_ERROR)) {
 
                     progressBar.setVisibility(View.GONE);
                     errorImageView.setVisibility(View.VISIBLE);
+                    statusTextView.setVisibility(View.GONE);
+                } else if (msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_RECALL) ||
+                        msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_RECEIVED) ||
+                        msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_READ)) {
+
+                    progressBar.setVisibility(View.GONE);
+                    errorImageView.setVisibility(View.GONE);
+                    statusTextView.setVisibility(View.VISIBLE);
+                    statusTextView.setText(msgEntity.getStatus() == BDCoreConstant.MESSAGE_STATUS_RECEIVED ? "送达" : "已读");
                 } else {
 
                     progressBar.setVisibility(View.GONE);
                     errorImageView.setVisibility(View.GONE);
+                    statusTextView.setVisibility(View.GONE);
                 }
             }
 
-            // FIXME: 仅针对单聊和客服会话有效，群聊暂不发送已读状态
-            // 非自己发送的消息
-            if (!msgEntity.isSend() && !msgEntity.getSessionType().equals(BDCoreConstant.THREAD_TYPE_GROUP)) {
-                // 且非系统消息
+//          // FIXME: 仅针对单聊和客服会话有效，群聊暂不发送已读状态
+            // 收到消息的时候，不在当前页，重新进入页面之后，发送已读回执
+//          // 非自己发送的消息
+            //  && !msgEntity.getSessionType().equals(BDCoreConstant.THREAD_TYPE_GROUP)
+            if (!msgEntity.isSend()) {
+                // 非系统消息类型
                 if (!msgEntity.getType().startsWith(BDCoreConstant.MESSAGE_TYPE_NOTIFICATION)) {
                     // 消息状态
                     if (msgEntity.getStatus() == null ||
-                            msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_STORED)) {
-                        // TODO: 更新本地消息为已读
+                            msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_STORED) ||
+                            msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_RECEIVED)) {
+                        // 更新本地消息为已读
                         msgEntity.setStatus(BDCoreConstant.MESSAGE_STATUS_READ);
                         BDRepository.getInstance(mContext).insertMessageEntity(msgEntity);
                         // 发送已读回执，通知服务器更新状态
-                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid());
+                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid(), msgEntity.getThreadTid());
                     }
                 }
             }
@@ -651,7 +668,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         }
         playMusic(voiceUrl);
         // 隐藏键盘
-        BDUiUtils.showSysSoftKeybord(mContext, false);
+//        BDUiUtils.showSysSoftKeybord(mContext, false);
 //        ((ChatIMActivity) mContext).mEmotionLayout.setVisibility(View.GONE);
 //        ((ChatIMActivity) mContext).mExtensionLayout.setVisibility(View.GONE);
     }
@@ -740,6 +757,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
 
     protected static final int STOP = 0x10000;
     protected static final int NEXT = 0x10001;
+
     private class ProgressHandler extends Handler {
         private WeakReference<QMUIProgressBar> weakCircleProgressBar;
 
@@ -757,7 +775,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     // 本地销毁阅后即焚消息
                     BDRepository.getInstance(mContext).deleteMessage(mid);
                     // 通知服务器销毁
-                    BDMqttApi.sendReceiptReceivedMessage(mContext, mid);
+//                    BDMqttApi.sendReceiptReceivedMessage(mContext, mid);
                 case NEXT:
                     if (!Thread.currentThread().isInterrupted()) {
                         if (weakCircleProgressBar.get() != null) {

@@ -2,8 +2,8 @@ package com.bytedesk.ui.util;
 
 import android.content.Context;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
-import com.bytedesk.ui.activity.ChatIMActivity;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import java.text.ParseException;
@@ -24,11 +24,11 @@ public class BDUiUtils {
      * 显示或隐藏系统软键盘
      * @param isShowSoftkeybord true:显示，false:隐藏
      */
-    public static void showSysSoftKeybord(Context context, boolean isShowSoftkeybord)
-    {
+    public static void showSysSoftKeybord(Context context, EditText editText, boolean isShowSoftkeybord) {
         try {
             if(context == null)
                 return;
+
             InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             if(imm == null)
                 return;
@@ -37,14 +37,14 @@ public class BDUiUtils {
                 imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);//SHOW_FORCED表示强制显示
             }
             else {
-                imm.hideSoftInputFromWindow(((ChatIMActivity)context).getCurrentFocus().getWindowToken(), 0);////强制隐藏键盘
+//                imm.hideSoftInputFromWindow(((ChatIMActivity)context).getCurrentFocus().getWindowToken(), 0);////强制隐藏键盘
+                imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
             }
 
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -87,6 +87,27 @@ public class BDUiUtils {
                 },
                 2000
         );
+    }
+
+    public static Boolean showTime(String mytime, String before) {
+
+        if(mytime == null || before == null)
+            return true;
+
+        Date mydate = toDate(mytime);
+        Date beforedate = toDate(before);
+
+        if (mydate == null || beforedate == null)
+            return true;
+
+        long timeInterval = mydate.getTime() - beforedate.getTime();
+
+        if(timeInterval/1000 > 60)//显示超过一分钟的
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /**

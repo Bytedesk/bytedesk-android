@@ -77,70 +77,69 @@
         <!--对话页面-->
         <activity
             android:name="com.bytedesk.ui.activity.ChatKFActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ByteDesk"/>
 
         <activity
             android:name="com.bytedesk.ui.activity.ChatIMActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--群组会话详情页-->
         <activity
             android:name="com.bytedesk.ui.activity.GroupProfileActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--好友、联系人详情页-->
         <activity
             android:name="com.bytedesk.ui.activity.ContactProfileActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--留言页面-->
         <activity
             android:name="com.bytedesk.ui.activity.LeaveMessageActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--二维码-->
         <activity
             android:name="com.bytedesk.ui.activity.QRCodeActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--联系人列表-->
         <activity
             android:name="com.bytedesk.ui.activity.ContactSelectActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--URL浏览器页面-->
         <activity
             android:name="com.bytedesk.ui.activity.BrowserActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--查看图片-->
         <activity
             android:name="com.bytedesk.ui.activity.BigImageViewActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--意见反馈-->
         <activity
             android:name="com.bytedesk.ui.activity.FeedbackActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <activity
             android:name="com.bytedesk.ui.activity.FeedbackRecordActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--提交工单-->
         <activity
             android:name="com.bytedesk.ui.activity.TicketActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <activity
             android:name="com.bytedesk.ui.activity.TicketRecordActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--帮助中心-->
         <activity
             android:name="com.bytedesk.ui.activity.SupportApiActivity"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/AppTheme.ByteDesk"/>
 
         <!--长连接service-->
         <service android:name="com.bytedesk.paho.android.service.MqttService"/>
@@ -176,18 +175,6 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-
-        <!-- 完善兼容android N, 24相机访问权限-->
-        <!-- FIXME 注意：修改 android:authorities为 ${自己程序的包名applicationId}.provider -->
-        <!--<provider-->
-            <!--android:name="android.support.v4.content.FileProvider"-->
-            <!--android:authorities="com.bytedesk.demo.provider"-->
-            <!--android:exported="false"-->
-            <!--android:grantUriPermissions="true">-->
-            <!--<meta-data-->
-                <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
-                <!--android:resource="@xml/bytedesk_provider_paths"/>-->
-        <!--</provider>-->
 
         <!--./萝卜丝bytedesk.com代码 结束-->
 

@@ -3,8 +3,8 @@ package com.bytedesk.ui.api;
 import android.content.Context;
 import android.content.Intent;
 
-import com.bytedesk.core.api.BDConfig;
 import com.bytedesk.core.util.BDCoreConstant;
+import com.bytedesk.core.util.MMKVUtils;
 import com.bytedesk.ui.activity.BrowserActivity;
 import com.bytedesk.ui.activity.ChatIMActivity;
 import com.bytedesk.ui.activity.ChatKFActivity;
@@ -13,6 +13,7 @@ import com.bytedesk.ui.activity.SupportApiActivity;
 import com.bytedesk.ui.activity.TicketActivity;
 import com.bytedesk.ui.util.BDUiConstant;
 import com.bytedesk.ui.util.MediaLoader;
+import com.bytedesk.core.api.BDConfig;
 import com.yanzhenjie.album.Album;
 import com.yanzhenjie.album.AlbumConfig;
 
@@ -37,6 +38,8 @@ public class BDUiApi {
             .setLocale(Locale.getDefault())
             .build()
         );
+        // key-value存储库,替代sharedPreference
+        MMKVUtils.init(context);
     }
 
     /**
@@ -49,29 +52,29 @@ public class BDUiApi {
      */
     public static void startWorkGroupChatActivity(Context context, String wId, String title) {
         //
-        BDConfig.getInstance(context).switchToKF();
+        BDConfig.getInstance().switchToKF();
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
-        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_UID, "");
         intent.putExtra(BDUiConstant.EXTRA_WID, wId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_WORK_GROUP);
-        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_WORKGROUP);
         context.startActivity(intent);
     }
 
     public static void startWorkGroupChatActivity(Context context, String wId, String title, String custom) {
         //
-        BDConfig.getInstance(context).switchToKF();
+        BDConfig.getInstance().switchToKF();
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
-        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_UID, "");
         intent.putExtra(BDUiConstant.EXTRA_WID, wId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_WORK_GROUP);
-        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_WORKGROUP);
         intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
         context.startActivity(intent);
     }
@@ -87,31 +90,31 @@ public class BDUiApi {
      */
     public static void startAppointChatActivity(Context context, String aId, String title) {
         //
-        BDConfig.getInstance(context).switchToKF();
+        BDConfig.getInstance().switchToKF();
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
-        intent.putExtra(BDUiConstant.EXTRA_UID, "");
-        intent.putExtra(BDUiConstant.EXTRA_WID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_WID, "");
         intent.putExtra(BDUiConstant.EXTRA_AID, aId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED);
-        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_APPOINTED);
         context.startActivity(intent);
     }
 
     public static void startAppointChatActivity(Context context, String aId, String title, String custom) {
         //
-        BDConfig.getInstance(context).switchToKF();
+        BDConfig.getInstance().switchToKF();
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
-        intent.putExtra(BDUiConstant.EXTRA_UID, "");
-        intent.putExtra(BDUiConstant.EXTRA_WID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_UID, "");
+//        intent.putExtra(BDUiConstant.EXTRA_WID, "");
         intent.putExtra(BDUiConstant.EXTRA_AID, aId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED);
-        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_APPOINTED);
         intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
         context.startActivity(intent);
     }
@@ -130,38 +133,53 @@ public class BDUiApi {
         context.startActivity(intent);
     }
 
-    /**
-     * 客服端接口，开启原生会话页面Activity
-     * 访客会话
-     *
-     * @param context 上下文
-     * @param tId 会话tid
-     * @param title 标题
-     */
-    public static void startThreadChatActivity(Context context, String tId, String uId, String title) {
-        //
-        BDConfig.getInstance(context).switchToIM();
-        //
-        Intent intent = new Intent(context, ChatKFActivity.class);
-        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_TID, tId);
-        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
-        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
-        context.startActivity(intent);
-    }
+//    /**
+//     * 客服端接口，开启原生会话页面Activity
+//     * 访客会话
+//     *
+//     * @param context 上下文
+//     * @param tId 会话tid
+//     * @param title 标题
+//     */
+//    public static void startThreadChatActivity(Context context, String tId, String uId, String title) {
+//        //
+//        BDConfig.getInstance().switchToIM();
+//        //
+//        Intent intent = new Intent(context, ChatKFActivity.class);
+//        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
+//        intent.putExtra(BDUiConstant.EXTRA_TID, tId);
+//        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+//        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+//        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_WORKGROUP);
+//        context.startActivity(intent);
+//    }
+//
+//    public static void startThreadChatActivity(Context context, String tId, String uId, String title, String custom) {
+//        //
+//        BDConfig.getInstance().switchToIM();
+//        //
+//        Intent intent = new Intent(context, ChatKFActivity.class);
+//        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
+//        intent.putExtra(BDUiConstant.EXTRA_TID, tId);
+//        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+//        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+//        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_WORKGROUP);
+//        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
+//        context.startActivity(intent);
+//    }
 
-    public static void startThreadChatActivity(Context context, String tId, String uId, String title, String custom) {
+    public static void startThreadChatActivity(Context context, String tid, String topic, String type, String nickname, String avatar) {
         //
-        BDConfig.getInstance(context).switchToIM();
+        BDConfig.getInstance().switchToIM();
         //
-        Intent intent = new Intent(context, ChatKFActivity.class);
-        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_TID, tId);
-        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
-        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_THREAD);
-        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
+        Intent intent = new Intent(context, ChatIMActivity.class);
+        intent.putExtra(BDUiConstant.EXTRA_IS_THREAD, true);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TID, tid);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, type);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_TOPIC, topic);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_NICKNAME, nickname);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_AVATAR, avatar);
+
         context.startActivity(intent);
     }
 
@@ -175,28 +193,29 @@ public class BDUiApi {
      */
     public static void startContactChatActivity(Context context, String uId, String title) {
         //
-        BDConfig.getInstance(context).switchToIM();
+        BDConfig.getInstance().switchToIM();
         //
         Intent intent = new Intent(context, ChatIMActivity.class);
-        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+        intent.putExtra(BDUiConstant.EXTRA_IS_THREAD, false);
+//        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+        intent.putExtra(BDUiConstant.EXTRA_UUID, uId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_CONTACT);
         context.startActivity(intent);
     }
 
-    public static void startContactChatActivity(Context context, String uId, String title, String custom) {
-        //
-        BDConfig.getInstance(context).switchToIM();
-        //
-        Intent intent = new Intent(context, ChatIMActivity.class);
-        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
-        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_CONTACT);
-        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
-        context.startActivity(intent);
-    }
+//    public static void startContactChatActivity(Context context, String uId, String title, String custom) {
+//        //
+//        BDConfig.getInstance().switchToIM();
+//        //
+//        Intent intent = new Intent(context, ChatIMActivity.class);
+//        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
+//        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
+//        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+//        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_CONTACT);
+//        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
+//        context.startActivity(intent);
+//    }
 
 
     /**
@@ -209,33 +228,37 @@ public class BDUiApi {
      */
     public static void startGroupChatActivity(Context context, String gId, String title) {
         //
-        BDConfig.getInstance(context).switchToIM();
+        BDConfig.getInstance().switchToIM();
         //
         Intent intent = new Intent(context, ChatIMActivity.class);
-        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_UID, gId);
+        intent.putExtra(BDUiConstant.EXTRA_IS_THREAD, false);
+//        intent.putExtra(BDUiConstant.EXTRA_GID, gId);
+        intent.putExtra(BDUiConstant.EXTRA_UUID, gId);
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
         context.startActivity(intent);
     }
 
-    public static void startGroupChatActivity(Context context, String gId, String title, String custom) {
-        //
-        BDConfig.getInstance(context).switchToIM();
-        //
-        Intent intent = new Intent(context, ChatIMActivity.class);
-        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
-        intent.putExtra(BDUiConstant.EXTRA_UID, gId);
-        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
-        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
-        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
-        context.startActivity(intent);
-    }
+//    public static void startGroupChatActivity(Context context, String gId, String title, String custom) {
+//        //
+//        BDConfig.getInstance().switchToIM();
+//        //
+//        Intent intent = new Intent(context, ChatIMActivity.class);
+//        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
+//        intent.putExtra(BDUiConstant.EXTRA_GID, gId);
+//        intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
+//        intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_GROUP);
+//        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
+//        context.startActivity(intent);
+//    }
+
+
+
 
 
     public static void startFeedbackActivity(Context context, String uid) {
         //
-        BDConfig.getInstance(context).switchToKF();
+        BDConfig.getInstance().switchToKF();
         //
         Intent intent = new Intent(context, FeedbackActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_UID, uid);
@@ -245,7 +268,7 @@ public class BDUiApi {
 
     public static void startTicketActivity(Context context, String uid) {
         //
-        BDConfig.getInstance(context).switchToKF();
+        BDConfig.getInstance().switchToKF();
         //
         Intent intent = new Intent(context, TicketActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_UID, uid);
@@ -255,7 +278,7 @@ public class BDUiApi {
 
     public static void startSupportApiActivity(Context context, String uid) {
         //
-        BDConfig.getInstance(context).switchToKF();
+        BDConfig.getInstance().switchToKF();
         //
         Intent intent = new Intent(context, SupportApiActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_UID, uid);

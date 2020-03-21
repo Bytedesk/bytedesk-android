@@ -2,16 +2,16 @@ package com.bytedesk.ui.activity;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
@@ -20,13 +20,13 @@ import com.bytedesk.ui.R;
 import com.bytedesk.ui.util.BDUiConstant;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.util.QMUIViewHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
-import com.yanzhenjie.album.Action;
 import com.yanzhenjie.album.Album;
 import com.yanzhenjie.album.AlbumFile;
 
@@ -36,7 +36,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,8 +69,8 @@ public class TicketActivity extends AppCompatActivity {
     //
     private Map<String, String> mCategoryMap = new HashMap<>();
 
-    // 注意：mUrgent仅有两个值，NSString类型，紧急：“1”，一般：“0”
-    private String mUrgent = "0";
+    // 注意：mUrgent仅有两个值，NSString类型，紧急：“true”，一般：“false”
+    private String mUrgent = "false";
     private String mCategoryCid;
     //
     private String mContent;
@@ -99,7 +98,15 @@ public class TicketActivity extends AppCompatActivity {
     }
 
     private void initTopBar() {
+        //
         mTopBar.addLeftBackImageButton().setOnClickListener(v ->  finish());
+        //
+        mTopBar.addRightTextButton("我的工单", QMUIViewHelper.generateViewId())
+                .setOnClickListener(v -> {
+                    Intent intent = new Intent(this, TicketRecordActivity.class);
+                    intent.putExtra(BDUiConstant.EXTRA_UID, mUid);
+                    startActivity(intent);
+                });
         mTopBar.setTitle(mTitle);
     }
 
@@ -107,7 +114,7 @@ public class TicketActivity extends AppCompatActivity {
         //
         urgentItem = mGroupListView.createItemView("优先级");
         urgentItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        urgentItem.setDetailText(mUrgent.equals("0") ? "一般" : "紧急");
+        urgentItem.setDetailText(mUrgent.equals("false") ? "一般" : "紧急");
         categoryItem = mGroupListView.createItemView("分类");
         categoryItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(this)
@@ -219,18 +226,15 @@ public class TicketActivity extends AppCompatActivity {
         new QMUIBottomSheet.BottomListSheetBuilder(this)
                 .addItem("一般")
                 .addItem("紧急")
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
+                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
+                    dialog.dismiss();
 
-                        if (position == 0) {
-                            urgentItem.setDetailText("一般");
-                            mUrgent = "0";
-                        } else {
-                            urgentItem.setDetailText("紧急");
-                            mUrgent = "1";
-                        }
+                    if (position == 0) {
+                        urgentItem.setDetailText("一般");
+                        mUrgent = "false";
+                    } else {
+                        urgentItem.setDetailText("紧急");
+                        mUrgent = "true";
                     }
                 })
                 .build()
@@ -247,17 +251,14 @@ public class TicketActivity extends AppCompatActivity {
 //        final int checkedIndex = 0;
         new QMUIDialog.CheckableDialogBuilder(this)
 //                .setCheckedIndex(checkedIndex)
-                .addItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                .addItems(items, (dialog, which) -> {
+                    dialog.dismiss();
 
-                        String name = items[which];
-                        mCategoryCid = mCategoryMap.get(name);
-                        Logger.i("name %s, cid %s", name, mCategoryCid);
+                    String name = items[which];
+                    mCategoryCid = mCategoryMap.get(name);
+                    Logger.i("name %s, cid %s", name, mCategoryCid);
 
-                        categoryItem.setDetailText(name);
-                    }
+                    categoryItem.setDetailText(name);
                 }).show();
     }
 
@@ -272,19 +273,16 @@ public class TicketActivity extends AppCompatActivity {
                 .setPlaceholder("在此输入内容")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
                 .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        final CharSequence text = builder.getEditText().getText();
-                        if (text != null && text.length() > 0) {
+                .addAction("确定", (dialog, index) -> {
+                    final CharSequence text = builder.getEditText().getText();
+                    if (text != null && text.length() > 0) {
 
-                            dialog.dismiss();
-                            mContent = text.toString();
-                            contentItem.setDetailText(text.toString());
+                        dialog.dismiss();
+                        mContent = text.toString();
+                        contentItem.setDetailText(text.toString());
 
-                        } else {
-                            Toast.makeText(context, "请填入内容", Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Toast.makeText(context, "请填入内容", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
@@ -299,24 +297,16 @@ public class TicketActivity extends AppCompatActivity {
         Album.image(this)
                 .singleChoice()
                 .camera(false)
-                .onResult(new Action<ArrayList<AlbumFile>>() {
-                    @Override
-                    public void onAction(@NonNull ArrayList<AlbumFile> result) {
-                        //
-                        if (result.size() > 0) {
-                            AlbumFile albumFile = result.get(0);
+                .onResult(result -> {
+                    //
+                    if (result.size() > 0) {
+                        AlbumFile albumFile = result.get(0);
 
-                            String imageName = BDCoreUtils.getPictureTimestamp();
-                            uploadImage(albumFile.getPath(), imageName);
-                        }
+                        String imageName = BDCoreUtils.getPictureTimestamp();
+                        uploadImage(albumFile.getPath(), imageName);
                     }
                 })
-                .onCancel(new Action<String>() {
-                    @Override
-                    public void onAction(@NonNull String result) {
-                        Toast.makeText(context, "取消选择图片", Toast.LENGTH_LONG).show();
-                    }
-                })
+                .onCancel(result -> Toast.makeText(context, "取消选择图片", Toast.LENGTH_LONG).show())
                 .start();
     }
 
