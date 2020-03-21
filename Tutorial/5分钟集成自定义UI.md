@@ -112,7 +112,6 @@ implementation 'com.qmuiteam:qmui:2.0.0-alpha04'
 <!--对话页面-->
 <activity
     android:name="com.bytedesk.ui.activity.ChatKFActivity"
-    android:screenOrientation="portrait"
     android:theme="@style/AppTheme.ByteDesk"/>
 <!--长连接service-->
 <service android:name="com.bytedesk.paho.android.service.MqttService"/>
