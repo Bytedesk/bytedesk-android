@@ -253,9 +253,6 @@ public class BDUiApi {
 //    }
 
 
-
-
-
     public static void startFeedbackActivity(Context context, String uid) {
         //
         BDConfig.getInstance().switchToKF();

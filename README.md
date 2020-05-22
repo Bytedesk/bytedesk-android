@@ -6,8 +6,8 @@
 
 ## 准备工作
 
-- [注册账号](https://www.bytedesk.com/antv/user/login)
-- [登录后台](https://www.bytedesk.com/admin#/login)
+- [注册账号](https://www.bytedesk.com/antv/user/register)
+- [登录后台](https://www.bytedesk.com/antv/user/login)
 - 分配应用：登录后台->所有设置->应用管理->APP
 
 ## 集成SDK
@@ -16,8 +16,8 @@
 
 ```bash
 # androidx版, 参考demo：ByteDeskDemoX
-- 核心库: implementation 'com.bytedesk:libcore:2.2.7'
-- 界面库: implementation 'com.bytedesk:libui:2.2.7'
+- 核心库: implementation 'com.bytedesk:libcore:2.2.8'
+- 界面库: implementation 'com.bytedesk:libui:2.2.8'
 ```
 
 <!-- - 核心库：com.bytedesk:libcore: [![Download](https://api.bintray.com/packages/jackning/maven/core/images/download.svg)](https://bintray.com/jackning/maven/core/_latestVersion)

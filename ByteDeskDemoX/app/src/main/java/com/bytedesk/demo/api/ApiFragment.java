@@ -90,11 +90,11 @@ public class ApiFragment extends BaseFragment {
         // 公共接口
         QMUICommonListItemView serverItem = mGroupListView.createItemView("0. 自定义服务器");
         serverItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView registerItem = mGroupListView.createItemView("1. 注册接口");
+        QMUICommonListItemView registerItem = mGroupListView.createItemView("1. 点我注册");
         registerItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        loginItem = mGroupListView.createItemView("2. 登录接口");
+        loginItem = mGroupListView.createItemView("2. 点我登录");
         loginItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView logoutItem = mGroupListView.createItemView("3. 退出登录接口");
+        QMUICommonListItemView logoutItem = mGroupListView.createItemView("3. 退出登录");
         logoutItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView scanItem = mGroupListView.createItemView("4. 二维码");
         scanItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
@@ -153,7 +153,7 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(helpCenterItem, view -> startFragment(new SupportFragment()))
                 .addItemView(wapChatItem, view -> {
                     // 注意: 登录后台->所有设置->所有客服->技能组->获取代码 获取相应URL
-                    String url = "https://www.bytedesk.com/chatvue?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
+                    String url = "https://www.bytedesk.com/chat?sub=vip&uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
                     BDUiApi.startHtml5Chat(getContext(), url, "在线客服");
                 })
                 .addItemView(rateItem,  view -> {

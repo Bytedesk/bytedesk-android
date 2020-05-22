@@ -101,7 +101,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bytedesk_activity_chat_kf);
-
         //
         if (null != getIntent()) {
             //
@@ -116,7 +115,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             //
             if (mIsVisitor) {
                 Logger.i("访客会话");
-
                 mWorkGroupWid = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
                 mRequestType = getIntent().getStringExtra(BDUiConstant.EXTRA_REQUEST_TYPE);
                 // 判断是否指定客服会话
@@ -354,6 +352,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                             + " status_code:" + object.get("status_code")
                             + " data:" + object.get("data"));
                     Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    // TODO: token过期，要求重新登录
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -381,7 +380,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
 
             @Override
@@ -577,7 +575,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 }
             });
         }
-
     }
 
     /**
@@ -588,7 +585,9 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     private void dealWithThread(JSONObject object) {
         //
         try {
-            Logger.d("request thread success message: " + object.get("message") + " status_code:" + object.get("status_code"));
+            Logger.d("request thread success message: "
+                    + object.get("message")
+                    + " status_code:" + object.get("status_code"));
 
             int status_code = object.getInt("status_code");
             if (status_code == 200 || status_code == 201) {
@@ -1205,8 +1204,9 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
 
         //
-        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
-                mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
+        BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
+//        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
+//                mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
     }
 
     /**
@@ -1248,8 +1248,9 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
 
-                    BDMqttApi.sendImageMessageProtobuf(ChatKFActivity.this, localId, imageUrl,
-                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
+                    BDMqttApi.sendImageMessageProtobuf(ChatKFActivity.this, localId, imageUrl, mThreadEntity);
+//                    BDMqttApi.sendImageMessageProtobuf(ChatKFActivity.this, localId, imageUrl,
+//                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1424,10 +1425,11 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
         @Override
         public void afterTextChanged(Editable editable) {
-
+            //
             String content = editable.toString();
             if (content != null) {
                 // 输入框文字变化时，发送消息输入状态消息
+                BDMqttApi.sendPreviewMessageProtobuf(ChatKFActivity.this, mThreadEntity, content);
 //                BDMqttApi.sendPreviewMessage(ChatKFActivity.this, mUUID, content, mThreadType);
             }
         }
@@ -1441,48 +1443,49 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
         // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
         final String localId = BDCoreUtils.uuid();
-
         // 插入本地消息
         mRepository.insertCommodityMessageLocal(mUUID, mWorkGroupWid, mUid, custom, localId, mThreadType);
+        //
+        BDMqttApi.sendCommodityMessageProtobuf(this, localId, custom, mThreadEntity);
 
         // 发送商品
-        BDCoreApi.sendCommodityMessage(this, mUUID, custom, localId, mThreadType, new BaseCallback() {
-            @Override
-            public void onSuccess(JSONObject object) {
-                //
-                try {
-
-                    int status_code = object.getInt("status_code");
-                    if (status_code == 200) {
-
-                        String localId = object.getJSONObject("data").getString("localId");
-                        Logger.i("callback localId: " + localId);
-
-                        // TODO: 更新消息发送状态为成功
-                        mRepository.updateMessageStatusSuccess(localId);
-
-                        // 发送成功
-                    } else {
-
-                        // 修改本地消息发送状态为error
-                        mRepository.updateMessageStatusError(localId);
-
-                        // 发送消息失败
-                        String message = object.getString("message");
-                        Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-                // 发送消息失败
-                Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-            }
-        });
+//        BDCoreApi.sendCommodityMessage(this, mUUID, custom, localId, mThreadType, new BaseCallback() {
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//                //
+//                try {
+//
+//                    int status_code = object.getInt("status_code");
+//                    if (status_code == 200) {
+//
+//                        String localId = object.getJSONObject("data").getString("localId");
+//                        Logger.i("callback localId: " + localId);
+//
+//                        // TODO: 更新消息发送状态为成功
+//                        mRepository.updateMessageStatusSuccess(localId);
+//
+//                        // 发送成功
+//                    } else {
+//
+//                        // 修改本地消息发送状态为error
+//                        mRepository.updateMessageStatusError(localId);
+//
+//                        // 发送消息失败
+//                        String message = object.getString("message");
+//                        Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//                // 发送消息失败
+//                Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+//            }
+//        });
     }
 
     @Override

@@ -13,12 +13,16 @@
 
     <style name="QDTopBar" parent="QMUI.TopBar">
 <!--        <item name="qmui_topbar_bg_color">@color/app_color_blue</item>-->
+<!--        <item name="qmui_backgroundColor">@color/app_color_blue</item>-->
+<!--        <item name="qmui_skin_support_topbar_bg">@color/app_color_blue</item>-->
 <!--        <item name="android:background">@color/app_color_blue</item>-->
 <!--        <item name="qmui_topbar_title_color">@color/qmui_config_color_white</item>-->
 <!--        <item name="qmui_topbar_subtitle_color">@color/qmui_config_color_white</item>-->
 <!--        <item name="qmui_topbar_text_btn_color_state_list">@color/s_topbar_btn_color</item>-->
+
         <item name="qmui_topbar_height">48dp</item>
         <item name="qmui_topbar_image_btn_height">48dp</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar" parent="QMUI.Compat.NoActionBar">
@@ -58,6 +62,9 @@
     </style>
     <style name="ByteDeskTopBar" parent="QMUI.TopBar">
         <!--导航栏背景颜色-->
+<!--        <item name="qmui_topbar_bg_color">@color/app_color_blue</item>-->
+<!--        <item name="qmui_backgroundColor">@color/app_color_blue</item>-->
+        <item name="qmui_skin_support_topbar_bg">@color/app_color_blue</item>
         <item name="android:background">@color/app_color_blue</item>
         <!--导航栏字体颜色-->
         <item name="qmui_topbar_title_color">@color/qmui_config_color_white</item>

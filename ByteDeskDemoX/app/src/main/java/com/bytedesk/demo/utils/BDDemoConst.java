@@ -7,15 +7,14 @@ package com.bytedesk.demo.utils;
  */
 public class BDDemoConst {
 
-    // 获取adminUid, 登录后台->所有设置->客服账号->管理员账号(唯一ID(uid))列
+    // 管理后台：https://www.bytedesk.com/antv/user/login
+    // 获取管理员uid, 登录后台->客服->账号->管理员账号(唯一ID(uid))列
     public final static String DEFAULT_TEST_ADMIN_UID = "201808221551193";
-
     // TODO: 参考文档：https://github.com/pengjinning/bytedesk-android
     // appkey和subDomain请替换为真实值
-    // 登录后台->所有设置->应用管理->App
+    // 获取appkey，登录后台->客服->渠道->添加应用->appkey
     public final static String DEFAULT_TEST_APPKEY = "201809171553112";
-
-    // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
+    // 获取subDomain，也即企业号：登录后台->客服->账号->企业号
     public final static String DEFAULT_TEST_SUBDOMAIN = "vip";
 
     // 默认设置工作组wid

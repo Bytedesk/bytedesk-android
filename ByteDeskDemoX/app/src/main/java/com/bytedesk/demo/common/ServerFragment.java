@@ -86,10 +86,10 @@ public class ServerFragment extends BaseFragment {
         mqAddressItem.setDetailText(BDConfig.getInstance().getMqttHost());
         QMUICommonListItemView mqPortItem = mGroupListView.createItemView("端口号");
         mqPortItem.setDetailText(String.valueOf(BDConfig.getInstance().getMqttPort()));
-        QMUICommonListItemView mqAuthUsername = mGroupListView.createItemView("用户名");
-        mqAuthUsername.setDetailText(BDConfig.getInstance().getMqttAuthUsername());
-        QMUICommonListItemView mqAuthPassword = mGroupListView.createItemView("密码");
-        mqAuthPassword.setDetailText(BDConfig.getInstance().getMqttAuthPassword());
+//        QMUICommonListItemView mqAuthUsername = mGroupListView.createItemView("用户名");
+//        mqAuthUsername.setDetailText(BDConfig.getInstance().getMqttAuthUsername());
+//        QMUICommonListItemView mqAuthPassword = mGroupListView.createItemView("密码");
+//        mqAuthPassword.setDetailText(BDConfig.getInstance().getMqttAuthPassword());
         QMUIGroupListView.newSection(getContext())
                 .setTitle("消息服务器, 注意：地址没有http前缀")
                 .addItemView(mqAddressItem, view -> {
@@ -102,17 +102,19 @@ public class ServerFragment extends BaseFragment {
 //              修改为自己消息服务器端口号
 //             BDConfig.getInstance().setMqttPort(1883);
 
-        }).addItemView(mqAuthUsername, view -> {
-
-//              修改为自己消息服务器用户名
-//              BDConfig.getInstance().setMqttAuthUsername("mqtt_android");
-
-        }).addItemView(mqAuthPassword, view -> {
-
-//              修改为自己消息服务器密码
-//              BDConfig.getInstance().setMqttAuthPassword("mqtt_android");
-
-        }).addTo(mGroupListView);
+        })
+//                .addItemView(mqAuthUsername, view -> {
+//
+////              修改为自己消息服务器用户名
+////              BDConfig.getInstance().setMqttAuthUsername("mqtt_android");
+//
+//        }).addItemView(mqAuthPassword, view -> {
+//
+////              修改为自己消息服务器密码
+////              BDConfig.getInstance().setMqttAuthPassword("mqtt_android");
+//
+//        })
+                .addTo(mGroupListView);
 
         //
         QMUICommonListItemView restoreDefault = mGroupListView.createItemView("恢复默认值");
@@ -125,8 +127,8 @@ public class ServerFragment extends BaseFragment {
             authAddressItem.setDetailText(BDConfig.getInstance().getRestApiHost());
             mqAddressItem.setDetailText(BDConfig.getInstance().getMqttHost());
             mqPortItem.setDetailText(String.valueOf(BDConfig.getInstance().getMqttPort()));
-            mqAuthUsername.setDetailText(BDConfig.getInstance().getMqttAuthUsername());
-            mqAuthPassword.setDetailText(BDConfig.getInstance().getMqttAuthPassword());
+//            mqAuthUsername.setDetailText(BDConfig.getInstance().getMqttAuthUsername());
+//            mqAuthPassword.setDetailText(BDConfig.getInstance().getMqttAuthPassword());
 
         }).addTo(mGroupListView);
 

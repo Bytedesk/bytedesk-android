@@ -63,7 +63,7 @@ public class ChatFragment extends BaseFragment {
             .addTo(mGroupListView);
         //
         QMUICommonListItemView shopWorkGroupChatItem = mGroupListView.createItemView("电商客服工作组:" + BDDemoConst.wId);
-        QMUICommonListItemView shopAppointedChatItem = mGroupListView.createItemView("指定客服会话:" + BDDemoConst.agentUid);
+        QMUICommonListItemView shopAppointedChatItem = mGroupListView.createItemView("电商指定客服:" + BDDemoConst.agentUid);
         //
         QMUIGroupListView.newSection(getContext())
             .setTitle("电商客服")
@@ -98,15 +98,14 @@ public class ChatFragment extends BaseFragment {
             }).addTo(mGroupListView);
 
         //
-        QMUICommonListItemView preChoiceChatItem = mGroupListView.createItemView("前置选择:" +  BDDemoConst.preWid);
-        //
-        QMUIGroupListView.newSection(getContext())
-            .setTitle("前置选择")
-            .setDescription("在后台启用问卷选择")
-            .addItemView(preChoiceChatItem, view -> {
-                //
-                BDUiApi.startWorkGroupChatActivity(getContext(), BDDemoConst.preWid, "前置选择");
-            }).addTo(mGroupListView);
+//        QMUICommonListItemView preChoiceChatItem = mGroupListView.createItemView("前置选择:" +  BDDemoConst.preWid);
+//        QMUIGroupListView.newSection(getContext())
+//            .setTitle("前置选择")
+//            .setDescription("在后台启用问卷选择")
+//            .addItemView(preChoiceChatItem, view -> {
+//                //
+//                BDUiApi.startWorkGroupChatActivity(getContext(), BDDemoConst.preWid, "前置选择");
+//            }).addTo(mGroupListView);
 
         //
         QMUICommonListItemView robotChatItem = mGroupListView.createItemView("默认机器人:" +  BDDemoConst.robotWid);

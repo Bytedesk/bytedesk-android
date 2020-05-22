@@ -29,11 +29,13 @@ import com.bytedesk.core.event.QueryAnswerEvent;
 import com.bytedesk.core.event.SendCommodityEvent;
 import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.room.entity.MessageEntity;
+import com.bytedesk.core.room.entity.ThreadEntity;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDFileUtils;
 import com.bytedesk.core.util.JsonCustom;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.activity.BigImageViewActivity;
+import com.bytedesk.ui.activity.ChatBaseActivity;
 import com.bytedesk.ui.api.BDUiApi;
 import com.bytedesk.ui.listener.ChatItemClickListener;
 import com.bytedesk.ui.util.BDUiUtils;
@@ -558,7 +560,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                         msgEntity.setStatus(BDCoreConstant.MESSAGE_STATUS_READ);
                         BDRepository.getInstance(mContext).insertMessageEntity(msgEntity);
                         // 发送已读回执，通知服务器更新状态
-                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid(), msgEntity.getThreadTid());
+//                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid(), msgEntity.getThreadTid());
+                        ThreadEntity threadEntity = ((ChatBaseActivity)mContext).mThreadEntity;
+                        BDMqttApi.sendReceiptReadMessageProtobuf(mContext, threadEntity, msgEntity.getMid());
                     }
                 }
             }

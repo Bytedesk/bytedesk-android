@@ -7,7 +7,7 @@ buildscript {
         
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:3.6.3'
         
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -35,8 +35,8 @@ ext {
     targetSdkVersion = 28
     compileSdkVersion = 28
 
-    versionCode = 227
-    versionName = '2.2.7'
+    versionCode = 228
+    versionName = '2.2.8'
 
     buildToolsVersion = '28.0.3'
     supportLibVersion = '28.0.0'
@@ -46,14 +46,17 @@ ext {
     recyleviewxVersion = '1.1.0-beta04'
     stethoVersion = '1.5.1'
 
+    easypermissionsVersion = '3.0.0'
     qmuiVersion = '2.0.0-alpha04'
     qmuiArchVersion = '2.0.0-alpha04'
     eventbusVersion = '3.2.0'
     glideVersion = '4.11.0'
+    loggerVersion = '2.2.0'
+    gsonVersion = '2.8.6'
 
     archLifecycleVersion = "2.2.0-alpha02"
     archRoomVersion = "2.1.0"
 
-    bytedeskCoreVersion = "2.2.7"
-    bytedeskUIVersion = "2.2.7"
+    bytedeskCoreVersion = "2.2.8"
+    bytedeskUIVersion = "2.2.8"
 }

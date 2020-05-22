@@ -21,12 +21,12 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    // 管理后台：https://www.bytedesk.com/admin#/login
-    // 获取wid, 所有设置->客服管理->技能组->唯一ID（wId）
-    public final static String wId = "201807171659201";
-    // 获取appkey，登录后台->所有设置->应用管理->添加应用->appkey
+    // 管理后台：https://www.bytedesk.com/antv/user/login
+    // 获取管理员uid, 登录后台->客服->账号->管理员账号(唯一ID(uid))列
+    public final static String adminUId = "201808221551193";
+    // 获取appkey，登录后台->客服->渠道->添加应用->appkey
     public final static String appkey = "201809171553112";
-    // 获取subDomain，也即企业号：登录后台->所有设置->客服账号->企业号
+    // 获取subDomain，也即企业号：登录后台->客服->账号->企业号
     public final static String subdomain = "vip";
 
     @Override

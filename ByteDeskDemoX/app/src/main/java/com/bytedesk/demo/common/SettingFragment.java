@@ -73,21 +73,12 @@ public class SettingFragment extends BaseFragment {
         vibrateItem.getSwitch().setOnCheckedChangeListener((buttonView, isChecked) -> preferenceManager.setVibrateWhenReceiveMessage(isChecked));
         //
         QMUIGroupListView.newSection(getContext())
-                .addItemView(sendVoiceItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
-                }).addItemView(receiveVoiceItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
-                }).addItemView(vibrateItem, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        //
-                    }
+                .addItemView(sendVoiceItem, view -> {
+                    //
+                }).addItemView(receiveVoiceItem, view -> {
+                    //
+                }).addItemView(vibrateItem, view -> {
+                    //
                 }).addTo(mGroupListView);
 
     }

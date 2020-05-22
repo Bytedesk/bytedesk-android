@@ -7,7 +7,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bytedesk.core.api.BDCoreApi;
-import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.event.ProfileEvent;
 import com.bytedesk.core.util.BDPreferenceManager;
@@ -375,17 +374,17 @@ public class ProfileFragment extends BaseFragment {
             Glide.with(getContext()).load(mPreferenceManager.getAvatar()).into(avatarImageView);
             profileItem.setImageDrawable(avatarImageView.getDrawable());
 
-            // 添加订阅主题
-            String subDomain = infoObject.getString("subDomain");
-            String subDomainTopic = "subDomain/" + subDomain;
-            BDMqttApi.subscribeTopic(getActivity(), subDomainTopic);
-
-            String uid = infoObject.getString("uid");
-            String userTopic = "user/" + uid;
-            BDMqttApi.subscribeTopic(getActivity(), userTopic);
-
-            String contactTopic = "contact/" + uid;
-            BDMqttApi.subscribeTopic(getActivity(), contactTopic);
+//            // 添加订阅主题
+//            String subDomain = infoObject.getString("subDomain");
+//            String subDomainTopic = "subDomain/" + subDomain;
+//            BDMqttApi.subscribeTopic(getActivity(), subDomainTopic);
+//
+//            String uid = infoObject.getString("uid");
+//            String userTopic = "user/" + uid;
+//            BDMqttApi.subscribeTopic(getActivity(), userTopic);
+//
+//            String contactTopic = "contact/" + uid;
+//            BDMqttApi.subscribeTopic(getActivity(), contactTopic);
 
 
         } catch (JSONException e) {
