@@ -110,7 +110,7 @@ public class KeFuController extends BaseController {
                 .addItemView(statusItem, view -> startFragment(new StatusFragment()))
                 .addItemView(sessionHistoryItem, view -> startFragment(new ThreadFragment()))
                 .addItemView(wapChatItem, view -> {
-                    // 注意: 登录后台->所有设置->所有客服->工作组->获取代码 获取相应URL
+                    // 注意: 登录后台->客服->工作组->获取代码 获取相应URL
                     String url = "https://vip.bytedesk.com/visitor/chat?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
                     BDUiApi.startHtml5Chat(getContext(), url, "在线客服");
                 })

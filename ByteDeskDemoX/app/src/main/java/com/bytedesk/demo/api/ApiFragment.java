@@ -152,7 +152,7 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(feedbackItem, view -> BDUiApi.startFeedbackActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
                 .addItemView(helpCenterItem, view -> startFragment(new SupportFragment()))
                 .addItemView(wapChatItem, view -> {
-                    // 注意: 登录后台->所有设置->所有客服->技能组->获取代码 获取相应URL
+                    // 注意: 登录后台->客服->技能组->获取代码 获取相应URL
                     String url = "https://www.bytedesk.com/chat?sub=vip&uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
                     BDUiApi.startHtml5Chat(getContext(), url, "在线客服");
                 })

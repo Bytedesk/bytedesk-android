@@ -119,7 +119,7 @@ anonymousLogin();
 
 ```java
 // 打开意见反馈界面
-// 获取管理员adminUid, 登录后台->所有设置->客服账号->管理员账号(唯一ID(uid))列
+// 获取管理员adminUid, 登录后台->客服->账号->管理员账号(唯一ID(uid))列
 BDUiApi.startFeedbackActivity(context, adminUId);
 ```
 
