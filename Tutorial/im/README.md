@@ -3,9 +3,12 @@
 ## 准备工作
 
 - 到[萝卜丝官网](https://www.bytedesk.com/antv/user/login)注册管理员账号，并登录管理后台。
-- 到 所有设置->应用管理->App 添加应用，填写相关信息之后点击确定，在生成记录中可见appkey，后面会用到。
-- 到 所有设置->客服管理->客服账号 添加客服账号。注意：生成记录中有一列 ‘唯一ID(uid)’ 会在指定客服接口中使用
-- 到 所有设置->客服管理->技能组 添加技能组，并可将客服账号添加到相关技能组。注意：生成记录中有一列 ‘唯一ID（wId）’ 会在工作组会话中用到
+- 到 客服->渠道 添加网站/App
+- 到 客服->账号 添加客服账号。注意：生成记录中有一列 ‘唯一ID(uid)’ 会在指定客服接口中使用
+- 到 客服->技能组 添加技能组，并可将客服账号添加到相关技能组。注意：生成记录中有一列 ‘唯一ID（wId）’ 会在工作组会话中用到
+- 获取管理员uid, 登录后台->客服->账号->管理员账号(唯一ID(uid))列
+- 获取appkey，登录后台->客服->渠道->添加应用->appkey
+- 获取subDomain，也即企业号：登录后台->客服->账号->企业号
 
 ## 开始集成
 
@@ -49,14 +52,14 @@ android {
 ```java
 // 萝卜丝第三步
 // 加载萝卜丝核心库
-implementation 'com.bytedesk:core:2.0.1'
+implementation 'com.bytedesk:libcore:2.2.9'
 // 加载萝卜丝默认UI库
-implementation 'com.bytedesk:ui:2.0.1'
+implementation 'com.bytedesk:libui:2.2.9'
 
 // 腾讯QMUI界面库
 // http://qmuiteam.com/android/page/start.html
 // https://bintray.com/chanthuang/qmuirepo
-implementation 'com.qmuiteam:qmui:1.4.0'
+implementation 'com.qmuiteam:qmui:2.0.0-alpha04'
 ```
 
 > 第四步：AndroidManifest.xml添加权限
@@ -77,7 +80,6 @@ implementation 'com.qmuiteam:qmui:1.4.0'
 <!--对话页面-->
 <activity
     android:name="com.bytedesk.ui.activity.ChatKFActivity"
-    android:screenOrientation="portrait"
     android:theme="@style/AppTheme.ByteDesk"/>
 <!--长连接service-->
 <service android:name="com.bytedesk.paho.android.service.MqttService"/>
@@ -98,7 +100,7 @@ implementation 'com.qmuiteam:qmui:1.4.0'
 </style>
 <style name="ByteDeskTopBar" parent="QMUI.TopBar">
     <!--导航栏背景颜色-->
-    <item name="qmui_topbar_bg_color">@color/app_color_blue</item>
+    <item name="android:background">@color/app_color_blue</item>
     <!--导航栏字体颜色-->
     <item name="qmui_topbar_title_color">@color/qmui_config_color_white</item>
     <item name="qmui_topbar_subtitle_color">@color/qmui_config_color_white</item>
@@ -124,8 +126,7 @@ anonymousLogin();
 > 第八步：开始客服会话
 
 ```java
-// 打开客服对话界面
-BDUiApi.startWorkGroupChatActivity(context, wId, "工作组客服");
+
 ```
 
 ## 集成完毕
