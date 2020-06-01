@@ -2,7 +2,6 @@ package com.bytedesk.demo;
 
 import android.os.Bundle;
 
-import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.demo.api.ApiFragment;
 import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.demo.common.BaseFragmentActivity;
@@ -30,7 +29,7 @@ public class BDMainActivity extends BaseFragmentActivity {
         }
 
         // 建立长连接
-        BDMqttApi.connect(getApplicationContext());
+//        BDMqttApi.connect(getApplicationContext());
     }
 
 }

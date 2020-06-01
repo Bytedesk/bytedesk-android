@@ -1202,7 +1202,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         // 插入本地消息
         mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
         // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-
         //
         BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
 //        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
@@ -1236,7 +1235,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                     // TODO: 无客服在线时，禁止发送图片
 
                     // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
-
 
                     // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
                     final String localId = BDCoreUtils.uuid();
@@ -1447,45 +1445,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         mRepository.insertCommodityMessageLocal(mUUID, mWorkGroupWid, mUid, custom, localId, mThreadType);
         //
         BDMqttApi.sendCommodityMessageProtobuf(this, localId, custom, mThreadEntity);
-
-        // 发送商品
-//        BDCoreApi.sendCommodityMessage(this, mUUID, custom, localId, mThreadType, new BaseCallback() {
-//            @Override
-//            public void onSuccess(JSONObject object) {
-//                //
-//                try {
-//
-//                    int status_code = object.getInt("status_code");
-//                    if (status_code == 200) {
-//
-//                        String localId = object.getJSONObject("data").getString("localId");
-//                        Logger.i("callback localId: " + localId);
-//
-//                        // TODO: 更新消息发送状态为成功
-//                        mRepository.updateMessageStatusSuccess(localId);
-//
-//                        // 发送成功
-//                    } else {
-//
-//                        // 修改本地消息发送状态为error
-//                        mRepository.updateMessageStatusError(localId);
-//
-//                        // 发送消息失败
-//                        String message = object.getString("message");
-//                        Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(JSONObject object) {
-//                // 发送消息失败
-//                Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-//            }
-//        });
     }
 
     @Override

@@ -76,7 +76,7 @@ public class ChatFragment extends BaseFragment {
                 jsonCustom.setContent("商品详情");
                 jsonCustom.setPrice("9.99");
                 jsonCustom.setUrl("https://item.m.jd.com/product/12172344.html");
-                jsonCustom.setImageUrl("https://m.360buyimg.com/mobilecms/s750x750_jfs/t4483/332/2284794111/122812/4bf353/58ed7f42Nf16d6b20.jpg!q80.dpg");
+                jsonCustom.setImageUrl("https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp");
                 jsonCustom.setId(100121);
                 jsonCustom.setCategoryCode("100010003");
                 //
@@ -91,7 +91,9 @@ public class ChatFragment extends BaseFragment {
                 jsonCustom.setContent("商品详情");
                 jsonCustom.setPrice("9.99");
                 jsonCustom.setUrl("https://item.m.jd.com/product/12172344.html");
-                jsonCustom.setImageUrl("https://m.360buyimg.com/mobilecms/s750x750_jfs/t4483/332/2284794111/122812/4bf353/58ed7f42Nf16d6b20.jpg!q80.dpg");
+                jsonCustom.setImageUrl("https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp");
+                jsonCustom.setId(100121);
+                jsonCustom.setCategoryCode("100010003");
                 //
                 String custom = new Gson().toJson(jsonCustom);
                 BDUiApi.startAppointChatActivity(getContext(), BDDemoConst.agentUid, "电商指定客服", custom);
