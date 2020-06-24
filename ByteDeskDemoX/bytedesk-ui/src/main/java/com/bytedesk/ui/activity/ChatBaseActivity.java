@@ -3,6 +3,7 @@ package com.bytedesk.ui.activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bytedesk.core.api.BDCoreApi;
+import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.event.KickoffEvent;
 import com.bytedesk.core.event.LongClickEvent;
@@ -93,15 +94,14 @@ public class ChatBaseActivity extends AppCompatActivity {
 
                         break;
                     case 2:
-                        String withDrawMid = longClickEvent.getMessageEntity().getMid();
-                        String withDrawTid = longClickEvent.getMessageEntity().getThreadTid();
-                        Logger.d("withDraw: " + withDrawMid);
+                        String recallMid = longClickEvent.getMessageEntity().getMid();
+                        Logger.d("recallMid: " + recallMid);
 
                         // 撤回消息
-//                        BDMqttApi.sendRecallMessage(getBaseContext(), withDrawMid, withDrawTid);
+                        BDMqttApi.sendRecallMessageProtobuf(getBaseContext(), mThreadEntity, recallMid);
 
                         // 删除本地消息
-                        BDRepository.getInstance(getBaseContext()).deleteMessage(withDrawMid);
+                        BDRepository.getInstance(getBaseContext()).deleteMessage(recallMid);
 
                         break;
                 }

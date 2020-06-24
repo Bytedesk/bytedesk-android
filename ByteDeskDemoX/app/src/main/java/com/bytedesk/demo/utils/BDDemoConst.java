@@ -24,7 +24,7 @@ public class BDDemoConst {
     public final static String agentUid = "201808221551193";
 
     // 设置有前置选择的工作组: dxz测试组
-    public final static String preWid = "201808101819291";
+//    public final static String preWid = "201808101819291";
 
     // 机器人测试组
     public final static String robotWid = "201809061716221";

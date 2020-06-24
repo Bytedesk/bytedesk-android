@@ -10,6 +10,7 @@ import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.callback.LoginCallback;
 import com.bytedesk.core.event.ConnectionEvent;
 import com.bytedesk.core.event.KickoffEvent;
+import com.bytedesk.core.event.MessageEntityEvent;
 import com.bytedesk.core.event.MessageEvent;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDPreferenceManager;
@@ -528,6 +529,28 @@ public class ApiFragment extends BaseFragment {
                 logout();
 
             }).show();
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEntityEvent(MessageEntityEvent messageEntityEvent) {
+
+        String type = messageEntityEvent.getMessageEntity().getType();
+        if (type.equals(BDCoreConstant.MESSAGE_TYPE_TEXT)) {
+            Logger.i("messageEntityEvent 文本消息 %s", messageEntityEvent.getMessageEntity().getContent());
+
+        } else if (type.equals(BDCoreConstant.MESSAGE_TYPE_IMAGE)) {
+            Logger.i("messageEntityEvent 图片消息 %s", messageEntityEvent.getMessageEntity().getImageUrl());
+
+        } else if (type.equals(BDCoreConstant.MESSAGE_TYPE_VOICE)) {
+            Logger.i("messageEntityEvent 语音消息 %s", messageEntityEvent.getMessageEntity().getVoiceUrl());
+
+        } else if (type.equals(BDCoreConstant.MESSAGE_TYPE_FILE)) {
+            Logger.i("messageEntityEvent 文件消息 %s", messageEntityEvent.getMessageEntity().getFileUrl());
+
+        } else {
+            Logger.i("messageEntityEvent 其他类型消息 %s", type);
+        }
     }
 
 

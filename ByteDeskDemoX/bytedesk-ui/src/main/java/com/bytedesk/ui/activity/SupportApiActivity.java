@@ -1,11 +1,11 @@
 package com.bytedesk.ui.activity;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.callback.BaseCallback;
-import com.bytedesk.core.room.entity.ArticleEntity;
 import com.bytedesk.core.room.entity.CategoryEntity;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.util.BDUiConstant;
@@ -21,7 +21,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- *
  * 帮助中心
  *
  * @author bytedesk.com
@@ -36,7 +35,7 @@ public class SupportApiActivity extends AppCompatActivity {
     private String mUid;
 
     private QMUIGroupListView.Section mCategorySection;
-    private QMUIGroupListView.Section mArticleSection;
+//    private QMUIGroupListView.Section mArticleSection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +66,7 @@ public class SupportApiActivity extends AppCompatActivity {
         mPullRefreshLayout.setOnPullListener(pullListener);
 
         mCategorySection = QMUIGroupListView.newSection(this).setTitle("问题分类");
-        mArticleSection = QMUIGroupListView.newSection(this).setTitle("常见问题");
+//        mArticleSection = QMUIGroupListView.newSection(this).setTitle("常见问题");
     }
 
     private void getCategories() {
@@ -97,7 +96,7 @@ public class SupportApiActivity extends AppCompatActivity {
                 mCategorySection.addTo(mGroupListView);
 
                 // 加载常见问题
-                getArticles();
+//                getArticles();
 
             }
 
@@ -106,47 +105,45 @@ public class SupportApiActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
 
-    private void getArticles() {
-
-        BDCoreApi.getSupportArticles(this, mUid, new BaseCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-
-                try {
-
-                    JSONArray articleArray = object.getJSONObject("data").getJSONArray("content");
-                    for (int i = 0; i < articleArray.length(); i++) {
-                        ArticleEntity articleEntity = new ArticleEntity(articleArray.getJSONObject(i));
-                        Logger.i("article:" + articleEntity.getTitle());
-
-                        QMUICommonListItemView articleItem = mGroupListView.createItemView(articleEntity.getTitle());
-                        mArticleSection.addItemView(articleItem, v -> {
-                            //
-
-                        });
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                //
-                mArticleSection.addTo(mGroupListView);
-                //
-                mPullRefreshLayout.finishRefresh();
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-
-            }
-        });
-    }
+//    private void getArticles() {
+//
+//        BDCoreApi.getSupportArticles(this, mUid, new BaseCallback() {
+//
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//
+//                try {
+//
+//                    JSONArray articleArray = object.getJSONObject("data").getJSONArray("content");
+//                    for (int i = 0; i < articleArray.length(); i++) {
+//                        ArticleEntity articleEntity = new ArticleEntity(articleArray.getJSONObject(i));
+//                        Logger.i("article:" + articleEntity.getTitle());
+//
+//                        QMUICommonListItemView articleItem = mGroupListView.createItemView(articleEntity.getTitle());
+//                        mArticleSection.addItemView(articleItem, v -> {
+//                            //
+//                        });
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                //
+//                mArticleSection.addTo(mGroupListView);
+//                //
+//                mPullRefreshLayout.finishRefresh();
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//
+//            }
+//        });
+//    }
 
 
     /**
