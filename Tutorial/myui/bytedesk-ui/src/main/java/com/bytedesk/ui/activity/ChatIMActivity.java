@@ -38,7 +38,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -675,7 +675,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
      */
     private void initModel () {
         //
-        mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        mMessageViewModel = new ViewModelProvider(this).get(MessageViewModel.class);
         //
         if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
             Logger.i("客服端：一对一会话");
@@ -1389,11 +1389,9 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         // 插入本地消息
         mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
 
-        // 1. 异步发送文字消息
-//        BDMqttApi.sendTextMessage(this, mUUID, content, localId, mThreadType);
-
-        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
-                mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
+        BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
+//        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
+//                mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
     }
 
@@ -1428,12 +1426,9 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     // 插入本地消息
                     mRepository.insertImageMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType);
 
-                    // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-                    // 1. 异步发送图片消息
-//                     BDMqttApi.sendImageMessage(ChatIMActivity.this, mUUID, imageUrl, localId, mThreadType);
-
-                    BDMqttApi.sendImageMessageProtobuf(ChatIMActivity.this, localId, imageUrl,
-                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
+                    BDMqttApi.sendImageMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+//                    BDMqttApi.sendImageMessageProtobuf(ChatIMActivity.this, localId, imageUrl,
+//                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1473,8 +1468,9 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     // 插入本地消息
                     mRepository.insertVoiceMessageLocal(mUUID, mWorkGroupWid, mUUID, voiceUrl, localId, mThreadType, voiceLength);
 
-                    BDMqttApi.sendVoiceMessageProtobuf(ChatIMActivity.this, localId, voiceUrl,
-                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
+                    BDMqttApi.sendVoiceMessageProtobuf(ChatIMActivity.this, localId, voiceUrl, mThreadEntity);
+//                    BDMqttApi.sendVoiceMessageProtobuf(ChatIMActivity.this, localId, voiceUrl,
+//                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1511,8 +1507,9 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     // 插入本地消息
                     mRepository.insertFileMessageLocal(mUUID, mWorkGroupWid, mUUID, fileUrl, localId, mThreadType, "doc", "fileName", "fileSize");
 
-                    BDMqttApi.sendFileMessageProtobuf(ChatIMActivity.this, localId, fileUrl,
-                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
+                    BDMqttApi.sendFileMessageProtobuf(ChatIMActivity.this, localId, fileUrl, mThreadEntity);
+//                    BDMqttApi.sendFileMessageProtobuf(ChatIMActivity.this, localId, fileUrl,
+//                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
                 } catch (JSONException e) {
                     e.printStackTrace();

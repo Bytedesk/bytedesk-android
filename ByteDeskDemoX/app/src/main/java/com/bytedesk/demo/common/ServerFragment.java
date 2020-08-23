@@ -47,25 +47,25 @@ public class ServerFragment extends BaseFragment {
     private void initGroupListView() {
 
         QMUICommonListItemView authAddressItem = mGroupListView.createItemView("地址");
-        authAddressItem.setDetailText(BDConfig.getInstance().getRestApiHost());
+        authAddressItem.setDetailText(BDConfig.getInstance(getContext()).getRestApiHost());
         QMUIGroupListView.newSection(getContext())
                 .setTitle("REST服务器,注意：以'/'结尾")
                 .addItemView(authAddressItem, view -> {
 
                     // 修改为自己的服务器地址，注意：地址以 http或https开头, '/'结尾
-//                    BDConfig.getInstance().setRestApiHost("https://api.bytedesk.com/");
+//                    BDConfig.getInstance(getContext()).setRestApiHost("https://api.bytedesk.com/");
 
                 }).addTo(mGroupListView);
 
         //
         QMUICommonListItemView stunAddressItem = mGroupListView.createItemView("STUN");
-        stunAddressItem.setDetailText(BDConfig.getInstance().getWebRTCStunServer());
+        stunAddressItem.setDetailText(BDConfig.getInstance(getContext()).getWebRTCStunServer());
         QMUICommonListItemView turnAddressItem = mGroupListView.createItemView("TURN");
-        turnAddressItem.setDetailText(BDConfig.getInstance().getWebRTCTurnServer());
+        turnAddressItem.setDetailText(BDConfig.getInstance(getContext()).getWebRTCTurnServer());
         QMUICommonListItemView turnUsernameItem = mGroupListView.createItemView("username");
-        turnUsernameItem.setDetailText(BDConfig.getInstance().getWebrtcTurnUsername());
+        turnUsernameItem.setDetailText(BDConfig.getInstance(getContext()).getWebrtcTurnUsername());
         QMUICommonListItemView turnPasswordItem = mGroupListView.createItemView("password");
-        turnPasswordItem.setDetailText(BDConfig.getInstance().getWebrtcTurnPassword());
+        turnPasswordItem.setDetailText(BDConfig.getInstance(getContext()).getWebrtcTurnPassword());
         QMUIGroupListView.newSection(getContext())
                 .setTitle("STUN/TURN for WebRTC")
                 .addItemView(stunAddressItem, view -> {
@@ -83,35 +83,35 @@ public class ServerFragment extends BaseFragment {
 
         //
         QMUICommonListItemView mqAddressItem = mGroupListView.createItemView("地址");
-        mqAddressItem.setDetailText(BDConfig.getInstance().getMqttHost());
+        mqAddressItem.setDetailText(BDConfig.getInstance(getContext()).getMqttHost());
         QMUICommonListItemView mqPortItem = mGroupListView.createItemView("端口号");
-        mqPortItem.setDetailText(String.valueOf(BDConfig.getInstance().getMqttPort()));
+        mqPortItem.setDetailText(String.valueOf(BDConfig.getInstance(getContext()).getMqttPort()));
 //        QMUICommonListItemView mqAuthUsername = mGroupListView.createItemView("用户名");
-//        mqAuthUsername.setDetailText(BDConfig.getInstance().getMqttAuthUsername());
+//        mqAuthUsername.setDetailText(BDConfig.getInstance(getContext()).getMqttAuthUsername());
 //        QMUICommonListItemView mqAuthPassword = mGroupListView.createItemView("密码");
-//        mqAuthPassword.setDetailText(BDConfig.getInstance().getMqttAuthPassword());
+//        mqAuthPassword.setDetailText(BDConfig.getInstance(getContext()).getMqttAuthPassword());
         QMUIGroupListView.newSection(getContext())
                 .setTitle("消息服务器, 注意：地址没有http前缀")
                 .addItemView(mqAddressItem, view -> {
 
 //              修改为自己消息服务器地址, 注意：地址没有http前缀
-//              BDConfig.getInstance().setMqttHost("mq.bytedesk.com");
+//              BDConfig.getInstance(getContext()).setMqttHost("mq.bytedesk.com");
 
                 }).addItemView(mqPortItem, view -> {
 
 //              修改为自己消息服务器端口号
-//             BDConfig.getInstance().setMqttPort(1883);
+//             BDConfig.getInstance(getContext()).setMqttPort(1883);
 
         })
 //                .addItemView(mqAuthUsername, view -> {
 //
 ////              修改为自己消息服务器用户名
-////              BDConfig.getInstance().setMqttAuthUsername("mqtt_android");
+////              BDConfig.getInstance(getContext()).setMqttAuthUsername("mqtt_android");
 //
 //        }).addItemView(mqAuthPassword, view -> {
 //
 ////              修改为自己消息服务器密码
-////              BDConfig.getInstance().setMqttAuthPassword("mqtt_android");
+////              BDConfig.getInstance(getContext()).setMqttAuthPassword("mqtt_android");
 //
 //        })
                 .addTo(mGroupListView);
@@ -121,14 +121,14 @@ public class ServerFragment extends BaseFragment {
         QMUIGroupListView.newSection(getContext()).addItemView(restoreDefault, view -> {
 
             // 恢复默认值
-            BDConfig.getInstance().restoreDefault();
+            BDConfig.getInstance(getContext()).restoreDefault();
 
             //
-            authAddressItem.setDetailText(BDConfig.getInstance().getRestApiHost());
-            mqAddressItem.setDetailText(BDConfig.getInstance().getMqttHost());
-            mqPortItem.setDetailText(String.valueOf(BDConfig.getInstance().getMqttPort()));
-//            mqAuthUsername.setDetailText(BDConfig.getInstance().getMqttAuthUsername());
-//            mqAuthPassword.setDetailText(BDConfig.getInstance().getMqttAuthPassword());
+            authAddressItem.setDetailText(BDConfig.getInstance(getContext()).getRestApiHost());
+            mqAddressItem.setDetailText(BDConfig.getInstance(getContext()).getMqttHost());
+            mqPortItem.setDetailText(String.valueOf(BDConfig.getInstance(getContext()).getMqttPort()));
+//            mqAuthUsername.setDetailText(BDConfig.getInstance(getContext()).getMqttAuthUsername());
+//            mqAuthPassword.setDetailText(BDConfig.getInstance(getContext()).getMqttAuthPassword());
 
         }).addTo(mGroupListView);
 

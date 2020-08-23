@@ -16,7 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -92,9 +92,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     private String mUid;
     // 工作组wid
     private String mWorkGroupWid;
-    //
     private final Handler mHandler = new Handler();
-    //
     private String mCustom;
 
     @Override
@@ -295,7 +293,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
      */
     private void initModel () {
         //
-        mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        mMessageViewModel = new ViewModelProvider(this).get(MessageViewModel.class);
 
         // FIXME: 当工作组设置有值班工作组的情况下，则界面无法显示值班工作组新消息
 
@@ -353,6 +351,34 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                             + " data:" + object.get("data"));
                     Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     // TODO: token过期，要求重新登录
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * 请求人工客服
+     */
+    private void requestAgent () {
+        //
+        // TODO: mUUID 替换为 agentUid, agentUid不能为空
+        BDCoreApi.requestAgent(this, mWorkGroupWid, mRequestType, mUUID, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                dealWithThread(object);
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                try {
+                    Logger.d("request thread message: " + object.get("message")
+                            + " status_code:" + object.get("status_code")
+                            + " data:" + object.get("data"));
+                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -429,12 +455,16 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                         //持久化到数据库
                         mRepository.insertMessageJson(queryMessageObject);
-                        mRepository.insertRobotRightAnswerMessageJson(replyMessageObject);
+
+                        if (content.indexOf("人工") != -1) {
+                            requestAgent();
+                        } else {
+                            mRepository.insertRobotRightAnswerMessageJson(replyMessageObject);
+                        }
 
                     } else if (status_code == 201) {
                         // 未匹配到答案
                         mRepository.deleteMessageLocal(localId);
-
                         //
                         JSONObject queryMessageObject = object.getJSONObject("data").getJSONObject("query");
                         JSONObject replyMessageObject = object.getJSONObject("data").getJSONObject("reply");
@@ -443,7 +473,14 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                         //持久化到数据库
                         mRepository.insertMessageJson(queryMessageObject);
-                        mRepository.insertRobotNoAnswerMessageJson(replyMessageObject);
+
+                        if (content.indexOf("人工") != -1) {
+
+                            requestAgent();
+
+                        } else {
+                            mRepository.insertRobotNoAnswerMessageJson(replyMessageObject);
+                        }
 
                     } else {
                         // 修改本地消息发送状态为error
@@ -538,7 +575,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 }
             });
 
-        }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_WORKGROUP)){
+        }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_WORKGROUP)) {
             Logger.i("客服端：客服会话 uid:" + mUid);
 
             // 客服端接口
@@ -756,7 +793,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
             } else {
                 // 请求会话失败
-
                 String message = object.getString("message");
                 Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_SHORT).show();
             }
@@ -1346,27 +1382,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         if (queryAnswerEvent.getAid().equals("00001")) {
 
             // 请求人工客服
-            // TODO: mUUID 替换为 agentUid, agentUid不能为空
-            BDCoreApi.requestAgent(this, mWorkGroupWid, mRequestType, mUUID, new BaseCallback() {
-
-                @Override
-                public void onSuccess(JSONObject object) {
-
-                    dealWithThread(object);
-                }
-
-                @Override
-                public void onError(JSONObject object) {
-                    try {
-                        Logger.d("request thread message: " + object.get("message")
-                                + " status_code:" + object.get("status_code")
-                                + " data:" + object.get("data"));
-                        Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            requestAgent();
 
         } else {
 

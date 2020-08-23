@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "com.bytedesk.helpcenter"
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -33,14 +33,15 @@ dependencies {
 
     // 萝卜丝第三步
     // 加载萝卜丝核心库
-    implementation 'com.bytedesk:libcore:2.3.0'
+    implementation 'com.bytedesk:libcore:2.3.1'
     // 加载萝卜丝默认UI库
-    implementation 'com.bytedesk:libui:2.3.0'
+    implementation 'com.bytedesk:libui:2.3.1'
 
     // 腾讯QMUI界面库
     // http://qmuiteam.com/android/page/start.html
     // https://bintray.com/chanthuang/qmuirepo
-    implementation 'com.qmuiteam:qmui:2.0.0-alpha04'
+    implementation 'com.qmuiteam:qmui:2.0.0-alpha10'
+    implementation "com.qmuiteam:arch:2.0.0-alpha10"
 
 
     implementation 'androidx.appcompat:appcompat:.1.2.0-alpha02'

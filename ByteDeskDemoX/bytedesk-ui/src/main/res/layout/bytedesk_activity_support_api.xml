@@ -27,19 +27,19 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true">
 
-                <EditText
-                    android:id="@+id/bytedesk_search_edittext"
-                    android:layout_width="fill_parent"
-                    android:layout_height="28dp"
-                    android:drawableLeft="@drawable/search_icon"
-                    android:background="@drawable/search_ba"
-                    android:layout_margin="15dp"
-                    android:paddingLeft="20dp"
-                    android:hint="搜索"
-                    android:drawablePadding="10dp"
-                    android:textColor="@color/qmui_config_color_black"
-                    android:gravity="center|left"
-                    android:maxLines="1" />
+<!--                <EditText-->
+<!--                    android:id="@+id/bytedesk_search_edittext"-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="28dp"-->
+<!--                    android:drawableLeft="@drawable/search_icon"-->
+<!--                    android:background="@drawable/search_ba"-->
+<!--                    android:layout_margin="15dp"-->
+<!--                    android:paddingLeft="20dp"-->
+<!--                    android:hint="搜索"-->
+<!--                    android:drawablePadding="10dp"-->
+<!--                    android:textColor="@color/qmui_config_color_black"-->
+<!--                    android:gravity="center|left"-->
+<!--                    android:maxLines="1" />-->
 
                 <com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView
                     android:id="@+id/bytedesk_support_api_groupListView"

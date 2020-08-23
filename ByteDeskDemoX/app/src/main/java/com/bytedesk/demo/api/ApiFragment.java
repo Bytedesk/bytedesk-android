@@ -56,6 +56,7 @@ import butterknife.ButterKnife;
  */
 public class ApiFragment extends BaseFragment {
 
+
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
     @BindView(R.id.groupListView) QMUIGroupListView mGroupListView;
 
@@ -87,36 +88,18 @@ public class ApiFragment extends BaseFragment {
     }
 
     private void initGroupListView() {
-
         // 公共接口
-        QMUICommonListItemView serverItem = mGroupListView.createItemView("0. 自定义服务器");
-        serverItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView registerItem = mGroupListView.createItemView("1. 点我注册");
         registerItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         loginItem = mGroupListView.createItemView("2. 点我登录");
         loginItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView logoutItem = mGroupListView.createItemView("3. 退出登录");
         logoutItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView scanItem = mGroupListView.createItemView("4. 二维码");
-        scanItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView multiAccountItem = mGroupListView.createItemView("5. 多账号管理(TODO)");
-        multiAccountItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("公共接口")
-                .addItemView(serverItem, view -> {
-                    ServerFragment serverFragment = new ServerFragment();
-                    startFragment(serverFragment);
-                })
                 .addItemView(registerItem, view -> showRegisterSheet())
                 .addItemView(loginItem, view -> showLoginSheet())
                 .addItemView(logoutItem, view -> logout())
-                .addItemView(scanItem, view -> {
-                    ScanQRFragment scanQRFragment = new ScanQRFragment();
-                    startFragment(scanQRFragment);
-                })
-                .addItemView(multiAccountItem, view -> {
-                    // TODO: 多账号管理
-                })
                 .addTo(mGroupListView);
 
         // 客服接口
@@ -132,14 +115,12 @@ public class ApiFragment extends BaseFragment {
         ticketItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView feedbackItem = mGroupListView.createItemView("6.意见反馈");
         feedbackItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView helpCenterItem = mGroupListView.createItemView("7.帮助中心");
+        QMUICommonListItemView helpCenterItem = mGroupListView.createItemView("7.常见问题");
         helpCenterItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView wapChatItem = mGroupListView.createItemView("8.网页会话");
         wapChatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView rateItem = mGroupListView.createItemView("9.引导应用商店好评(TODO)");
-        rateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView upgrateItem = mGroupListView.createItemView("10.引导新版本升级(TODO)");
-        upgrateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+//        QMUICommonListItemView upgrateItem = mGroupListView.createItemView("9.引导新版本升级");
+//        upgrateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
                 .addItemView(chatItem, view -> startFragment(new ChatFragment()))
@@ -151,75 +132,16 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(sessionHistoryItem, view -> startFragment(new ThreadFragment()))
                 .addItemView(ticketItem, view -> BDUiApi.startTicketActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
                 .addItemView(feedbackItem, view -> BDUiApi.startFeedbackActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
-                .addItemView(helpCenterItem, view -> startFragment(new SupportFragment()))
+                .addItemView(helpCenterItem, view -> BDUiApi.startSupportApiActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
                 .addItemView(wapChatItem, view -> {
                     // 注意: 登录后台->客服->技能组->获取代码 获取相应URL
                     String url = "https://www.bytedesk.com/chat?sub=vip&uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&wid=201807171659201&type=workGroup&aid=&ph=ph";
                     BDUiApi.startHtml5Chat(getContext(), url, "在线客服");
                 })
-                .addItemView(rateItem,  view -> {
-                    // TODO: 引导应用商店好评
-                    startFragment(new AppRateFragment());
-                })
-                .addItemView(upgrateItem,  view -> {
-                    // TODO: 引导新版本升级
-                    startFragment(new AppUpgradeFragment());
-                })
-                .addTo(mGroupListView);
-
-        // IM接口
-        QMUICommonListItemView friendItem = mGroupListView.createItemView("1.好友关系");
-        friendItem.setDetailText("社交：关注/粉丝/好友/黑名单");
-        friendItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView contactItem = mGroupListView.createItemView("2.联系人");
-        contactItem.setDetailText("客服同事");
-        contactItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView groupItem = mGroupListView.createItemView("3.群组");
-        groupItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView threadItem = mGroupListView.createItemView("4.会话");
-        threadItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView queueItem = mGroupListView.createItemView("5.排队");
-        queueItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView noticeItem = mGroupListView.createItemView("6.系统消息");
-        noticeItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView profileItem = mGroupListView.createItemView("7.个人资料");
-        profileItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        QMUICommonListItemView settingItem = mGroupListView.createItemView("8.设置");
-        settingItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-
-        QMUIGroupListView.newSection(getContext())
-                .setTitle("IM接口")
-                .addItemView(friendItem, view -> {
-                    TabFragment tabFragment = new TabFragment();
-                    startFragment(tabFragment);
-                })
-                .addItemView(contactItem, view -> {
-                    ContactFragment contactFragment = new ContactFragment();
-                    startFragment(contactFragment);
-                })
-                .addItemView(groupItem, view -> {
-                    GroupFragment groupFragment = new GroupFragment();
-                    startFragment(groupFragment);
-                })
-                .addItemView(threadItem, view -> {
-                    com.bytedesk.demo.im.fragment.thread.ThreadFragment threadFragment = new com.bytedesk.demo.im.fragment.thread.ThreadFragment();
-                    startFragment(threadFragment);
-                })
-                .addItemView(queueItem, view -> {
-                    QueueFragment queueFragment = new QueueFragment();
-                    startFragment(queueFragment);
-                }).addItemView(noticeItem, view -> {
-                    NoticeFragment noticeFragment = new NoticeFragment();
-                    startFragment(noticeFragment);
-                })
-                .addItemView(profileItem, view -> {
-                    ProfileFragment profileFragment = new ProfileFragment();
-                    startFragment(profileFragment);
-                })
-                .addItemView(settingItem, view -> {
-                    SettingFragment settingFragment = new SettingFragment();
-                    startFragment(settingFragment);
-                })
+//                .addItemView(upgrateItem,  view -> {
+//                    // TODO: 引导新版本升级
+//                    startFragment(new AppUpgradeFragment());
+//                })
                 .addTo(mGroupListView);
     }
 
@@ -532,6 +454,11 @@ public class ApiFragment extends BaseFragment {
     }
 
 
+    /**
+     * 监听接收消息
+     *
+     * @param messageEntityEvent
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEntityEvent(MessageEntityEvent messageEntityEvent) {
 

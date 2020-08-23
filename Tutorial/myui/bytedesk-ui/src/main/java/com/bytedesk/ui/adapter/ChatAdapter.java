@@ -29,11 +29,13 @@ import com.bytedesk.core.event.QueryAnswerEvent;
 import com.bytedesk.core.event.SendCommodityEvent;
 import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.room.entity.MessageEntity;
+import com.bytedesk.core.room.entity.ThreadEntity;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDFileUtils;
 import com.bytedesk.core.util.JsonCustom;
 import com.bytedesk.ui.R;
 import com.bytedesk.ui.activity.BigImageViewActivity;
+import com.bytedesk.ui.activity.ChatBaseActivity;
 import com.bytedesk.ui.api.BDUiApi;
 import com.bytedesk.ui.listener.ChatItemClickListener;
 import com.bytedesk.ui.util.BDUiUtils;
@@ -308,6 +310,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             }
 
             // 文字消息
+            // TODO: 支持html富文本，优化机器人问答时常见问题列表显示
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
                     || messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
                     || messageViewType == MessageEntity.TYPE_EVENT_ID
@@ -396,15 +399,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 voiceTextView.setWidth(width);
                 voiceLengthTextView.setText(msgEntity.getLength()+"\"");
                 // TODO: 点击播放语音
-                voiceTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                voiceTextView.setOnClickListener(view -> {
 //                        Toast.makeText(mContext,"点击播放语音：" + msgEntity.getVoiceUrl() + " length:" + msgEntity.getLength(), Toast.LENGTH_LONG).show();
-                        // TODO: 本地播放语音
-                        boolean isSend = (messageViewType == MessageEntity.TYPE_VOICE_SELF_ID);
-                        onVoiceMessageClicked((TextView)view, isSend, msgEntity.getVoiceUrl());
-                        // TODO: 调用接口通知服务器语音已经播放
-                    }
+                    // TODO: 本地播放语音
+                    boolean isSend = (messageViewType == MessageEntity.TYPE_VOICE_SELF_ID);
+                    onVoiceMessageClicked((TextView)view, isSend, msgEntity.getVoiceUrl());
+                    // TODO: 调用接口通知服务器语音已经播放
                 });
             }
             // TODO: 问卷消息
@@ -422,23 +422,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 commodityPriceTextView.setText("¥" + jsonCustom.getPrice());
                 //
                 Glide.with(mContext).load(jsonCustom.getImageUrl()).into(commodityImageView);
-                commodityImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.d("点击商品图片: "+ jsonCustom.getUrl());
-                        Intent intent = new Intent(mContext, BigImageViewActivity.class);
-                        intent.putExtra("image_url", jsonCustom.getImageUrl());
-                        mContext.startActivity(intent);
-                    }
+                commodityImageView.setOnClickListener(view -> {
+                    Logger.d("点击商品图片: "+ jsonCustom.getUrl());
+                    Intent intent = new Intent(mContext, BigImageViewActivity.class);
+                    intent.putExtra("image_url", jsonCustom.getImageUrl());
+                    mContext.startActivity(intent);
                 });
                 //
-                commoditySendButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Logger.i("发送商品信息");
-                        // TODO
-                        EventBus.getDefault().post(new SendCommodityEvent());
-                    }
+                commoditySendButton.setOnClickListener(view -> {
+                    Logger.i("发送商品信息");
+                    // TODO
+                    EventBus.getDefault().post(new SendCommodityEvent());
                 });
             }
             // 红包消息
@@ -558,7 +552,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                         msgEntity.setStatus(BDCoreConstant.MESSAGE_STATUS_READ);
                         BDRepository.getInstance(mContext).insertMessageEntity(msgEntity);
                         // 发送已读回执，通知服务器更新状态
-                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid(), msgEntity.getThreadTid());
+//                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid(), msgEntity.getThreadTid());
+                        ThreadEntity threadEntity = ((ChatBaseActivity)mContext).mThreadEntity;
+                        BDMqttApi.sendReceiptReadMessageProtobuf(mContext, threadEntity, msgEntity.getMid());
                     }
                 }
             }
@@ -594,11 +590,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         private void loadAvatar(MessageEntity messageEntity) {
             //
             Glide.with(mContext).load(messageEntity.getAvatar()).into(avatarImageView);
-            avatarImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Logger.d("avatar clicked:" + messageEntity.getAvatar());
-                }
+            avatarImageView.setOnClickListener(view -> {
+                //
+                Logger.d("avatar clicked:" + messageEntity.getAvatar());
             });
         }
 

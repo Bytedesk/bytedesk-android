@@ -51,9 +51,10 @@ public class SupportArticleActivity extends AppCompatActivity {
 
     private void initGroupListView() {
 
-
     }
 
+//  TODO: 增加按钮：有帮助、无帮助
+//  TODO: 增加按钮：联系客服
     private void getArticles() {
 
         BDCoreApi.getSupportArticles(this, mUid, new BaseCallback() {

@@ -1,6 +1,8 @@
 <resources>
 
 
+    <string name="bytedesk_app_upgrade_tip_title">Release Notes (%1$s)</string>
+
     <!-- ChatFragment -->
     <string name="kfds_demo_chat_chat_description">一：会话接口参数说明</string>
     <string name="kfds_demo_chat_normal_start_txt">1.人工会话说明</string>

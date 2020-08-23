@@ -52,7 +52,7 @@ public class BDUiApi {
      */
     public static void startWorkGroupChatActivity(Context context, String wId, String title) {
         //
-        BDConfig.getInstance().switchToKF();
+        BDConfig.getInstance(context).switchToKF();
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
@@ -66,7 +66,7 @@ public class BDUiApi {
 
     public static void startWorkGroupChatActivity(Context context, String wId, String title, String custom) {
         //
-        BDConfig.getInstance().switchToKF();
+        BDConfig.getInstance(context).switchToKF();
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
@@ -90,7 +90,7 @@ public class BDUiApi {
      */
     public static void startAppointChatActivity(Context context, String aId, String title) {
         //
-        BDConfig.getInstance().switchToKF();
+        BDConfig.getInstance(context).switchToKF();
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
@@ -105,7 +105,7 @@ public class BDUiApi {
 
     public static void startAppointChatActivity(Context context, String aId, String title, String custom) {
         //
-        BDConfig.getInstance().switchToKF();
+        BDConfig.getInstance(context).switchToKF();
         //
         Intent intent = new Intent(context, ChatKFActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_VISITOR, true);
@@ -143,7 +143,7 @@ public class BDUiApi {
 //     */
 //    public static void startThreadChatActivity(Context context, String tId, String uId, String title) {
 //        //
-//        BDConfig.getInstance().switchToIM();
+//        BDConfig.getInstance(context).switchToIM();
 //        //
 //        Intent intent = new Intent(context, ChatKFActivity.class);
 //        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
@@ -156,7 +156,7 @@ public class BDUiApi {
 //
 //    public static void startThreadChatActivity(Context context, String tId, String uId, String title, String custom) {
 //        //
-//        BDConfig.getInstance().switchToIM();
+//        BDConfig.getInstance(context).switchToIM();
 //        //
 //        Intent intent = new Intent(context, ChatKFActivity.class);
 //        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
@@ -170,7 +170,7 @@ public class BDUiApi {
 
     public static void startThreadChatActivity(Context context, String tid, String topic, String type, String nickname, String avatar) {
         //
-        BDConfig.getInstance().switchToIM();
+        BDConfig.getInstance(context).switchToIM();
         //
         Intent intent = new Intent(context, ChatIMActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_IS_THREAD, true);
@@ -193,7 +193,7 @@ public class BDUiApi {
      */
     public static void startContactChatActivity(Context context, String uId, String title) {
         //
-        BDConfig.getInstance().switchToIM();
+        BDConfig.getInstance(context).switchToIM();
         //
         Intent intent = new Intent(context, ChatIMActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_IS_THREAD, false);
@@ -206,7 +206,7 @@ public class BDUiApi {
 
 //    public static void startContactChatActivity(Context context, String uId, String title, String custom) {
 //        //
-//        BDConfig.getInstance().switchToIM();
+//        BDConfig.getInstance(context).switchToIM();
 //        //
 //        Intent intent = new Intent(context, ChatIMActivity.class);
 //        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
@@ -228,7 +228,7 @@ public class BDUiApi {
      */
     public static void startGroupChatActivity(Context context, String gId, String title) {
         //
-        BDConfig.getInstance().switchToIM();
+        BDConfig.getInstance(context).switchToIM();
         //
         Intent intent = new Intent(context, ChatIMActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_IS_THREAD, false);
@@ -241,7 +241,7 @@ public class BDUiApi {
 
 //    public static void startGroupChatActivity(Context context, String gId, String title, String custom) {
 //        //
-//        BDConfig.getInstance().switchToIM();
+//        BDConfig.getInstance(context).switchToIM();
 //        //
 //        Intent intent = new Intent(context, ChatIMActivity.class);
 //        intent.putExtra(BDUiConstant.EXTRA_VISITOR, false);
@@ -253,12 +253,9 @@ public class BDUiApi {
 //    }
 
 
-
-
-
     public static void startFeedbackActivity(Context context, String uid) {
         //
-        BDConfig.getInstance().switchToKF();
+        BDConfig.getInstance(context).switchToKF();
         //
         Intent intent = new Intent(context, FeedbackActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_UID, uid);
@@ -268,7 +265,7 @@ public class BDUiApi {
 
     public static void startTicketActivity(Context context, String uid) {
         //
-        BDConfig.getInstance().switchToKF();
+        BDConfig.getInstance(context).switchToKF();
         //
         Intent intent = new Intent(context, TicketActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_UID, uid);
@@ -278,7 +275,7 @@ public class BDUiApi {
 
     public static void startSupportApiActivity(Context context, String uid) {
         //
-        BDConfig.getInstance().switchToKF();
+        BDConfig.getInstance(context).switchToKF();
         //
         Intent intent = new Intent(context, SupportApiActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_UID, uid);

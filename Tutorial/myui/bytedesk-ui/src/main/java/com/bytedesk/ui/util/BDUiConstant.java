@@ -7,7 +7,6 @@ package com.bytedesk.ui.util;
 
 public class BDUiConstant {
 
-
     public static final String EXTRA_UUID = "extra_uuid";
 
     public static final String EXTRA_UID = "uId";
@@ -29,6 +28,8 @@ public class BDUiConstant {
     public static final String EXTRA_REQUEST_TYPE = "request_type";
     public static final String EXTRA_CUSTOM = "custom";
 
+    public static final String EXTRA_SUPPORT_CATEGORY = "support_category";
+    public static final String EXTRA_SUPPORT_ARTICLE = "support_article";
 
     //
     public static final int PERMISSION_REQUEST_CAMERA = 0;

@@ -9,7 +9,7 @@ import com.bytedesk.demo.common.BaseFragmentActivity;
 public class BDMainActivity extends BaseFragmentActivity {
 
     @Override
-    protected int getContextViewId() {
+    public int getContextViewId() {
         return R.id.kefudemo;
     }
 

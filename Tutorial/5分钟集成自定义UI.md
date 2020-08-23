@@ -6,8 +6,8 @@
 
 - 到[萝卜丝官网](https://www.bytedesk.com/antv/user/login)注册管理员账号，并登录管理后台。
 - 到 客服->渠道 添加网站/App
-- 到 客服->账号 添加客服账号。注意：生成记录中有一列 ‘唯一ID(uid)’ 会在指定客服接口中使用
-- 到 客服->技能组 添加技能组，并可将客服账号添加到相关技能组。注意：生成记录中有一列 ‘唯一ID（wId）’ 会在工作组会话中用到
+- 到 客服->账号 有一列 ‘唯一ID(uid)’ 会在指定客服接口中使用
+- 到 客服->技能组 有一列 ‘唯一ID（wId）’ 会在技能组会话中用到
 - 获取管理员uid, 登录后台->客服->账号->管理员账号(唯一ID(uid))列
 - 获取appkey，登录后台->客服->渠道->添加应用->appkey
 - 获取subDomain，也即企业号：登录后台->客服->账号->企业号
@@ -87,14 +87,15 @@ android {
 ```java
 // 萝卜丝第三步
 // 加载萝卜丝核心库
-implementation 'com.bytedesk:libcore:2.3.0'
+implementation 'com.bytedesk:libcore:2.3.1'
 // 加载萝卜丝默认UI库
-implementation 'com.bytedesk:libui:2.3.0'
+implementation 'com.bytedesk:libui:2.3.1'
 
 // 腾讯QMUI界面库
 // http://qmuiteam.com/android/page/start.html
 // https://bintray.com/chanthuang/qmuirepo
-implementation 'com.qmuiteam:qmui:2.0.0-alpha04'
+implementation 'com.qmuiteam:qmui:2.0.0-alpha10'
+implementation "com.qmuiteam:arch:2.0.0-alpha10"
 ```
 
 > 第六步：AndroidManifest.xml添加权限

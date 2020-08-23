@@ -108,10 +108,10 @@ public class TabFragment extends BaseFragment {
         mQMUIViewPager.setAdapter(tabAdapter);
         //
         mTabSegment.setupWithViewPager(mQMUIViewPager, false);
-        mTabSegment.setOnTabClickListener(index -> {
-            Logger.i("tab " + index + " clicked");
-            EventBus.getDefault().post(new TabEvent(index));
-        });
+//        mTabSegment.setOnTabClickListener(index -> {
+//            Logger.i("tab " + index + " clicked");
+//            EventBus.getDefault().post(new TabEvent(index));
+//        });
     }
 
 

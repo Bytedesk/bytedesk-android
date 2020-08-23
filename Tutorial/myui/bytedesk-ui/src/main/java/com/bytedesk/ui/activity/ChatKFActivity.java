@@ -16,7 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -92,16 +92,13 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     private String mUid;
     // 工作组wid
     private String mWorkGroupWid;
-    //
     private final Handler mHandler = new Handler();
-    //
     private String mCustom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bytedesk_activity_chat_kf);
-
         //
         if (null != getIntent()) {
             //
@@ -116,7 +113,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             //
             if (mIsVisitor) {
                 Logger.i("访客会话");
-
                 mWorkGroupWid = getIntent().getStringExtra(BDUiConstant.EXTRA_WID);
                 mRequestType = getIntent().getStringExtra(BDUiConstant.EXTRA_REQUEST_TYPE);
                 // 判断是否指定客服会话
@@ -297,7 +293,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
      */
     private void initModel () {
         //
-        mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        mMessageViewModel = new ViewModelProvider(this).get(MessageViewModel.class);
 
         // FIXME: 当工作组设置有值班工作组的情况下，则界面无法显示值班工作组新消息
 
@@ -354,6 +350,35 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                             + " status_code:" + object.get("status_code")
                             + " data:" + object.get("data"));
                     Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    // TODO: token过期，要求重新登录
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * 请求人工客服
+     */
+    private void requestAgent () {
+        //
+        // TODO: mUUID 替换为 agentUid, agentUid不能为空
+        BDCoreApi.requestAgent(this, mWorkGroupWid, mRequestType, mUUID, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                dealWithThread(object);
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                try {
+                    Logger.d("request thread message: " + object.get("message")
+                            + " status_code:" + object.get("status_code")
+                            + " data:" + object.get("data"));
+                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -381,7 +406,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
 
             @Override
@@ -431,12 +455,16 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                         //持久化到数据库
                         mRepository.insertMessageJson(queryMessageObject);
-                        mRepository.insertRobotRightAnswerMessageJson(replyMessageObject);
+
+                        if (content.indexOf("人工") != -1) {
+                            requestAgent();
+                        } else {
+                            mRepository.insertRobotRightAnswerMessageJson(replyMessageObject);
+                        }
 
                     } else if (status_code == 201) {
                         // 未匹配到答案
                         mRepository.deleteMessageLocal(localId);
-
                         //
                         JSONObject queryMessageObject = object.getJSONObject("data").getJSONObject("query");
                         JSONObject replyMessageObject = object.getJSONObject("data").getJSONObject("reply");
@@ -445,7 +473,14 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                         //持久化到数据库
                         mRepository.insertMessageJson(queryMessageObject);
-                        mRepository.insertRobotNoAnswerMessageJson(replyMessageObject);
+
+                        if (content.indexOf("人工") != -1) {
+
+                            requestAgent();
+
+                        } else {
+                            mRepository.insertRobotNoAnswerMessageJson(replyMessageObject);
+                        }
 
                     } else {
                         // 修改本地消息发送状态为error
@@ -540,7 +575,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 }
             });
 
-        }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_WORKGROUP)){
+        }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_WORKGROUP)) {
             Logger.i("客服端：客服会话 uid:" + mUid);
 
             // 客服端接口
@@ -577,7 +612,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 }
             });
         }
-
     }
 
     /**
@@ -588,8 +622,11 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     private void dealWithThread(JSONObject object) {
         //
         try {
-            Logger.d("request thread success message: " + object.get("message") + " status_code:" + object.get("status_code"));
+            Logger.d("request thread success message: "
+                    + object.get("message")
+                    + " status_code:" + object.get("status_code"));
 
+            mIsRobot = false;
             int status_code = object.getInt("status_code");
             if (status_code == 200 || status_code == 201) {
                 // 创建新会话
@@ -618,7 +655,14 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mUUID = message.getJSONObject("thread").getString("tid");
+//                mUUID = message.getJSONObject("thread").getString("tid");
+                JSONObject thread = message.getJSONObject("thread");
+                mUUID = thread.getString("tid");
+                mThreadEntity.setTid(thread.getString("tid"));
+                mThreadEntity.setType(thread.getString("type"));
+                mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
+                mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
 //                String threadTopic = "thread/" + mUUID;
 //                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
@@ -633,7 +677,15 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mUUID = message.getJSONObject("thread").getString("tid");
+//                mUUID = message.getJSONObject("thread").getString("tid");
+                JSONObject thread = message.getJSONObject("thread");
+                mUUID = thread.getString("tid");
+                mThreadEntity.setTid(thread.getString("tid"));
+                mThreadEntity.setType(thread.getString("type"));
+                mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
+                mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
+
 //                String threadTopic = "thread/" + mUUID;
 //                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
@@ -643,7 +695,15 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mUUID = message.getJSONObject("thread").getString("tid");
+//                mUUID = message.getJSONObject("thread").getString("tid");
+                JSONObject thread = message.getJSONObject("thread");
+                mUUID = thread.getString("tid");
+                mThreadEntity.setTid(thread.getString("tid"));
+                mThreadEntity.setType(thread.getString("type"));
+                mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
+                mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
+
 //                String threadTopic = "thread/" + mUUID;
 //                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
@@ -653,6 +713,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 String title = "";
                 JSONObject message = object.getJSONObject("data");
                 mUUID = message.getJSONObject("thread").getString("tid");
+
                 // 存储key/value: content/qid
                 final Map<String, String> questionMap = new HashMap<>();
                 // 存储key/value: content/workGroups
@@ -718,13 +779,20 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-                mUUID = message.getJSONObject("thread").getString("tid");
+//                mUUID = message.getJSONObject("thread").getString("tid");
+                JSONObject thread = message.getJSONObject("thread");
+                mUUID = thread.getString("tid");
+                mThreadEntity.setTid(thread.getString("tid"));
+                mThreadEntity.setType(thread.getString("type"));
+                mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
+                mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
+
 //                String threadTopic = "thread/" + mUUID;
 //                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else {
                 // 请求会话失败
-
                 String message = object.getString("message");
                 Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_SHORT).show();
             }
@@ -1203,10 +1271,10 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         // 插入本地消息
         mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
         // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-
         //
-        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
-                mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
+        BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
+//        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
+//                mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
     }
 
     /**
@@ -1237,7 +1305,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                     // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
-
                     // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
                     final String localId = BDCoreUtils.uuid();
 
@@ -1248,8 +1315,9 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                     // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
 
-                    BDMqttApi.sendImageMessageProtobuf(ChatKFActivity.this, localId, imageUrl,
-                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
+                    BDMqttApi.sendImageMessageProtobuf(ChatKFActivity.this, localId, imageUrl, mThreadEntity);
+//                    BDMqttApi.sendImageMessageProtobuf(ChatKFActivity.this, localId, imageUrl,
+//                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1314,27 +1382,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         if (queryAnswerEvent.getAid().equals("00001")) {
 
             // 请求人工客服
-            // TODO: mUUID 替换为 agentUid, agentUid不能为空
-            BDCoreApi.requestAgent(this, mWorkGroupWid, mRequestType, mUUID, new BaseCallback() {
-
-                @Override
-                public void onSuccess(JSONObject object) {
-
-                    dealWithThread(object);
-                }
-
-                @Override
-                public void onError(JSONObject object) {
-                    try {
-                        Logger.d("request thread message: " + object.get("message")
-                                + " status_code:" + object.get("status_code")
-                                + " data:" + object.get("data"));
-                        Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            requestAgent();
 
         } else {
 
@@ -1356,7 +1404,8 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                             //持久化到数据库
                             mRepository.insertMessageJson(queryMessageObject);
-                            mRepository.insertRobotRightAnswerMessageJson(replyMessageObject);
+                            mRepository.insertMessageJson(replyMessageObject);
+//                            mRepository.insertRobotRightAnswerMessageJson(replyMessageObject);
 
                         } else {
 
@@ -1424,10 +1473,11 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
         @Override
         public void afterTextChanged(Editable editable) {
-
+            //
             String content = editable.toString();
             if (content != null) {
                 // 输入框文字变化时，发送消息输入状态消息
+                BDMqttApi.sendPreviewMessageProtobuf(ChatKFActivity.this, mThreadEntity, content);
 //                BDMqttApi.sendPreviewMessage(ChatKFActivity.this, mUUID, content, mThreadType);
             }
         }
@@ -1441,48 +1491,10 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
         // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
         final String localId = BDCoreUtils.uuid();
-
         // 插入本地消息
         mRepository.insertCommodityMessageLocal(mUUID, mWorkGroupWid, mUid, custom, localId, mThreadType);
-
-        // 发送商品
-        BDCoreApi.sendCommodityMessage(this, mUUID, custom, localId, mThreadType, new BaseCallback() {
-            @Override
-            public void onSuccess(JSONObject object) {
-                //
-                try {
-
-                    int status_code = object.getInt("status_code");
-                    if (status_code == 200) {
-
-                        String localId = object.getJSONObject("data").getString("localId");
-                        Logger.i("callback localId: " + localId);
-
-                        // TODO: 更新消息发送状态为成功
-                        mRepository.updateMessageStatusSuccess(localId);
-
-                        // 发送成功
-                    } else {
-
-                        // 修改本地消息发送状态为error
-                        mRepository.updateMessageStatusError(localId);
-
-                        // 发送消息失败
-                        String message = object.getString("message");
-                        Toast.makeText(ChatKFActivity.this, message, Toast.LENGTH_LONG).show();
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-                // 发送消息失败
-                Toast.makeText(ChatKFActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-            }
-        });
+        //
+        BDMqttApi.sendCommodityMessageProtobuf(this, localId, custom, mThreadEntity);
     }
 
     @Override

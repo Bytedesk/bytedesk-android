@@ -30,14 +30,14 @@ public class ChatBaseActivity extends AppCompatActivity {
 
     // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
     protected String mUUID;
-    protected ThreadEntity mThreadEntity = new ThreadEntity();
+    public ThreadEntity mThreadEntity = new ThreadEntity();
     // 指定坐席uid
     protected String mAgentUid;
     protected String mTitle;
     // 是否访客端调用接口
     protected boolean mIsVisitor;
     protected boolean mIsRobot;
-    // 区分客服会话thread、同事会话contact、群组会话group
+    // 区分客服会话workgroup/appointed、同事会话contact、群组会话group
     protected String mThreadType;
     // 区分工作组会话、指定客服会话
     protected String mRequestType;
@@ -47,8 +47,6 @@ public class ChatBaseActivity extends AppCompatActivity {
     // 本地存储信息
     protected BDPreferenceManager mPreferenceManager;
     protected BDRepository mRepository;
-
-//    protected void getMessages() {}
 
     /**
      * 监听 EventBus 广播消息: 长按消息
@@ -96,15 +94,14 @@ public class ChatBaseActivity extends AppCompatActivity {
 
                         break;
                     case 2:
-                        String withDrawMid = longClickEvent.getMessageEntity().getMid();
-                        String withDrawTid = longClickEvent.getMessageEntity().getThreadTid();
-                        Logger.d("withDraw: " + withDrawMid);
+                        String recallMid = longClickEvent.getMessageEntity().getMid();
+                        Logger.d("recallMid: " + recallMid);
 
                         // 撤回消息
-                        BDMqttApi.sendRecallMessage(getBaseContext(), withDrawMid, withDrawTid);
+                        BDMqttApi.sendRecallMessageProtobuf(getBaseContext(), mThreadEntity, recallMid);
 
                         // 删除本地消息
-                        BDRepository.getInstance(getBaseContext()).deleteMessage(withDrawMid);
+                        BDRepository.getInstance(getBaseContext()).deleteMessage(recallMid);
 
                         break;
                 }
@@ -141,7 +138,7 @@ public class ChatBaseActivity extends AppCompatActivity {
                         //
                         String mid = messageEvent.getJsonObject().getString("mid");
                         // 检查是否当前页面消息，如果是，则发送已读消息回执
-                        BDMqttApi.sendReceiptReadMessage(this, mid, tid);
+//                        BDMqttApi.sendReceiptReadMessage(this, mid, tid);
                     }
                 }
             } else {

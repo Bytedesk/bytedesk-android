@@ -23,11 +23,13 @@ public class MainActivity extends AppCompatActivity {
 
     // 管理后台：https://www.bytedesk.com/antv/user/login
     // 获取管理员uid, 登录后台->客服->账号->管理员账号(唯一ID(uid))列
-    public final static String adminUId = "201808221551193";
+//    public final static String adminUId = "201808221551193";
     // 获取appkey，登录后台->客服->渠道->添加应用->appkey
     public final static String appkey = "201809171553112";
     // 获取subDomain，也即企业号：登录后台->客服->账号->企业号
     public final static String subdomain = "vip";
+    // 到 客服->技能组-有一列 ‘唯一ID（wId）’, 默认设置工作组wid
+    public final static String wId = "201807171659201";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -33,6 +33,7 @@ import butterknife.ButterKnife;
 public class ThreadFragment extends BaseFragment {
 
     private int page;
+    private int size;
 
     @BindView(R.id.session_topbar) QMUITopBarLayout mTopBar;
     @BindView(R.id.session_refreshlayout)
@@ -47,6 +48,7 @@ public class ThreadFragment extends BaseFragment {
         ButterKnife.bind(this, root);
 
         page = 0;
+        size = 20;
 
         initTopBar();
         initRecyclerView();
@@ -82,21 +84,19 @@ public class ThreadFragment extends BaseFragment {
 
 
     private void getThreads() {
-
         //
-        BDCoreApi.visitorGetThreads(getContext(), page, new BaseCallback() {
+        BDCoreApi.visitorGetThreads(getContext(), page, size, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
 
                 List<ThreadEntity> threadEntityList = new LinkedList<>();
-
                 try {
 
                     JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         //
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-
+                        //
                         ThreadEntity threadEntity = new ThreadEntity();
 //                        threadEntity.setId(jsonObject.getLong("id"));
                         threadEntity.setTid(jsonObject.getString("tid"));
@@ -126,7 +126,5 @@ public class ThreadFragment extends BaseFragment {
             }
         });
     }
-
-
 
 }

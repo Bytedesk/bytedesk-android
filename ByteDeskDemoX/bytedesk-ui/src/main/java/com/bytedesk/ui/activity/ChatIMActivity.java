@@ -38,7 +38,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -675,7 +675,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
      */
     private void initModel () {
         //
-        mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        mMessageViewModel = new ViewModelProvider(this).get(MessageViewModel.class);
         //
         if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_CONTACT)) {
             Logger.i("客服端：一对一会话");
