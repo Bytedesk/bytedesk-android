@@ -1,6 +1,8 @@
 package com.bytedesk.ui.activity;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -94,6 +96,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     private String mWorkGroupWid;
     private final Handler mHandler = new Handler();
     private String mCustom;
+    private int mCurrentDialogStyle = com.qmuiteam.qmui.R.style.QMUI_Dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1010,30 +1013,41 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
     private void visitorTopRightSheet() {
         //
+        Context contextActivity = this;
         new QMUIBottomSheet.BottomListSheetBuilder(this)
-                .addItem("满意度评价")
+                .addItem("评价")
                 .addItem("留言")
-                .addItem(mIsRobot ? "人工客服" : "机器人")
                 .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
                     //
                     dialog.dismiss();
 
                     if (position == 0) {
 
-                        // TODO: 暂未增加评价页面，开发者可自行设计。具体参数意思可跟进函数定义查看
-                        BDCoreApi.rate(ChatKFActivity.this, mUUID, 5, "附言", false, new BaseCallback() {
+                        final String[] items = new String[]{"非常满意", "满意", "一般", "不满意", "非常差"};
+                        final int checkedIndex = 0;
+                        new QMUIDialog.CheckableDialogBuilder(contextActivity)
+                                .setCheckedIndex(checkedIndex)
+                                .addItems(items, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(getApplicationContext(), "评分：" + (5-which), Toast.LENGTH_SHORT).show();
 
-                            @Override
-                            public void onSuccess(JSONObject object) {
+                                        // TODO: 暂未增加评价页面，开发者可自行设计。具体参数意思可跟进函数定义查看
+                                        BDCoreApi.rate(contextActivity, mUUID, 5 - which, "附言", false, new BaseCallback() {
+                                            @Override
+                                            public void onSuccess(JSONObject object) {
 
-                            }
+                                            }
+                                            @Override
+                                            public void onError(JSONObject object) {
 
-                            @Override
-                            public void onError(JSONObject object) {
-
-                            }
-
-                        });
+                                            }
+                                        });
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .create(mCurrentDialogStyle)
+                                .show();
 
                     } else if (position == 1) {
 
@@ -1044,20 +1058,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                         intent.putExtra(BDUiConstant.EXTRA_AID, mAgentUid);
                         startActivity(intent);
 
-                    } else if (position == 1) {
-
-                        if (mIsRobot) {
-
-                            // 切换人工客服
-                            requestThread();
-
-                        } else {
-
-                            // 切换智能机器人
-                            requestRobot();
-                        }
-
-                        mIsRobot = !mIsRobot;
                     }
                 })
                 .build()

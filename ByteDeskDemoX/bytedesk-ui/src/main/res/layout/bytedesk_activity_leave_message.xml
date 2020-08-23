@@ -20,17 +20,10 @@
             android:paddingBottom="25dp"
             android:paddingTop="70dp">
 
-            <!--TODO-->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="请查看代码save函数"/>
-
-            <Button
-                android:id="@+id/bytedesk_leave_msg_submit_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="提交"/>
+            <com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView
+                android:id="@+id/bytedesk_leave_msg_groupListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
 

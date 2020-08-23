@@ -16,8 +16,8 @@
 
 ```bash
 # androidx版, 参考demo：ByteDeskDemoX
-- 核心库: implementation 'com.bytedesk:libcore:2.3.1'
-- 界面库: implementation 'com.bytedesk:libui:2.3.1'
+- 核心库: implementation 'com.bytedesk:libcore:2.3.2'
+- 界面库: implementation 'com.bytedesk:libui:2.3.2'
 ```
 <!-- - 核心库：com.bytedesk:libcore: [![Download](https://api.bintray.com/packages/jackning/maven/core/images/download.svg)](https://bintray.com/jackning/maven/core/_latestVersion)
 - 界面库，完全开源(Demo中的bytedesk-ui模块)，方便开发者自定义界面：com.bytedesk:libui: [![Download](https://api.bintray.com/packages/jackning/maven/ui/images/download.svg)](https://bintray.com/jackning/maven/ui/_latestVersion) -->
