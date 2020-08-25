@@ -52,7 +52,7 @@ public class SupportFragment extends BaseFragment {
                 .setTitle("方式一")
                 .addItemView(webViewItem, view -> {
                     // 替换：URL参数uid
-                    // 注意: 登录后台->客服->账号->管理员唯一uid
+                    // 注意: 登录后台->客服管理->客服账号->管理员唯一uid
 //                        String url = "https://www.bytedesk.com/support?uid=" + BDDemoConst.DEFAULT_TEST_ADMIN_UID + "&ph=ph";
 //                        BDUiApi.startHtml5Chat(getContext(), url, "帮助中心");
                     BDUiApi.startSupportURLActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID);
