@@ -54,9 +54,9 @@ android {
 ```java
 // 萝卜丝第三步
 // 加载萝卜丝核心库
-implementation 'com.bytedesk:libcore:2.3.3'
+implementation 'com.bytedesk:libcore:2.3.4'
 // 加载萝卜丝默认UI库
-implementation 'com.bytedesk:libui:2.3.3'
+implementation 'com.bytedesk:libui:2.3.4'
 
 // 腾讯QMUI界面库
 // http://qmuiteam.com/android/page/start.html
