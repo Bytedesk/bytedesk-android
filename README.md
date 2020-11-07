@@ -35,6 +35,7 @@
 
 ## 其他
 
+- [Flutter SDK](https://github.com/bytedesk/bytedesk-flutter)
 - [iOS SDK](https://github.com/bytedesk/bytedesk-ios)
 - [Android SDK](https://github.com/bytedesk/bytedesk-android)
 - [Web端接口](https://github.com/bytedesk/bytedesk-web)
