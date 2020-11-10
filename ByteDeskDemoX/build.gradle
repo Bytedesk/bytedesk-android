@@ -2,9 +2,11 @@
 
 buildscript {
     repositories {
-        google()
-        jcenter()
-        
+        // google()
+        // jcenter()
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/repository/google/'}
+        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.0'
@@ -16,8 +18,11 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        jcenter()
+        // google()
+        // jcenter()
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/repository/google/'}
+        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
         // 如需要引用bytedesk sdk，需要添加如下：
         maven {
             url  "https://dl.bintray.com/jackning/maven"
