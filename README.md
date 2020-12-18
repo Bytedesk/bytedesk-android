@@ -53,3 +53,7 @@
 <img src="./img/5.png" width="25%" height="25%"/>
 <img src="./img/6.png" width="25%" height="25%"/>
 <img src="./img/7.png" width="25%" height="25%"/>
+
+## 公众号
+
+<img src="./img/luobosi_mp.png?raw=true" width="250">
