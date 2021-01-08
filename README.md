@@ -34,16 +34,6 @@
     - [5分钟集成自定义UI](https://github.com/Bytedesk/bytedesk-android/wiki/5%E5%88%86%E9%92%9F%E9%9B%86%E6%88%90%E8%87%AA%E5%AE%9A%E4%B9%89UI)
 - [IM开发文档](https://github.com/bytedesk/bytedesk-android/wiki/IM%E5%BC%80%E5%8F%91%E6%96%87%E6%A1%A3)
 
-## 其他
-
-- [Flutter SDK](https://github.com/bytedesk/bytedesk-flutter)
-- [iOS SDK](https://github.com/bytedesk/bytedesk-ios)
-- [Android SDK](https://github.com/bytedesk/bytedesk-android)
-- [Web端接口](https://github.com/bytedesk/bytedesk-web)
-- [微信公众号/小程序接口](https://github.com/bytedesk/bytedesk-wechat)
-- [服务器端接口](https://github.com/bytedesk/bytedesk-server)
-- [机器人](https://github.com/bytedesk/bytedesk-chatbot)
-
 ## 截图
 
 <img src="./img/1.png" width="25%" height="25%"/>
@@ -57,3 +47,14 @@
 ## 公众号
 
 <img src="./img/luobosi_mp.png?raw=true" width="250">
+
+## 其他
+
+- [Flutter SDK](https://github.com/bytedesk/bytedesk-flutter)
+- [UniApp SDK](https://github.com/bytedesk/bytedesk-uniapp)
+- [iOS SDK](https://github.com/bytedesk/bytedesk-ios)
+- [Android SDK](https://github.com/bytedesk/bytedesk-android)
+- [Web端接口](https://github.com/bytedesk/bytedesk-web)
+- [微信公众号/小程序接口](https://github.com/bytedesk/bytedesk-wechat)
+- [服务器端接口](https://github.com/bytedesk/bytedesk-server)
+- [机器人](https://github.com/bytedesk/bytedesk-chatbot)
