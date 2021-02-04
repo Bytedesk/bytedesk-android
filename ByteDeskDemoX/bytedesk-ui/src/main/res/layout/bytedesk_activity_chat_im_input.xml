@@ -8,6 +8,17 @@
     android:gravity="center_vertical">
 
     <Button
+        android:id="@+id/bytedesk_chat_input_cuw_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bytedesk_input_cuw_button"
+        />
+
+    <Button
         android:id="@+id/bytedesk_chat_input_voice_button"
         android:layout_width="30dp"
         android:layout_height="30dp"

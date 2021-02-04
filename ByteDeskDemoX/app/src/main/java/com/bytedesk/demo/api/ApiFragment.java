@@ -396,11 +396,11 @@ public class ApiFragment extends BaseFragment {
         } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_CONNECTED)) {
 
             title = "萝卜丝" + version + "(已连接)";
-            loginItem.setDetailText("连接已建立: " + mPreferenceManager.getUsername());
+//            loginItem.setDetailText("连接已建立: " + mPreferenceManager.getUsername());
         } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_DISCONNECTED)) {
 
             title = "萝卜丝" + version + "(连接断开)";
-            loginItem.setDetailText("当前未连接");
+//            loginItem.setDetailText("当前未连接");
         }
         mTopBar.setTitle(title);
     }

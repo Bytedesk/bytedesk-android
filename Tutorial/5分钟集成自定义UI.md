@@ -1,4 +1,4 @@
-# 5分钟集成在线客服
+# 5 分钟集成在线客服
 
 - [Demo](https://github.com/Bytedesk/bytedesk-android/tree/master/Tutorial/kefu)
 
@@ -6,15 +6,15 @@
 
 - 到[萝卜丝官网](https://www.bytedesk.com/antv/user/login)注册管理员账号，并登录管理后台。
 - 到 客服管理->渠道管理 添加网站/App
-- 到 客服管理->客服账号 有一列 ‘唯一ID(uid)’ 会在指定客服接口中使用
-- 到 客服管理->技能组 有一列 ‘唯一ID（wId）’ 会在技能组会话中用到
-- 获取管理员uid, 登录后台->客服管理->客服账号->管理员账号(唯一ID(uid))列
-- 获取appkey，登录后台->客服管理->渠道管理->添加应用->appkey
-- 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
+- 到 客服管理->客服账号 有一列 ‘唯一 ID(uid)’ 会在指定客服接口中使用
+- 到 客服管理->技能组 有一列 ‘唯一 ID（wId）’ 会在技能组会话中用到
+- 获取管理员 uid, 登录后台->客服管理->客服账号->管理员账号(唯一 ID(uid))列
+- 获取 appkey，登录后台->客服管理->渠道管理->添加应用->appkey
+- 获取 subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
 
 ## 开始集成
 
-> 第一步：在总项目build.gradle的 allprojects -> repositories 添加
+> 第一步：在总项目 build.gradle 的 allprojects -> repositories 添加
 
 ```java
 maven {
@@ -57,11 +57,11 @@ ext {
 }
 ```
 
-> 第二步：复制bytedesk-ui库到自己项目目录
+> 第二步：复制 bytedesk-ui 库到自己项目目录
 
-开发者可以参考demo，直接从demo目录中复制到自己项目中
+开发者可以参考 demo，直接从 demo 目录中复制到自己项目中
 
-> 第三步：在总项目的settings.gradle末尾添加
+> 第三步：在总项目的 settings.gradle 末尾添加
 
 ```java
 include ':bytedesk-ui'
@@ -69,7 +69,7 @@ include ':bytedesk-ui'
 
 添加完毕后，同步 `Sync Now`
 
-> 第四步：在module的build.gradle android{}添加
+> 第四步：在 module 的 build.gradle android{}添加
 
 ```java
 android {
@@ -82,14 +82,14 @@ android {
 }
 ```
 
-> 第五步：在module的build.gradle dependencies{}添加
+> 第五步：在 module 的 build.gradle dependencies{}添加
 
 ```java
 // 萝卜丝第三步
 // 加载萝卜丝核心库
-implementation 'com.bytedesk:libcore:2.3.4'
+implementation 'com.bytedesk:libcore:2.3.5'
 // 加载萝卜丝默认UI库
-implementation 'com.bytedesk:libui:2.3.4'
+implementation 'com.bytedesk:libui:2.3.5'
 
 // 腾讯QMUI界面库
 // http://qmuiteam.com/android/page/start.html
@@ -98,7 +98,7 @@ implementation 'com.qmuiteam:qmui:2.0.0-alpha10'
 implementation "com.qmuiteam:arch:2.0.0-alpha10"
 ```
 
-> 第六步：AndroidManifest.xml添加权限
+> 第六步：AndroidManifest.xml 添加权限
 
 ```xml
 <!--添加萝卜丝权限-->
@@ -109,7 +109,7 @@ implementation "com.qmuiteam:arch:2.0.0-alpha10"
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
-> 第七步：AndroidManifest.xml添加Activity和Service
+> 第七步：AndroidManifest.xml 添加 Activity 和 Service
 
 ```xml
 <!--萝卜丝bytedesk.com代码 开始-->
@@ -126,7 +126,7 @@ implementation "com.qmuiteam:arch:2.0.0-alpha10"
 <!--./萝卜丝bytedesk.com代码 结束-->
 ```
 
-> 第八步：在样式文件styles.xml中添加
+> 第八步：在样式文件 styles.xml 中添加
 
 ```xml
 <!--添加萝卜丝样式 开始-->
@@ -148,9 +148,9 @@ implementation "com.qmuiteam:arch:2.0.0-alpha10"
 <!--添加萝卜丝样式 结束-->
 ```
 
-> 第九部：初始化UI和建立长连接
+> 第九部：初始化 UI 和建立长连接
 
-参考demo中MainActivity.java
+参考 demo 中 MainActivity.java
 
 ```java
 // 初始化萝卜丝UI界面库

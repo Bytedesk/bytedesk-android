@@ -3,10 +3,9 @@ package com.bytedesk.ui.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -21,6 +20,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bytedesk.core.api.BDMqttApi;
@@ -198,6 +200,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         private Button commoditySendButton;
         // 文件消息
         private TextView fileTextView;
+        // 机器人
+        public TextView robotTextView;
         // 阅后即焚倒计时
         private QMUIProgressBar destroyAfterReadingProgressBar;
         // 发送中
@@ -271,7 +275,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             } else if (messageViewType == MessageEntity.TYPE_ROBOT_ID
                     || messageViewType == MessageEntity.TYPE_ROBOT_SELF_ID) {
                 initAvatar();
-                contentTextView = itemView.findViewById(R.id.bytedesk_message_item_content);
+                robotTextView = itemView.findViewById(R.id.bytedesk_message_item_content);
             }
 
             // 收到的消息
@@ -452,19 +456,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             else if (messageViewType == MessageEntity.TYPE_ROBOT_ID
                         || messageViewType == MessageEntity.TYPE_ROBOT_SELF_ID) {
                 loadAvatar(msgEntity);
-                contentTextView.setText("");
-//                contentTextView.setText(Html.fromHtml(msgEntity.getContent()));
+                robotTextView.setText("");
                 //
                 String robotMessageString = msgEntity.getContent();
                 Boolean matchFlagBoolean = false;
                 int startIndex = 0;
                 Pattern robotPattern = Pattern.compile("[0-9]+:[0-9A-Za-z:/[-]_#[?][(),\"\"][“”（），、。？][ ][=][.][&][\\u4e00-\\u9fa5]]*");
                 Matcher robotMatcher = robotPattern.matcher(robotMessageString);
-
+                //
                 while (robotMatcher.find()) {
-
+                    //
                     matchFlagBoolean = true;
-                    contentTextView.append(robotMessageString.substring(startIndex, robotMatcher.start()));
+                    robotTextView.append(robotMessageString.substring(startIndex, robotMatcher.start()));
 
                     String matchString = robotMessageString.substring(robotMatcher.start(), robotMatcher.end());
 
@@ -477,14 +480,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     SpannableString spannableMatch = new SpannableString(questionString);
                     spannableMatch.setSpan(robotSpan, 0, questionString.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
-                    contentTextView.append(spannableMatch);
+                    robotTextView.append(spannableMatch);
                     startIndex = robotMatcher.end();
                 }
+                //
                 if (!matchFlagBoolean) {
-//                    contentTextView.setText(robotMessageString);
-                    contentTextView.setText(Html.fromHtml(msgEntity.getContent()));
+                    Logger.i("robot not match:" + msgEntity.getContent());
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        robotTextView.setText(Html.fromHtml(msgEntity.getContent(), Html.FROM_HTML_MODE_LEGACY));
+                    } else {
+                        robotTextView.setText(Html.fromHtml(msgEntity.getContent()));
+                    }
                 }
-                contentTextView.setMovementMethod(LinkMovementMethod.getInstance());
+                robotTextView.setMovementMethod(LinkMovementMethod.getInstance());
             }
 
             // 收到的消息
@@ -512,25 +520,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 }
                 //
                 if (msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_SENDING)) {
-
                     progressBar.setVisibility(View.VISIBLE);
                     errorImageView.setVisibility(View.GONE);
                     statusTextView.setVisibility(View.GONE);
                 } else if (msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_ERROR)) {
-
                     progressBar.setVisibility(View.GONE);
                     errorImageView.setVisibility(View.VISIBLE);
                     statusTextView.setVisibility(View.GONE);
                 } else if (msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_RECALL) ||
                         msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_RECEIVED) ||
                         msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_READ)) {
-
                     progressBar.setVisibility(View.GONE);
                     errorImageView.setVisibility(View.GONE);
                     statusTextView.setVisibility(View.VISIBLE);
                     statusTextView.setText(msgEntity.getStatus() == BDCoreConstant.MESSAGE_STATUS_RECEIVED ? "送达" : "已读");
                 } else {
-
                     progressBar.setVisibility(View.GONE);
                     errorImageView.setVisibility(View.GONE);
                     statusTextView.setVisibility(View.GONE);

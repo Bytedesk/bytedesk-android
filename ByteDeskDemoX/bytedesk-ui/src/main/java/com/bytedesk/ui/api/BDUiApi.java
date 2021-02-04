@@ -3,6 +3,7 @@ package com.bytedesk.ui.api;
 import android.content.Context;
 import android.content.Intent;
 
+import com.bytedesk.core.room.entity.ThreadEntity;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.MMKVUtils;
 import com.bytedesk.ui.activity.BrowserActivity;
@@ -64,7 +65,7 @@ public class BDUiApi {
         context.startActivity(intent);
     }
 
-    public static void startWorkGroupChatActivity(Context context, String wId, String title, String custom) {
+    public static void startWorkGroupChatActivityShop(Context context, String wId, String title, String commodity) {
         //
         BDConfig.getInstance(context).switchToKF();
         //
@@ -75,7 +76,7 @@ public class BDUiApi {
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_WORK_GROUP);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_WORKGROUP);
-        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
+        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, commodity);
         context.startActivity(intent);
     }
 
@@ -103,7 +104,7 @@ public class BDUiApi {
         context.startActivity(intent);
     }
 
-    public static void startAppointChatActivity(Context context, String aId, String title, String custom) {
+    public static void startAppointChatActivityShop(Context context, String aId, String title, String commodity) {
         //
         BDConfig.getInstance(context).switchToKF();
         //
@@ -115,7 +116,7 @@ public class BDUiApi {
         intent.putExtra(BDUiConstant.EXTRA_TITLE, title);
         intent.putExtra(BDUiConstant.EXTRA_REQUEST_TYPE, BDCoreConstant.THREAD_REQUEST_TYPE_APPOINTED);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, BDCoreConstant.THREAD_TYPE_APPOINTED);
-        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
+        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, commodity);
         context.startActivity(intent);
     }
 
@@ -167,6 +168,11 @@ public class BDUiApi {
 //        intent.putExtra(BDUiConstant.EXTRA_CUSTOM, custom);
 //        context.startActivity(intent);
 //    }
+
+    public static void startThreadChatActivity2(Context context, ThreadEntity threadEntity) {
+        //
+        startThreadChatActivity(context, threadEntity.getTid(), threadEntity.getTopic(), threadEntity.getType(), threadEntity.getNickname(), threadEntity.getAvatar());
+    }
 
     public static void startThreadChatActivity(Context context, String tid, String topic, String type, String nickname, String avatar) {
         //

@@ -30,6 +30,7 @@ public class ChatBaseActivity extends AppCompatActivity {
 
     // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
     protected String mUUID;
+    protected String mTopic;
     public ThreadEntity mThreadEntity = new ThreadEntity();
     // 指定坐席uid
     protected String mAgentUid;
@@ -119,9 +120,7 @@ public class ChatBaseActivity extends AppCompatActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent messageEvent) {
 //        Logger.i("MessageEvent");
-
         // TODO: 判断是否阅后即焚消息，如果是，则倒计时销毁
-
         try {
 
             JSONObject messageObject = messageEvent.getJsonObject();

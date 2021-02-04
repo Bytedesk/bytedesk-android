@@ -645,9 +645,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
-//                String threadTopic = BDCoreConstant.BD_THREAD_PREFIX + mUUID;
-//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
-
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
                 }
@@ -658,7 +655,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-//                mUUID = message.getJSONObject("thread").getString("tid");
                 JSONObject thread = message.getJSONObject("thread");
                 mUUID = thread.getString("tid");
                 mThreadEntity.setTid(thread.getString("tid"));
@@ -666,9 +662,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setTopic(thread.getString("topic"));
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
-
-//                String threadTopic = "thread/" + mUUID;
-//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
                 if (mCustom != null && mCustom.trim().length() > 0) {
                     sendCommodityMessage(mCustom);
@@ -680,7 +673,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-//                mUUID = message.getJSONObject("thread").getString("tid");
                 JSONObject thread = message.getJSONObject("thread");
                 mUUID = thread.getString("tid");
                 mThreadEntity.setTid(thread.getString("tid"));
@@ -689,8 +681,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
-//                String threadTopic = "thread/" + mUUID;
-//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else if (status_code == 204) {
                 // 当前无客服在线，请自助查询或留言
@@ -698,7 +688,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-//                mUUID = message.getJSONObject("thread").getString("tid");
                 JSONObject thread = message.getJSONObject("thread");
                 mUUID = thread.getString("tid");
                 mThreadEntity.setTid(thread.getString("tid"));
@@ -706,9 +695,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setTopic(thread.getString("topic"));
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
-
-//                String threadTopic = "thread/" + mUUID;
-//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else if (status_code == 205) {
                 // 咨询前问卷
@@ -757,11 +743,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                         String questionnaireItemItemQid = questionMap.get(items[which]);
                         Logger.i("qid:" + questionnaireItemItemQid + " content:" + items[which]);
-                        // 留学: 意向国家 qid = '201810061551181'
-                        // 移民：意向国家 qid = '201810061551183'
-                        // 语培：意向类别 qid = '201810061551182'
-                        // 其他：意向类别 qid = '201810061551184'
-                        // 院校：意向院校 qid = '201810061551185'
 
                         if (questionnaireItemItemQid.equals("201810061551181")) {
                             // 单独处理 留学: 意向国家 qid = '201810061551181'
@@ -782,7 +763,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 JSONObject message = object.getJSONObject("data");
                 mMessageViewModel.insertMessageJson(message);
 
-//                mUUID = message.getJSONObject("thread").getString("tid");
                 JSONObject thread = message.getJSONObject("thread");
                 mUUID = thread.getString("tid");
                 mThreadEntity.setTid(thread.getString("tid"));
@@ -790,9 +770,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setTopic(thread.getString("topic"));
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
-
-//                String threadTopic = "thread/" + mUUID;
-//                BDMqttApi.subscribeTopic(ChatKFActivity.this, threadTopic);
 
             } else {
                 // 请求会话失败
@@ -1262,6 +1239,10 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
         if (!BDMqttApi.isConnected(this)) {
             Toast.makeText(this, "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (content.length() >= 512) {
+            Toast.makeText(this, "消息太长，请分多次发送", Toast.LENGTH_LONG).show();
             return;
         }
 

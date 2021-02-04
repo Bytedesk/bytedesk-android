@@ -45,15 +45,18 @@ public class QDUpgradeManager {
 
                     JSONObject app = object.getJSONObject("data");
                     String version = app.getString("version");
+                    int versionCode = app.getInt("versionCode");
                     String tip = app.getString("tip");
                     String url = app.getString("url");
                     boolean forceUpgrade = app.getBoolean("forceUpgrade");
                     Logger.i("version %s, tip %s, url %s, forceUpgrade %s", version, tip, url, forceUpgrade);
 
-                    int newVersion = Integer.parseInt(version);
-                    if (newVersion > currentVersion) {
-                        new UpgradeTipTask().upgrade(mContext, tip, url);
+//                    int newVersion = Integer.parseInt(version);
+                    if (versionCode > currentVersion) {
+//                        new UpgradeTipTask().upgrade(mContext, tip, url);
+//                        TODO: eventbus发送广播，提示需要升级，前端收到事件之后，弹窗提示，如果要升级，则跳转下载url
                     }
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -29,6 +29,7 @@ import android.text.style.ImageSpan;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,6 +49,9 @@ import com.bytedesk.core.api.BDCoreApi;
 import com.bytedesk.core.api.BDMqttApi;
 import com.bytedesk.core.callback.BaseCallback;
 import com.bytedesk.core.event.PreviewEvent;
+import com.bytedesk.core.event.TransferAcceptEvent;
+import com.bytedesk.core.event.TransferEvent;
+import com.bytedesk.core.event.TransferRejectEvent;
 import com.bytedesk.core.repository.BDRepository;
 import com.bytedesk.core.util.BDCoreConstant;
 import com.bytedesk.core.util.BDCoreUtils;
@@ -69,10 +73,14 @@ import com.bytedesk.ui.util.ExpressionUtil;
 import com.bytedesk.ui.widget.InputAwareLayout;
 import com.bytedesk.ui.widget.KeyboardAwareLinearLayout;
 import com.orhanobut.logger.Logger;
+import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.util.QMUIViewHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
+import com.qmuiteam.qmui.widget.popup.QMUIPopup;
+import com.qmuiteam.qmui.widget.popup.QMUIPopups;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 import com.yanzhenjie.album.Album;
 import com.yanzhenjie.album.AlbumFile;
@@ -85,6 +93,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *  用途：
@@ -115,6 +126,8 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
     private boolean mIsFromThread = false;
     // 是否是机器人会话
     private boolean mIsRobot = false;
+    // 常用语
+    private Button mCuwButton;
     // 切换文字、录音按钮
     private Button mVoiceButton;
     // 按住说话
@@ -155,6 +168,9 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
     private Handler m_voiceRecordHandler = new Handler();
     private static final int VOICE_RECORDING_REFRESH_AMP_INTERVAL = 100;
     private static final int CHECK_RECORD_AUDIO_PERMISSION = 5;
+    private int mCurrentDialogStyle = com.qmuiteam.qmui.R.style.QMUI_Dialog;
+    //
+    private QMUIPopup mListPopup;
 
     // 表情
     public RelativeLayout mEmotionLayout;
@@ -187,7 +203,6 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bytedesk_activity_chat_im);
-
         //
         if (null != getIntent()) {
             //
@@ -195,7 +210,6 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
             mRepository = BDRepository.getInstance(this);
             //
             mIsFromThread = getIntent().getBooleanExtra(BDUiConstant.EXTRA_IS_THREAD, false);
-
             if (mIsFromThread) {
                 // 从会话列表进入聊天页面
                 mThreadEntity.setTid(getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TID));
@@ -205,6 +219,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setAvatar(getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_AVATAR));
                 //
                 mUUID = mThreadEntity.getTid();
+                mTopic = mThreadEntity.getTopic();
                 mTitle = mThreadEntity.getNickname();
                 mThreadType = mThreadEntity.getType();
             } else {
@@ -213,7 +228,6 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 mTitle = getIntent().getStringExtra(BDUiConstant.EXTRA_TITLE);
                 mThreadType = getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TYPE);
                 //
-
             }
         }
 
@@ -229,13 +243,12 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         }
 
         // 从服务器端加载聊天记录，默认暂不加载
-        // getMessages();
+         getMessages();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
         //
         IntentFilter iFilter = new IntentFilter();
         iFilter.addAction(Intent.ACTION_MEDIA_EJECT);
@@ -383,7 +396,16 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
             mEmotionLayout.setVisibility(View.GONE);
             mExtensionLayout.setVisibility(View.GONE);
 
-        } else if (view.getId() == R.id.appkefu_plus_pick_picture_btn) {
+        } else if (view.getId() == R.id.bytedesk_chat_input_cuw_button) {
+            BDUiUtils.showSysSoftKeybord(this, mInputEditText, false);
+            mEmotionLayout.setVisibility(View.GONE);
+            mExtensionLayout.setVisibility(View.GONE);
+            // TODO: 回调常用语列表
+            Intent intent = new Intent(ChatIMActivity.this, CuwActivity.class);
+//            startActivity(intent);
+            startActivityForResult(intent, BDUiConstant.SELECT_CUW);
+
+        }  else if (view.getId() == R.id.appkefu_plus_pick_picture_btn) {
 
             // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
@@ -447,6 +469,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 //            sendCommodityMessage(custom);
         }
     }
+
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -568,6 +591,14 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                         intent.putExtra(BDUiConstant.EXTRA_UID, mUUID);
                         startActivity(intent);
                     });
+        } else {
+            // 客服会话
+            mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId()).setOnClickListener(view -> {
+                initListPopupIfNeed();
+                mListPopup.animStyle(QMUIPopup.ANIM_GROW_FROM_CENTER);
+                mListPopup.preferredDirection(QMUIPopup.DIRECTION_TOP);
+                mListPopup.show(view);
+            });
         }
         QMUIStatusBarHelper.translucent(this);
     }
@@ -601,6 +632,10 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         mRecordVoiceTextLayout = findViewById(R.id.appkefu_voice_record_hint_text_record_layout);
         mRecordVoiceCancelTextLayout = findViewById(R.id.appkefu_voice_record_hint_text_cancel_layout);
         mRecordVoiceHintAMPImageView = findViewById(R.id.appkefu_voice_record_hint_amp);
+
+        // 常用语
+        mCuwButton = findViewById(R.id.bytedesk_chat_input_cuw_button);
+        mCuwButton.setOnClickListener(this);
 
         // 语音
         mVoiceButton = findViewById(R.id.bytedesk_chat_input_voice_button);
@@ -848,6 +883,38 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     }
                 }
             });
+        } else {
+
+            String uid = mTopic.split("/")[1];
+            BDCoreApi.getMessagesWithUser(getBaseContext(), uid, mPage, mSize, new BaseCallback() {
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    try {
+                        JSONArray jsonArray = object.getJSONObject("data").getJSONArray("content");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            mMessageViewModel.insertMessageJson(jsonArray.getJSONObject(i));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    mPullRefreshLayout.finishRefresh();
+                    mPage++;
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+
+                    mPullRefreshLayout.finishRefresh();
+
+                    try {
+                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
 
     }
@@ -993,13 +1060,47 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPreviewEvent(PreviewEvent previewEvent) {
         Logger.i("onPreviewEvent");
-
+        //
         if (previewEvent.getContent().trim().length() == 0) {
             return;
         }
-
         //
         mHandler.postDelayed(() -> mTopBar.setTitle(mTitle), 3000);
+    }
+
+    /**
+     * 收到被转接会话
+     *
+     * @param transferEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onTransferEvent(TransferEvent transferEvent) {
+        Logger.i("transferEvent");
+
+    }
+
+    /**
+     * 对方接受转接
+     *
+     * @param transferEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onTransferAcceptEvent(TransferAcceptEvent transferEvent) {
+        Logger.i("transferAcceptEvent");
+        //
+        Toast.makeText(this, "转接对话被接受", Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * 对方拒绝接受转接
+     *
+     * @param transferEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onTransferRejectEvent(TransferRejectEvent transferEvent) {
+        Logger.i("transferRejectEvent");
+        //
+        Toast.makeText(this, "转接对话被拒绝", Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -1346,9 +1447,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         if (requestCode == BDUiConstant.SELECT_FILE) {
             //
             if (resultCode == Activity.RESULT_OK) {
-
                 String filePath;
-
                 Uri uri = data.getData();
                 if ("file".equalsIgnoreCase(uri.getScheme())){//使用第三方应用打开
                     filePath = uri.getPath();
@@ -1362,11 +1461,15 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     filePath = BDFileUtils.getRealPathFromURI(ChatIMActivity.this, uri);
                     Toast.makeText(ChatIMActivity.this, filePath, Toast.LENGTH_SHORT).show();
                 }
-
-                Logger.i("filePath:" + filePath);
-
+//                Logger.i("filePath:" + filePath);
                 // 上传、发送文件
                 uploadFile(filePath, BDCoreUtils.uuid());
+            }
+        } else if (requestCode == BDUiConstant.SELECT_CUW) {
+            // 忽略resultCode直接获取content即可
+            if (resultCode == 1) {
+                String content = data.getStringExtra("content");
+                sendTextMessage(content);
             }
         }
     }
@@ -1377,22 +1480,20 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
      * @param content
      */
     private void sendTextMessage(String content) {
-
         if (!BDMqttApi.isConnected(this)) {
             Toast.makeText(this, "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
             return;
         }
-
+        if (content.length() >= 500) {
+            Toast.makeText(this, "消息太长，请分多次发送", Toast.LENGTH_LONG).show();
+            return;
+        }
         // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
         final String localId = BDCoreUtils.uuid();
-
         // 插入本地消息
         mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
-
+        //
         BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
-//        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
-//                mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
-
     }
 
     /**
@@ -1578,6 +1679,220 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 //
 //        });
 
+    }
+
+    private void initListPopupIfNeed() {
+        if (mListPopup == null) {
+            String[] listItems = new String[]{
+                    "用户信息",
+                    "转接会话",
+                    "邀请评价",
+                    "发送表单",
+                    "关闭会话",
+                    "拉黑用户"
+            };
+            List<String> data = new ArrayList<>();
+            Collections.addAll(data, listItems);
+            ArrayAdapter adapter = new ArrayAdapter<>(this, R.layout.bytedesk_simple_list_item, data);
+            AdapterView.OnItemClickListener onItemClickListener = (adapterView, view, i, l) -> {
+                //
+                if (mListPopup != null) {
+                    mListPopup.dismiss();
+                }
+                if (i == 0) {
+                    Logger.i("用户信息");
+                    //
+                    String uid = mThreadEntity.getTopic().split("/")[1];
+                    Intent intent = new Intent(ChatIMActivity.this, VisitorInfoActivity.class);
+                    intent.putExtra(BDUiConstant.EXTRA_UID, uid);
+                    startActivity(intent);
+
+                } else if (i == 1) {
+                    Logger.i("转接会话");
+                    // TODO: 弹窗选择在线的客服
+                    Context context = this;
+                    BDCoreApi.getOnlineAgents(this, 0, 100, new BaseCallback() {
+                        @Override
+                        public void onSuccess(JSONObject object) {
+                            // 无客服在线，提示
+                            // 有在线，弹窗供选择
+                            try {
+                                //
+                                JSONArray agentArray = object.getJSONObject("data").getJSONArray("content");
+                                if (agentArray.length() > 0) {
+                                    //
+                                    List<String> agentRealNames = new ArrayList<>();
+                                    List<String> agentUids = new ArrayList<>();
+                                    for (int j = 0; j < agentArray.length(); j++) {
+                                        JSONObject agent = agentArray.getJSONObject(j);
+                                        agentUids.add(agent.getString("uid"));
+                                        agentRealNames.add(agent.getString("realName"));
+                                    }
+                                    //
+                                    String[] itemsArray = new String[agentRealNames.size()];
+                                    itemsArray = agentRealNames.toArray(itemsArray);
+                                    new QMUIDialog.MenuDialogBuilder(context)
+                                        .addItems(itemsArray, (dialog, which) -> {
+                                            Toast.makeText(context, "你选择了 " + agentRealNames.get(which), Toast.LENGTH_SHORT).show();
+                                            dialog.dismiss();
+                                            // 调用转接会话接口， TODO: 自定义附言内容
+                                            String transferAgentUid = agentUids.get(which);
+                                            BDMqttApi.sendTransferMessageProtobuf(context, mThreadEntity, transferAgentUid, "附言");
+                                        })
+                                        .create(mCurrentDialogStyle).show();
+
+                                } else {
+                                    Toast.makeText(context, "当前无其他客服在线", Toast.LENGTH_LONG).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        @Override
+                        public void onError(JSONObject object) {
+                            try {
+                                String message = object.getString("message");
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                } else if (i == 2) {
+                    Logger.i("邀请评价");
+                    // 插入本地
+                    final String localId = BDCoreUtils.uuid();
+                    // 插入本地消息
+                    mRepository.insertInviteRateMessageLocal(mUUID, mWorkGroupWid, mUUID, "邀请评价", localId, mThreadType);
+                    //
+                    BDMqttApi.sendInviteRateMessageProtobuf(this, localId, "邀请评价", mThreadEntity);
+
+                } else if (i == 3) {
+                    Logger.i("发送表单");
+                    // 插入本地
+                    // TODO: 弹窗选择字段
+                    final String localId = BDCoreUtils.uuid();
+                    mRepository.insertFormRequestMessageLocal(mUUID, mWorkGroupWid, mUUID, "发送表单", localId, mThreadType);
+                    //
+                    String formContent = "{ 'form': [ '姓名', '手机' ]}";
+                    BDMqttApi.sendFormRequestMessageProtobuf(this, localId, formContent, mThreadEntity);
+
+                } else if (i == 4) {
+                    Logger.i("关闭会话");
+                    // 弹窗确认
+                    Context context = this;
+                    new QMUIDialog.MessageDialogBuilder(context)
+                        .setTitle("关闭会话")
+                        .setMessage("确定要关闭会话？")
+                        .addAction("取消", (dialog, index) -> dialog.dismiss())
+                        .addAction(0, "确定", QMUIDialogAction.ACTION_PROP_POSITIVE, (dialog, index) -> {
+                            dialog.dismiss();
+                            // 关闭会话
+                            agentCloseThread();
+                        })
+                        .create(mCurrentDialogStyle).show();
+                } else if (i == 5) {
+                    Logger.i("拉黑用户");
+                    // 弹窗，输入备注内容
+                    Context context = this;
+                    final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
+                    builder.setTitle("拉黑")
+                            .setPlaceholder("请输入拉黑理由")
+                            .setInputType(InputType.TYPE_CLASS_TEXT)
+                            .addAction("取消", (dialog, index) -> dialog.dismiss())
+                            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                @Override
+                                public void onClick(QMUIDialog dialog, int index) {
+                                    CharSequence text = builder.getEditText().getText();
+                                    if (text != null && text.length() > 0) {
+//                                        Toast.makeText(getActivity(), "您的昵称: " + text, Toast.LENGTH_SHORT).show();
+                                        dialog.dismiss();
+                                        // 拉黑
+                                        addBlock(text.toString());
+                                    } else {
+                                        Toast.makeText(context, "请输入拉黑理由", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            })
+                            .create(mCurrentDialogStyle).show();
+
+                }
+            };
+            mListPopup = QMUIPopups.listPopup(this,
+                    QMUIDisplayHelper.dp2px(this, 100),
+                    QMUIDisplayHelper.dp2px(this, 300),
+                    adapter,
+                    onItemClickListener)
+                    .animStyle(QMUIPopup.ANIM_GROW_FROM_CENTER)
+                    .preferredDirection(QMUIPopup.DIRECTION_TOP)
+                    .shadow(true)
+                    .offsetYIfTop(QMUIDisplayHelper.dp2px(this, 5))
+                    .onDismiss(() -> {
+//                            Toast.makeText(this, "onDismiss", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+
+    private void agentCloseThread () {
+
+        Context context = this;
+        BDCoreApi.agentCloseThread(this, mThreadEntity.getTid(), new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                // TODO: 结果提醒
+                try {
+                    String message = object.getString("message");
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                try {
+                    String message = object.getString("message");
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    // 拉黑
+    private void addBlock (String note) {
+        //
+        Context context = this;
+        String uid = mThreadEntity.getTopic().split("/")[1];
+
+        BDCoreApi.addBlock(this, uid, note, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+
+                // TODO: 结果提醒
+                try {
+                    String message = object.getString("message");
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                try {
+                    String message = object.getString("message");
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**

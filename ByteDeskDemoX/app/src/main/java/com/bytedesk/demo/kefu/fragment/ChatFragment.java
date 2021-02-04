@@ -81,7 +81,7 @@ public class ChatFragment extends BaseFragment {
                 jsonCustom.setCategoryCode("100010003");
                 //
                 String custom = new Gson().toJson(jsonCustom);
-                BDUiApi.startWorkGroupChatActivity(getContext(), BDDemoConst.wId, "电商工作组客服", custom);
+                BDUiApi.startWorkGroupChatActivityShop(getContext(), BDDemoConst.wId, "电商工作组客服", custom);
             })
             .addItemView(shopAppointedChatItem, view -> {
                 //
@@ -96,7 +96,7 @@ public class ChatFragment extends BaseFragment {
                 jsonCustom.setCategoryCode("100010003");
                 //
                 String custom = new Gson().toJson(jsonCustom);
-                BDUiApi.startAppointChatActivity(getContext(), BDDemoConst.agentUid, "电商指定客服", custom);
+                BDUiApi.startAppointChatActivityShop(getContext(), BDDemoConst.agentUid, "电商指定客服", custom);
             }).addTo(mGroupListView);
 
         //

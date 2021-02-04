@@ -9,7 +9,7 @@ buildscript {
         maven { url 'https://maven.aliyun.com/repository/jcenter/'}
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath 'com.android.tools.build:gradle:4.1.2'
         
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -40,8 +40,8 @@ ext {
     targetSdkVersion = 29
     compileSdkVersion = 29
 
-    versionCode = 231
-    versionName = '2.3.4'
+    versionCode = 244
+    versionName = '2.4.4'
 
     buildToolsVersion = '29.0.3'
     supportLibVersion = '28.0.0'
@@ -63,6 +63,6 @@ ext {
     archLifecycleVersion = "2.2.0"
     archRoomVersion = "2.2.5"
 
-    bytedeskCoreVersion = "2.3.4"
-    bytedeskUIVersion = "2.3.4"
+    bytedeskCoreVersion = "2.3.5"
+    bytedeskUIVersion = "2.3.5"
 }

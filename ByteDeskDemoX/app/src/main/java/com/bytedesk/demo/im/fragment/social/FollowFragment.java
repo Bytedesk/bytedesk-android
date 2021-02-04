@@ -278,7 +278,7 @@ public class FollowFragment extends BaseFragment implements SwipeItemClickListen
      */
     private void addBlock(String uid) {
         //
-        BDCoreApi.addBlock(getContext(), uid, "添加备注", "im", new BaseCallback() {
+        BDCoreApi.addBlock(getContext(), uid, "添加备注",  new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
