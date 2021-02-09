@@ -42,6 +42,10 @@ public class BDApplication extends Application{
         // 初始化萝卜丝UI界面库
         BDUiApi.init(this);
 
+        // 自定义服务器，请跟萝卜丝联系获取，私有部署开发者调用。公有云用户无需调用
+//        BDConfig.getInstance(this).setRestApiHost("https://zovwus.iczhl.com/");
+//        BDConfig.getInstance(this).setMqttWebSocketWssURL("wss://zovwus.iczhl.com/websocket");
+
         // 萝卜丝授权登录
         anonymousLogin();
     }

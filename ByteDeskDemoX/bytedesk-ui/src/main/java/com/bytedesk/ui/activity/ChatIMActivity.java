@@ -1011,6 +1011,15 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         startActivity(intent);
     }
 
+    @Override
+    public void onMessageVideoItemClick(String videoUrl) {
+        Logger.d("videoUrl:" + videoUrl);
+
+        Intent intent = new Intent(this, ChatVideoActivity.class);
+        intent.putExtra("video_url", videoUrl);
+        startActivity(intent);
+    }
+
     /**
      *
      * @param requestCode

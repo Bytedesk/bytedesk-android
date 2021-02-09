@@ -206,6 +206,8 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             new QMUIBottomSheet.BottomListSheetBuilder(this)
                 .addItem("相册")
                 .addItem("拍照")
+                .addItem("上传视频")
+                .addItem("录制视频")
                 .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
                     switch (position) {
                         case 0:
@@ -215,6 +217,14 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                         case 1:
                             Logger.d("camera");
                             requestCameraPermission();
+                            break;
+                        case 2:
+                            Logger.d("上传视频");
+                            requestAlbumVideoPermission();
+                            break;
+                        case 3:
+                            Logger.d("录制视频");
+                            requestCameraVideoPermission();
                             break;
                     }
                     dialog.dismiss();
@@ -987,6 +997,51 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
     }
 
+    private void pickVideoFromAlbum() {
+        Logger.i("pickVideoFromAlbum");
+
+        // 目前仅允许一次选一张视频
+        Album.video(this)
+                .singleChoice()
+                .camera(false)
+                .onResult(result -> {
+
+                    if (result.size() > 0) {
+                        AlbumFile albumFile = result.get(0);
+
+                        String videoName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp() + ".mp4";
+                        uploadVideo(albumFile.getPath(), videoName);
+                    }
+                })
+                .onCancel(result -> {
+                    //
+                    Toast.makeText(ChatKFActivity.this, "取消发送视频", Toast.LENGTH_LONG).show();
+                })
+                .start();
+
+    }
+
+    private void takeCameraVideo() {
+        Logger.i("takeCameraVideo");
+
+        // TODO: 判断是否模拟器，如果是，则弹出tip提示，并返回
+
+        // 调用第三方库album
+        Album.camera(this)
+                .video()
+                .onResult(result -> {
+
+                    String videoFileName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp() + ".mp4";
+                    uploadVideo(result, videoFileName);
+                })
+                .onCancel(result -> {
+                    //
+                    Toast.makeText(ChatKFActivity.this, "取消录像", Toast.LENGTH_LONG).show();
+                })
+                .start();
+
+    }
+
 
     private void visitorTopRightSheet() {
         //
@@ -1141,6 +1196,72 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         }
     }
 
+    private void requestAlbumVideoPermission() {
+
+        // android 6.0动态授权机制
+        // http://jijiaxin89.com/2015/08/30/Android-s-Runtime-Permission/
+        // http://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
+        if (Build.VERSION.SDK_INT >= 23) {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                // 首先提示用户，待确认之后，请求用户授权
+                new QMUIDialog.MessageDialogBuilder(this)
+                        .setTitle("请求授权")
+                        .setMessage("相册视频需要授权，请授权")
+                        .addAction("取消", (dialog, index) -> dialog.dismiss())
+                        .addAction("确定", (dialog, index) -> {
+                            dialog.dismiss();
+                            // 请求授权
+                            ActivityCompat.requestPermissions(ChatKFActivity.this,
+                                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    BDUiConstant.PERMISSION_REQUEST_ALBUM_VIDEO);
+                        }).show();
+            }
+            else {
+                pickVideoFromAlbum();
+            }
+        }
+        else {
+            pickVideoFromAlbum();
+        }
+    }
+
+    private void requestCameraVideoPermission() {
+
+        // android 6.0动态授权机制
+        // http://jijiaxin89.com/2015/08/30/Android-s-Runtime-Permission/
+        // http://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
+        if (Build.VERSION.SDK_INT >= 23) {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
+
+                // 首先提示用户，待确认之后，请求用户授权
+                new QMUIDialog.MessageDialogBuilder(this)
+                        .setTitle("请求授权")
+                        .setMessage("录像需要授权，请授权")
+                        .addAction("取消", (dialog, index) -> dialog.dismiss())
+                        .addAction("确定", (dialog, index) -> {
+                            dialog.dismiss();
+                            // 请求授权
+                            ActivityCompat.requestPermissions(ChatKFActivity.this,
+                                    new String[] { Manifest.permission.CAMERA,
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    BDUiConstant.PERMISSION_REQUEST_CAMERA_VIDEO);
+                        }).show();
+            }
+            else {
+                takeCameraVideo();
+            }
+        }
+        else {
+            takeCameraVideo();
+        }
+    }
+
     /**
      * 点击图片消息回调
      */
@@ -1187,6 +1308,15 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         startActivity(intent);
     }
 
+    @Override
+    public void onMessageVideoItemClick(String videoUrl) {
+        Logger.d("videoUrl:" + videoUrl);
+
+        Intent intent = new Intent(this, ChatVideoActivity.class);
+        intent.putExtra("video_url", videoUrl);
+        startActivity(intent);
+    }
+
     /**
      *
      * @param requestCode
@@ -1206,6 +1336,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 }
                 break;
             case BDUiConstant.PERMISSION_REQUEST_CAMERA:
+                //
                 if (BDPermissionUtils.verifyPermissions(grantResults)) {
                     // Permission Granted
                     takeCameraImage();
@@ -1221,6 +1352,25 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 } else {
                     // Permission Denied
                     Toast.makeText(this, "相册授权失败", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case BDUiConstant.PERMISSION_REQUEST_CAMERA_VIDEO:
+                //
+                if (BDPermissionUtils.verifyPermissions(grantResults)) {
+                    // Permission Granted
+                    takeCameraVideo();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(this, "录像授权失败", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case BDUiConstant.PERMISSION_REQUEST_ALBUM_VIDEO:
+                if (BDPermissionUtils.verifyPermissions(grantResults)) {
+                    // Permission Granted
+                    pickVideoFromAlbum();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(this, "相册视频授权失败", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -1275,16 +1425,15 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             return;
         }
 
+        // TODO: 无客服在线时，禁止发送图片
+        // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
+
         BDCoreApi.uploadImage(this, filePath, fileName, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
 
                 try {
-
-                    // TODO: 无客服在线时，禁止发送图片
-
-                    // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
 
                     // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
                     final String localId = BDCoreUtils.uuid();
@@ -1308,6 +1457,44 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             @Override
             public void onError(JSONObject object) {
                 Toast.makeText(getApplicationContext(), "上传图片失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void uploadVideo(String filePath, String fileName) {
+
+        if (mIsRobot) {
+            Toast.makeText(this, "机器人暂时不支持视频", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // TODO: 无客服在线时，禁止发送图片
+        // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
+
+        BDCoreApi.uploadVoice(this, filePath, fileName, new BaseCallback() {
+
+            @Override
+            public void onSuccess(JSONObject object) {
+                try {
+
+                    // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
+                    final String localId = BDCoreUtils.uuid();
+                    String videoUrl = object.getString("data");
+                    Logger.i("videoUrl:", videoUrl);
+
+                    // 插入本地消息
+                    mRepository.insertVideoMessageLocal(mUUID, mWorkGroupWid, mUid, videoUrl, localId, mThreadType);
+                    // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
+                    BDMqttApi.sendVideoMessageProtobuf(ChatKFActivity.this, localId, videoUrl, mThreadEntity);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                Toast.makeText(getApplicationContext(), "上传视频失败", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -35,6 +35,8 @@ public class BDUiConstant {
     public static final int PERMISSION_REQUEST_CAMERA = 0;
     public static final int  PERMISSION_REQUEST_RECORD_AUDIO = 1;
     public static final int  PERMISSION_REQUEST_ALBUM = 2;
+    public static final int PERMISSION_REQUEST_CAMERA_VIDEO = 3;
+    public static final int  PERMISSION_REQUEST_ALBUM_VIDEO = 4;
     //
     public static final int  SELECT_PIC_BY_TAKE_PHOTO = 2;
     public static final int  SELECT_PIC_BY_PICK_PHOTO = 3;

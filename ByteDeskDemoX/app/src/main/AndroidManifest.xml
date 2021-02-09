@@ -117,6 +117,10 @@
         <activity
             android:name="com.bytedesk.ui.activity.BigImageViewActivity"
             android:theme="@style/AppTheme.ByteDesk"/>
+        <!-- 播放视频 -->
+        <activity
+            android:name="com.bytedesk.ui.activity.ChatVideoActivity"
+            android:theme="@style/AppTheme.ByteDesk" />
 
         <!--意见反馈-->
         <activity

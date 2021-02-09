@@ -10,6 +10,8 @@ public interface ChatItemClickListener {
 
     void onMessageImageItemClick(String imageUrl);
 
+    void onMessageVideoItemClick(String videoUrl);
+
 //    void onMessageVoiceItemClick(int position);
 
 }

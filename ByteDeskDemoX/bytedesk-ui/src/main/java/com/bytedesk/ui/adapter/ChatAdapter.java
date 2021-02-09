@@ -109,6 +109,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             case MessageEntity.TYPE_IMAGE_SELF_ID:
                 layout = R.layout.bytedesk_message_item_image_self;
                 break;
+            case MessageEntity.TYPE_VIDEO_ID:
+                layout = R.layout.bytedesk_message_item_video;
+                break;
+            case MessageEntity.TYPE_VIDEO_SELF_ID:
+                layout = R.layout.bytedesk_message_item_video_self;
+                break;
             case MessageEntity.TYPE_VOICE_ID:
                 layout = R.layout.bytedesk_message_item_voice;
                 break;
@@ -187,6 +193,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         private QMUILinkTextView contentTextView;
         // 图片消息
         private ImageView imageImageView;
+        // 视频消息
+        private ImageView videoImageView;
         // 语音消息
         public TextView voiceTextView;
         public TextView voiceLengthTextView;
@@ -218,7 +226,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             //
             messageViewType = msgViewType;
             timestampTextView = itemView.findViewById(R.id.bytedesk_message_item_timestamp_textview);
-
             // 文字消息
             if (messageViewType == MessageEntity.TYPE_TEXT_ID
                     || messageViewType == MessageEntity.TYPE_TEXT_SELF_ID
@@ -232,6 +239,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     || messageViewType == MessageEntity.TYPE_IMAGE_SELF_ID) {
                 initAvatar();
                 imageImageView = itemView.findViewById(R.id.bytedesk_message_item_image);
+            }
+            // 视频消息
+            else if (messageViewType == MessageEntity.TYPE_VIDEO_ID
+                    || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID) {
+                initAvatar();
+                videoImageView = itemView.findViewById(R.id.bytedesk_message_item_video);
             }
             // 语音消息
             else if (messageViewType == MessageEntity.TYPE_VOICE_ID
@@ -383,6 +396,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
 //                            viewData.setTargetHeight(imageImageView.getHeight());
 //                            itemClickListener.onMessageImageItemClick(viewData, msgEntity.getImageUrl());
                         itemClickListener.onMessageImageItemClick(msgEntity.getImageUrl());
+                    }
+                });
+            }
+            // 视频消息
+            else if (messageViewType == MessageEntity.TYPE_VIDEO_ID
+                    || messageViewType == MessageEntity.TYPE_VIDEO_SELF_ID) {
+                loadAvatar(msgEntity);
+                // TODO: 显示视频真实thumb
+                Glide.with(mContext).load("https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/videoplay.png").into(videoImageView);
+                videoImageView.setOnClickListener(view -> {
+                    Logger.d("video clicked:" + msgEntity.getVideoOrShortUrl());
+                    if (null != itemClickListener) {
+                        itemClickListener.onMessageVideoItemClick(msgEntity.getVideoOrShortUrl());
                     }
                 });
             }

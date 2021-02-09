@@ -316,6 +316,7 @@
     <string name="appkefu_f103">[飞吻]</string>
     <string name="appkefu_f104">[母企鹅]</string>
     <string name="appkefu_f105">[公企鹅]</string>
+
     <string name="title_activity_big_image">BigImageActivity</string>
     <string name="title_activity_contact">ContactActivity</string>
     <string name="title_activity_feedback">FeedbackActivity</string>
@@ -324,5 +325,7 @@
     <string name="title_activity_leave_message">LeaveMessageActivity</string>
     <string name="title_activity_feedback_record">FeedbackRecordActivity</string>
     <string name="title_activity_ticket_record">TicketRecordActivity</string>
+    <string name="title_activity_chat_video">ChatVideoActivity</string>
+
 
 </resources>
