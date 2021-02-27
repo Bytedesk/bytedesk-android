@@ -691,7 +691,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
-
             } else if (status_code == 204) {
                 // 当前无客服在线，请自助查询或留言
 
@@ -1424,6 +1423,9 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             Toast.makeText(this, "机器人暂时不支持图片", Toast.LENGTH_LONG).show();
             return;
         }
+        Logger.i("upload image:", filePath);
+
+        // TODO: 压缩，显示上传进度
 
         // TODO: 无客服在线时，禁止发送图片
         // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
@@ -1467,6 +1469,8 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             Toast.makeText(this, "机器人暂时不支持视频", Toast.LENGTH_LONG).show();
             return;
         }
+
+        // TODO: 压缩，显示上传进度
 
         // TODO: 无客服在线时，禁止发送图片
         // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
