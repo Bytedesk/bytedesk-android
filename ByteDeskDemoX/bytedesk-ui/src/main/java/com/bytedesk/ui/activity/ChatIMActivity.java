@@ -79,6 +79,7 @@ import com.qmuiteam.qmui.util.QMUIViewHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.qmuiteam.qmui.widget.popup.QMUIPopup;
 import com.qmuiteam.qmui.widget.popup.QMUIPopups;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
@@ -1517,10 +1518,18 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
      */
     private void uploadImage(String filePath, String fileName) {
 
+        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(this)
+                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                .setTipWord("上传中...")
+                .create();
+        loadingDialog.show();
+
         BDCoreApi.uploadImage(this, filePath, fileName, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
+
+                loadingDialog.dismiss();
 
                 try {
 
@@ -1547,6 +1556,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 
             @Override
             public void onError(JSONObject object) {
+                loadingDialog.dismiss();
                 Toast.makeText(getApplicationContext(), "上传图片失败", Toast.LENGTH_SHORT).show();
             }
         });

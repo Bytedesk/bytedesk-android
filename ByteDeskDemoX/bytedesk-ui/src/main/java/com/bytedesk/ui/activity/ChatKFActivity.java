@@ -47,6 +47,7 @@ import com.qmuiteam.qmui.util.QMUIViewHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 import com.yanzhenjie.album.Album;
 import com.yanzhenjie.album.AlbumFile;
@@ -1426,6 +1427,11 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         Logger.i("upload image:", filePath);
 
         // TODO: 压缩，显示上传进度
+        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(this)
+                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                .setTipWord("上传中...")
+                .create();
+        loadingDialog.show();
 
         // TODO: 无客服在线时，禁止发送图片
         // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
@@ -1434,6 +1440,8 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
             @Override
             public void onSuccess(JSONObject object) {
+
+                loadingDialog.dismiss();
 
                 try {
 
@@ -1458,6 +1466,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
             @Override
             public void onError(JSONObject object) {
+                loadingDialog.dismiss();
                 Toast.makeText(getApplicationContext(), "上传图片失败", Toast.LENGTH_SHORT).show();
             }
         });
@@ -1471,6 +1480,11 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         }
 
         // TODO: 压缩，显示上传进度
+        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(this)
+                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                .setTipWord("上传中...")
+                .create();
+        loadingDialog.show();
 
         // TODO: 无客服在线时，禁止发送图片
         // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
@@ -1479,6 +1493,9 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
             @Override
             public void onSuccess(JSONObject object) {
+
+                loadingDialog.dismiss();
+
                 try {
 
                     // 自定义本地消息id，用于判断消息发送状态。消息通知或者回调接口中会返回此id
@@ -1498,6 +1515,9 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
             @Override
             public void onError(JSONObject object) {
+
+                loadingDialog.dismiss();
+
                 Toast.makeText(getApplicationContext(), "上传视频失败", Toast.LENGTH_SHORT).show();
             }
         });
