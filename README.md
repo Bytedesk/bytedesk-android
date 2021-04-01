@@ -27,6 +27,7 @@
 ```bash
 # proguard-rules.pro中添加
 -keep class com.bytedesk.**{*;}
+-keep class io.xiaper.**{*;}
 -keep class com.tencent.**{*;}
 ```
 
