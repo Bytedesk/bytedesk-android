@@ -21,6 +21,7 @@
 allprojects { 
   repositories { 
     # 添加
+    # 去查看最新版：https://search.maven.org/search?q=g:com.bytedesk
     mavenCentral()
   }
 }
