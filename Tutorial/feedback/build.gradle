@@ -18,10 +18,8 @@ allprojects {
     repositories {
         google()
         jcenter()
-        // 萝卜丝第一步：
-        maven {
-            url  "https://dl.bintray.com/jackning/maven"
-        }
+        // 添加
+        mavenCentral()
     }
 }
 

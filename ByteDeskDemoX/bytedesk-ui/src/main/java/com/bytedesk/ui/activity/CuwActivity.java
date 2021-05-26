@@ -60,6 +60,22 @@ public class CuwActivity extends AppCompatActivity {
         mCuwSection = QMUIGroupListView.newSection(this);
     }
 
+    private String getDetail(String type, String content) {
+        //
+        if (type.equals("text")) {
+            return "[文字]" + content;
+        } else if (type.equals("image")) {
+            return "[图片]";
+        } else if (type.equals("file")) {
+            return "[文件]";
+        } else if (type.equals("voice")) {
+            return "[语音]";
+        } else if (type.equals("video")) {
+            return "[视频]";
+        }
+        return "[文字]" + content;
+    }
+
     private void getCuws() {
 
         BDCoreApi.getCuws(this, new BaseCallback() {
@@ -74,16 +90,20 @@ public class CuwActivity extends AppCompatActivity {
                         JSONArray cuwChildren = category.getJSONArray("cuwChildren");
                         for (int j = 0; j < cuwChildren.length(); j++) {
                             JSONObject cuw = cuwChildren.getJSONObject(j);
-                            Long id = cuw.getLong("id");
-                            String cid = cuw.getString("cid");
+//                            Long id = cuw.getLong("id");
+//                            String cid = cuw.getString("cid");
+                            String type = cuw.getString("type");
                             String name = cuw.getString("name");
                             String content = cuw.getString("content");
-//                            Logger.i("mine id %s, cid: %s, name: %s, content: %s", id, cid, name, content);
+//                            Logger.i("mine type %s, name: %s, content: %s", type, name, content);
                             //
-                            QMUICommonListItemView articleItem = mGroupListView.createItemView(content);
+                            QMUICommonListItemView articleItem = mGroupListView.createItemView(name);
+//                            String detail = type.equals("text") ? "[文字]" + content : (type.equals("image") ? "[图片]": "["+type+"]");
+                            articleItem.setDetailText(getDetail(type, content));
                             mCuwSection.addItemView(articleItem, v -> {
                                 //
                                 Intent intent = new Intent();
+                                intent.putExtra("type", type);
                                 intent.putExtra("content", content);
                                 setResult(1, intent);
                                 finish();
@@ -97,16 +117,20 @@ public class CuwActivity extends AppCompatActivity {
                         JSONArray cuwChildren = category.getJSONArray("cuwChildren");
                         for (int j = 0; j < cuwChildren.length(); j++) {
                             JSONObject cuw = cuwChildren.getJSONObject(j);
-                            Long id = cuw.getLong("id");
-                            String cid = cuw.getString("cid");
+//                            Long id = cuw.getLong("id");
+//                            String cid = cuw.getString("cid");
+                            String type = cuw.getString("type");
                             String name = cuw.getString("name");
                             String content = cuw.getString("content");
-//                            Logger.i("company id %s, cid: %s, name: %s, content: %s", id, cid, name, content);
+//                            Logger.i("company type %s, name: %s, content: %s", type, name, content);
                             //
-                            QMUICommonListItemView articleItem = mGroupListView.createItemView(content);
+                            QMUICommonListItemView articleItem = mGroupListView.createItemView(name);
+//                            String detail = type.equals("text") ? "[文字]" + content : "[图片]" + content;
+                            articleItem.setDetailText(getDetail(type, content));
                             mCuwSection.addItemView(articleItem, v -> {
                                 //
                                 Intent intent = new Intent();
+                                intent.putExtra("type", type);
                                 intent.putExtra("content", content);
                                 setResult(1, intent);
                                 finish();
@@ -120,16 +144,20 @@ public class CuwActivity extends AppCompatActivity {
                         JSONArray cuwChildren = category.getJSONArray("cuwChildren");
                         for (int j = 0; j < cuwChildren.length(); j++) {
                             JSONObject cuw = cuwChildren.getJSONObject(j);
-                            Long id = cuw.getLong("id");
-                            String cid = cuw.getString("cid");
+//                            Long id = cuw.getLong("id");
+//                            String cid = cuw.getString("cid");
+                            String type = cuw.getString("type");
                             String name = cuw.getString("name");
                             String content = cuw.getString("content");
-//                            Logger.i("platform id %s, cid: %s, name: %s, content: %s", id, cid, name, content);
+//                            Logger.i("platform type %s, name: %s, content: %s", type, name, content);
                             //
-                            QMUICommonListItemView articleItem = mGroupListView.createItemView(content);
+                            QMUICommonListItemView articleItem = mGroupListView.createItemView(name);
+//                            String detail = type.equals("text") ? "[文字]" + content : "[图片]" + content;
+                            articleItem.setDetailText(getDetail(type, content));
                             mCuwSection.addItemView(articleItem, v -> {
                                 //
                                 Intent intent = new Intent();
+                                intent.putExtra("type", type);
                                 intent.putExtra("content", content);
                                 setResult(1, intent);
                                 finish();

@@ -63,6 +63,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *  用途：
@@ -98,6 +100,8 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     private final Handler mHandler = new Handler();
     private String mCustom;
     private int mCurrentDialogStyle = com.qmuiteam.qmui.R.style.QMUI_Dialog;
+    //
+    private Timer timer = new Timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,8 +150,11 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         if (mIsVisitor) {
             requestThread();
         }
+        //
         // 从服务器端加载聊天记录，默认暂不加载
-        // getMessages();
+        getMessages();
+        //
+        initTimerTask();
     }
 
     @Override
@@ -167,8 +174,8 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         // TODO: 清理
+        timer.cancel();
     }
 
     /**
@@ -342,6 +349,16 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         }
     }
 
+    private void initTimerTask() {
+        //
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                getMessages();
+            }
+        };
+        timer.schedule(task,0,10000);
+    }
 
     /**
      * 请求会话
@@ -555,8 +572,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     private void getMessages() {
 
         if (mIsVisitor) {
-            Logger.i("访客端");
-
+            Logger.i("getMessages 访客端");
             //
             BDCoreApi.getMessagesWithUser(getBaseContext(), mPage, mSize, new BaseCallback() {
 
@@ -590,7 +606,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             });
 
         }  else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_WORKGROUP)) {
-            Logger.i("客服端：客服会话 uid:" + mUid);
+            Logger.i("getMessages 客服端：客服会话 uid:" + mUid);
 
             // 客服端接口
             BDCoreApi.getMessagesWithUser(getBaseContext(), mUid, mPage, mSize, new BaseCallback() {
@@ -1376,7 +1392,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-
     }
 
 
@@ -1386,26 +1401,80 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
      * @param content
      */
     private void sendTextMessage(String content) {
-
+        //
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+        //
         if (!BDMqttApi.isConnected(this)) {
-            Toast.makeText(this, "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
+            //
+            String timestamp = BDCoreUtils.currentDate();
+            String client = BDCoreConstant.CLIENT_ANDROID;
+            String type = BDCoreConstant.MESSAGE_TYPE_TEXT;
+            //
+            JSONObject messageObject = new JSONObject();
+            try {
+                //
+                messageObject.put("mid", localId);
+                messageObject.put("timestamp", timestamp);
+                messageObject.put("client", client);
+                messageObject.put("version", "1");
+                messageObject.put("type", type);
+                //
+                JSONObject userObject = new JSONObject();
+                userObject.put("uid", mPreferenceManager.getUid());
+                userObject.put("nickname", mPreferenceManager.getNickname());
+                userObject.put("avatar", mPreferenceManager.getAvatar());
+                messageObject.put("user", userObject);
+                //
+                JSONObject textObject = new JSONObject();
+                textObject.put("content", content);
+                messageObject.put("text", textObject);
+                //
+                JSONObject threadObject = new JSONObject();
+                threadObject.put("tid", mThreadEntity.getTid());
+                threadObject.put("type", mThreadEntity.getType());
+                threadObject.put("content", content);
+                threadObject.put("nickname", mThreadEntity.getNickname());
+                threadObject.put("avatar", mThreadEntity.getAvatar());
+                threadObject.put("topic", mThreadEntity.getTopic());
+                threadObject.put("timestamp", timestamp);
+                threadObject.put("unreadCount", 0);
+                messageObject.put("thread", threadObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            //
+            String jsonContent = messageObject.toString();
+            Logger.d("send message rest %s", jsonContent);
+            //
+            BDCoreApi.sendMessageRest(this, jsonContent, new BaseCallback() {
+
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    // 插入本地消息
+                    mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+                    Toast.makeText(getApplicationContext(), "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
+                }
+            });
+
             return;
         }
+        //
         if (content.length() >= 512) {
             Toast.makeText(this, "消息太长，请分多次发送", Toast.LENGTH_LONG).show();
             return;
         }
-
-        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
-        final String localId = BDCoreUtils.uuid();
-
         // 插入本地消息
         mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
-        // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
         //
+        // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
         BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
-//        BDMqttApi.sendTextMessageProtobuf(this, localId, content,
-//                mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
+//
     }
 
     /**

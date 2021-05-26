@@ -1478,8 +1478,13 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         } else if (requestCode == BDUiConstant.SELECT_CUW) {
             // 忽略resultCode直接获取content即可
             if (resultCode == 1) {
+                String type = data.getStringExtra("type");
                 String content = data.getStringExtra("content");
-                sendTextMessage(content);
+                if (type.equals("text")) {
+                    sendTextMessage(content);
+                } else {
+                    sendImageMessage(content);
+                }
             }
         }
     }
@@ -1490,20 +1495,87 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
      * @param content
      */
     private void sendTextMessage(String content) {
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+
         if (!BDMqttApi.isConnected(this)) {
-            Toast.makeText(this, "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
+            //
+            String timestamp = BDCoreUtils.currentDate();
+            String client = BDCoreConstant.CLIENT_ANDROID;
+            String type = BDCoreConstant.MESSAGE_TYPE_TEXT;
+            //
+            JSONObject messageObject = new JSONObject();
+            try {
+                //
+                messageObject.put("mid", localId);
+                messageObject.put("timestamp", timestamp);
+                messageObject.put("client", client);
+                messageObject.put("version", "1");
+                messageObject.put("type", type);
+                //
+                JSONObject userObject = new JSONObject();
+                userObject.put("uid", mPreferenceManager.getUid());
+                userObject.put("nickname", mPreferenceManager.getNickname());
+                userObject.put("avatar", mPreferenceManager.getAvatar());
+                messageObject.put("user", userObject);
+                //
+                JSONObject textObject = new JSONObject();
+                textObject.put("content", content);
+                messageObject.put("text", textObject);
+                //
+                JSONObject threadObject = new JSONObject();
+                threadObject.put("tid", mThreadEntity.getTid());
+                threadObject.put("type", mThreadEntity.getType());
+                threadObject.put("content", content);
+                threadObject.put("nickname", mThreadEntity.getNickname());
+                threadObject.put("avatar", mThreadEntity.getAvatar());
+                threadObject.put("topic", mThreadEntity.getTopic());
+                threadObject.put("timestamp", timestamp);
+                threadObject.put("unreadCount", 0);
+                messageObject.put("thread", threadObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            //
+            String jsonContent = messageObject.toString();
+            BDCoreApi.sendMessageRest(this, jsonContent, new BaseCallback() {
+
+                @Override
+                public void onSuccess(JSONObject object) {
+
+                    // 插入本地消息
+                    mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
+                }
+
+                @Override
+                public void onError(JSONObject object) {
+                    Toast.makeText(getApplicationContext(), "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
+                }
+            });
+
             return;
         }
+
         if (content.length() >= 500) {
             Toast.makeText(this, "消息太长，请分多次发送", Toast.LENGTH_LONG).show();
             return;
         }
-        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
-        final String localId = BDCoreUtils.uuid();
+
         // 插入本地消息
         mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
         //
         BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
+    }
+
+    private void sendImageMessage(String imageUrl) {
+
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertImageMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType);
+
+        BDMqttApi.sendImageMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+
     }
 
     /**
@@ -1546,8 +1618,6 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     mRepository.insertImageMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType);
 
                     BDMqttApi.sendImageMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
-//                    BDMqttApi.sendImageMessageProtobuf(ChatIMActivity.this, localId, imageUrl,
-//                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
                 } catch (JSONException e) {
                     e.printStackTrace();

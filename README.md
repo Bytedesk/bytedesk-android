@@ -17,9 +17,19 @@
 萝卜丝·云客服在经典版[微客服](http://www.weikefu.net)基础上面做了重构，将原先一个 SDK 一分为二为两个 sdk：
 
 ```bash
+# 在项目根目录的build.gradle
+allprojects { 
+  repositories { 
+    # 添加
+    mavenCentral()
+  }
+}
+```
+
+```bash
 # androidx版, 参考demo：ByteDeskDemoX
-- 核心库: implementation 'com.bytedesk:libcore:2.5.4'
-- 界面库: implementation 'com.bytedesk:libui:2.5.4'
+- 核心库: implementation 'com.bytedesk:libcore:2.6.1'
+- 界面库: implementation 'com.bytedesk:libui:2.6.1'
 ```
 
 混淆

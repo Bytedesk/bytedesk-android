@@ -17,9 +17,8 @@
 > 第一步：在总项目 build.gradle 的 allprojects -> repositories 添加
 
 ```java
-maven {
-    url  "https://dl.bintray.com/jackning/maven"
-}
+// 添加
+mavenCentral()
 ```
 
 > 修改完后，效果如下：
@@ -27,11 +26,10 @@ maven {
 ```java
 allprojects {
     repositories {
-        jcenter()
         google()
-        maven {
-            url  "https://dl.bintray.com/jackning/maven"
-        }
+        // 萝卜丝第一步：
+        // 添加
+        mavenCentral()
     }
 }
 ```
@@ -87,9 +85,9 @@ android {
 ```java
 // 萝卜丝第三步
 // 加载萝卜丝核心库
-implementation 'com.bytedesk:libcore:2.5.4'
+implementation 'com.bytedesk:libcore:2.6.1'
 // 加载萝卜丝默认UI库
-implementation 'com.bytedesk:libui:2.5.4'
+implementation 'com.bytedesk:libui:2.6.1'
 
 // 腾讯QMUI界面库
 // http://qmuiteam.com/android/page/start.html

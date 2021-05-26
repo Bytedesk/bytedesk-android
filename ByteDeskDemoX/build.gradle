@@ -2,11 +2,8 @@
 
 buildscript {
     repositories {
-        // google()
-        // jcenter()
         maven { url 'https://maven.aliyun.com/repository/public/' }
         maven { url 'https://maven.aliyun.com/repository/google/'}
-        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.2'
@@ -18,15 +15,11 @@ buildscript {
 
 allprojects {
     repositories {
-        // google()
-        // jcenter()
         maven { url 'https://maven.aliyun.com/repository/public/' }
         maven { url 'https://maven.aliyun.com/repository/google/'}
-        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
-        // 如需要引用bytedesk sdk，需要添加如下：
-        maven {
-            url  "https://dl.bintray.com/jackning/maven"
-        }
+        // 萝卜丝第一步：
+        // 添加
+        mavenCentral()
     }
 }
 
@@ -40,15 +33,14 @@ ext {
     targetSdkVersion = 29
     compileSdkVersion = 29
 
-    versionCode = 254
-    versionName = '2.5.4'
+    versionCode = 260
+    versionName = '2.6.0'
 
     buildToolsVersion = '29.0.3'
-    supportLibVersion = '28.0.0'
     
-    appcompatVersion= '1.2.0-alpha02'
+    appcompatVersion = '1.2.0'
     butterknifeVersion = '10.1.0'
-    recyleviewxVersion = '1.1.0'
+    recyleviewxVersion = '1.2.0'
     stethoVersion = '1.5.1'
     
     qmuiVersion = '2.0.0-alpha10'
@@ -56,13 +48,13 @@ ext {
 
     easypermissionsVersion = '3.0.0'
     eventbusVersion = '3.2.0'
-    glideVersion = '4.11.0'
+    glideVersion = '4.12.0'
     loggerVersion = '2.2.0'
     gsonVersion = '2.8.6'
     
     archLifecycleVersion = "2.2.0"
-    archRoomVersion = "2.2.5"
+    archRoomVersion = '2.3.0'
 
-    bytedeskCoreVersion = "2.5.4"
-    bytedeskUIVersion = "2.5.4"
+    bytedeskCoreVersion = "2.6.0"
+    bytedeskUIVersion = "2.6.0"
 }
