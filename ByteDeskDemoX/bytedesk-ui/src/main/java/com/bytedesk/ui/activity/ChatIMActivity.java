@@ -338,7 +338,6 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         // TODO: 清理
         if (m_voiceRecordSDCardMountEventReceiver != null) {
             unregisterReceiver(m_voiceRecordSDCardMountEventReceiver);
@@ -403,19 +402,17 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
             mExtensionLayout.setVisibility(View.GONE);
             // TODO: 回调常用语列表
             Intent intent = new Intent(ChatIMActivity.this, CuwActivity.class);
-//            startActivity(intent);
             startActivityForResult(intent, BDUiConstant.SELECT_CUW);
+//            registerForActivityResult
 
         }  else if (view.getId() == R.id.appkefu_plus_pick_picture_btn) {
 
             // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
-
             pickImageFromAlbum();
 
         } else if (view.getId() == R.id.appkefu_plus_take_picture_btn) {
 
             // TODO: 收到客服关闭会话 或者 自动关闭会话消息之后，禁止访客发送消息
-
             takeCameraImage();
 
         } else if (view.getId() == R.id.appkefu_plus_show_red_packet_btn) {
@@ -1482,8 +1479,16 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 String content = data.getStringExtra("content");
                 if (type.equals("text")) {
                     sendTextMessage(content);
-                } else {
+                } else if (type.equals("image")) {
                     sendImageMessage(content);
+                } else if (type.equals("file")) {
+                    sendFileMessage(content);
+                } else if (type.equals("voice")) {
+                    sendVoiceMessage(content);
+                } else if (type.equals("video")) {
+                    sendVideoMessage(content);
+                } else {
+                    Toast.makeText(ChatIMActivity.this, "不支持的消息类型", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -1575,7 +1580,36 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         mRepository.insertImageMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType);
 
         BDMqttApi.sendImageMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+    }
 
+    private void sendFileMessage(String imageUrl) {
+
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertFileMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType, "doc", "fileName", "fileSize");
+
+        BDMqttApi.sendFileMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+    }
+
+    private void sendVoiceMessage(String imageUrl) {
+
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertVoiceMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType, 0);
+
+        BDMqttApi.sendVoiceMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+    }
+
+    private void sendVideoMessage(String imageUrl) {
+
+        final String localId = BDCoreUtils.uuid();
+
+        // 插入本地消息
+        mRepository.insertVideoMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType);
+
+        BDMqttApi.sendVideoMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
     }
 
     /**
@@ -1714,62 +1748,6 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         });
     }
 
-
-    /**
-     * 发送红包消息
-     * @param money 金额
-     */
-    private void sendRedPacketMessage(String money) {
-
-        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
-        final String localId = BDCoreUtils.uuid();
-
-        // 插入本地消息
-        mRepository.insertRedPacketMessageLocal(mUUID, mWorkGroupWid, mUUID, money, localId, mThreadType);
-
-        //
-//        BDCoreApi.sendRedPacketMessage(this, mUUID, money, localId, mThreadType, new BaseCallback() {
-//
-//            @Override
-//            public void onSuccess(JSONObject object) {
-//                //
-//                try {
-//
-//                    int status_code = object.getInt("status_code");
-//                    if (status_code == 200) {
-//
-//                        String localId = object.getJSONObject("data").getString("localId");
-//                        Logger.i("callback localId: " + localId);
-//
-//                        // TODO: 更新消息发送状态为成功
-//                        mRepository.updateMessageStatusSuccess(localId);
-//
-//                        // 发送成功
-//                    } else {
-//
-//                        // 修改本地消息发送状态为error
-//                        mRepository.updateMessageStatusError(localId);
-//
-//                        // 发送消息失败
-//                        String message = object.getString("message");
-//                        Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(JSONObject object) {
-//                // 发送消息失败
-//                Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
-//            }
-//
-//        });
-
-    }
-
     private void initListPopupIfNeed() {
         if (mListPopup == null) {
             String[] listItems = new String[]{
@@ -1779,6 +1757,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     "发送表单",
                     "关闭会话",
                     "拉黑用户"
+                    // TODO: 创建工单、添加到CRM、会话小结
             };
             List<String> data = new ArrayList<>();
             Collections.addAll(data, listItems);
@@ -1887,21 +1866,18 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     Context context = this;
                     final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(this);
                     builder.setTitle("拉黑")
-                            .setPlaceholder("请输入拉黑理由")
+//                            .setPlaceholder("请输入拉黑理由")
+                            .setDefaultText("垃圾用户")
                             .setInputType(InputType.TYPE_CLASS_TEXT)
                             .addAction("取消", (dialog, index) -> dialog.dismiss())
-                            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                @Override
-                                public void onClick(QMUIDialog dialog, int index) {
-                                    CharSequence text = builder.getEditText().getText();
-                                    if (text != null && text.length() > 0) {
-//                                        Toast.makeText(getActivity(), "您的昵称: " + text, Toast.LENGTH_SHORT).show();
-                                        dialog.dismiss();
-                                        // 拉黑
-                                        addBlock(text.toString());
-                                    } else {
-                                        Toast.makeText(context, "请输入拉黑理由", Toast.LENGTH_SHORT).show();
-                                    }
+                            .addAction("确定", (dialog, index) -> {
+                                CharSequence text = builder.getEditText().getText();
+                                if (text != null && text.length() > 0) {
+                                    dialog.dismiss();
+                                    // 拉黑
+                                    addBlock(text.toString());
+                                } else {
+                                    Toast.makeText(context, "请输入拉黑理由", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .create(mCurrentDialogStyle).show();
@@ -2051,6 +2027,58 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         mEmotionLayout.setVisibility(View.GONE);
     }
 
+    /**
+     * 发送红包消息
+     * @param money 金额
+     */
+    private void sendRedPacketMessage(String money) {
+
+        // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
+        final String localId = BDCoreUtils.uuid();
+        // 插入本地消息
+        mRepository.insertRedPacketMessageLocal(mUUID, mWorkGroupWid, mUUID, money, localId, mThreadType);
+
+//        BDCoreApi.sendRedPacketMessage(this, mUUID, money, localId, mThreadType, new BaseCallback() {
+//
+//            @Override
+//            public void onSuccess(JSONObject object) {
+//                //
+//                try {
+//
+//                    int status_code = object.getInt("status_code");
+//                    if (status_code == 200) {
+//
+//                        String localId = object.getJSONObject("data").getString("localId");
+//                        Logger.i("callback localId: " + localId);
+//
+//                        // TODO: 更新消息发送状态为成功
+//                        mRepository.updateMessageStatusSuccess(localId);
+//
+//                        // 发送成功
+//                    } else {
+//
+//                        // 修改本地消息发送状态为error
+//                        mRepository.updateMessageStatusError(localId);
+//
+//                        // 发送消息失败
+//                        String message = object.getString("message");
+//                        Toast.makeText(ChatIMActivity.this, message, Toast.LENGTH_LONG).show();
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onError(JSONObject object) {
+//                // 发送消息失败
+//                Toast.makeText(ChatIMActivity.this, "发送消息失败", Toast.LENGTH_LONG).show();
+//            }
+//
+//        });
+
+    }
 
 }
 

@@ -57,7 +57,7 @@
             android:value="portrait|landscape"/>
         <!--适配全面屏 结束-->
 
-        <activity
+        <activity android:exported="true"
             android:name="com.bytedesk.demo.BDLauncherActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
@@ -153,20 +153,20 @@
         <service android:name="com.bytedesk.ui.recorder.KFRecorderService"/>
 
         <!-- 监听网络变化 -->
-        <receiver android:name="com.bytedesk.core.receiver.BDNetworkConnectivityReceiver" >
+        <receiver android:exported="true" android:name="com.bytedesk.core.receiver.BDNetworkConnectivityReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.bytedesk.core.receiver.BDBootReceiver" >
+        <receiver android:exported="true" android:name="com.bytedesk.core.receiver.BDBootReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.bytedesk.core.receiver.BDPowerReceiver" >
+        <receiver android:exported="true" android:name="com.bytedesk.core.receiver.BDPowerReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
@@ -174,7 +174,7 @@
         </receiver>
 
         <!-- 监听屏幕解锁 -->
-        <receiver android:name="com.bytedesk.core.receiver.BDScreenReceiver">
+        <receiver android:exported="true" android:name="com.bytedesk.core.receiver.BDScreenReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>

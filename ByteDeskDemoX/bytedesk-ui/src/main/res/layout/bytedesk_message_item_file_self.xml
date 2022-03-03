@@ -38,14 +38,27 @@
             android:layout_alignParentTop="true"
             android:src="@drawable/bytedesk_sex_male"/>
 
-        <TextView
+<!--        <TextView-->
+<!--            android:id="@+id/bytedesk_message_item_file"-->
+<!--            style="@style/bytedesk_chat_content_date_style"-->
+<!--            android:layout_width="150sp"-->
+<!--            android:layout_height="80sp"-->
+<!--            android:layout_alignParentTop="true"-->
+<!--            android:layout_toLeftOf="@+id/bytedesk_message_item_header"-->
+<!--            android:background="@drawable/bytedesk_message_item_background_self" />-->
+
+        <com.qmuiteam.qmui.widget.textview.QMUILinkTextView
             android:id="@+id/bytedesk_message_item_file"
             style="@style/bytedesk_chat_content_date_style"
-            android:layout_width="150sp"
-            android:layout_height="80sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/bytedesk_message_item_header"
-            android:background="@drawable/bytedesk_message_item_background_self" />
+            android:autoLink="phone|email|web|map|all"
+            android:background="@drawable/bytedesk_message_item_background_self"
+            android:textColorLink="#0082CB"
+            android:gravity="center"
+            />
 
         <!--阅后即焚-->
         <com.qmuiteam.qmui.widget.QMUIProgressBar

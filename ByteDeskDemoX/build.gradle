@@ -29,14 +29,14 @@ task clean(type: Delete) {
 
 ext {
     // Sdk and tools
-    minSdkVersion = 19
-    targetSdkVersion = 29
-    compileSdkVersion = 29
+    minSdkVersion = 21
+    targetSdkVersion = 31
+    compileSdkVersion = 31
 
-    versionCode = 261
-    versionName = '2.6.1'
+    versionCode = 270
+    versionName = '2.7.0'
 
-    buildToolsVersion = '29.0.3'
+    buildToolsVersion = '31'
     
     appcompatVersion = '1.2.0'
     butterknifeVersion = '10.1.0'
@@ -55,6 +55,6 @@ ext {
     archLifecycleVersion = "2.2.0"
     archRoomVersion = '2.3.0'
 
-    bytedeskCoreVersion = "2.6.0"
-    bytedeskUIVersion = "2.6.0"
+    bytedeskCoreVersion = "2.7.0"
+    bytedeskUIVersion = "2.7.0"
 }

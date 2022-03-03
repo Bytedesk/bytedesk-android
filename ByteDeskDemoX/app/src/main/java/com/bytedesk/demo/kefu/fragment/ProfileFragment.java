@@ -30,10 +30,18 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
     @BindView(R.id.groupListView) QMUIGroupListView mGroupListView;
 
+    private QMUICommonListItemView uidItem;
     private QMUICommonListItemView nicknameItem;
+    private QMUICommonListItemView descriptionItem;
+    private QMUICommonListItemView avatarItem;
+
     private QMUICommonListItemView selfDefineItem;
 
-    private String mDefaultNickname = "";
+    private String mUid = "";
+    private String mNickname = "";
+    private String mDescription = "";
+    private String mAvatar = "";
+    //
     private String mTagName;
     private String mTagKey;
     private String mTagValue = "";
@@ -49,6 +57,7 @@ public class ProfileFragment extends BaseFragment {
         initTopBar();
         initGroupListView();
         getFingerPrint();
+        getProfile();
 
         return root;
     }
@@ -61,12 +70,24 @@ public class ProfileFragment extends BaseFragment {
 
     private void initGroupListView() {
 
+        uidItem = mGroupListView.createItemView("唯一uid");
+        uidItem.setDetailText(mUid);
+
         nicknameItem = mGroupListView.createItemView("昵称");
-        nicknameItem.setDetailText(mDefaultNickname);
+        nicknameItem.setDetailText(mNickname);
+
+        descriptionItem = mGroupListView.createItemView("描述");
+        descriptionItem.setDetailText(mDescription);
+
+        avatarItem = mGroupListView.createItemView("头像");
+        avatarItem.setDetailText(mAvatar);
 
         QMUIGroupListView.newSection(getContext())
                 .setTitle("默认用户信息接口")
+                .addItemView(uidItem, view -> {})
                 .addItemView(nicknameItem, v -> showEditNicknameDialog())
+                .addItemView(descriptionItem, view -> setDescription())
+                .addItemView(avatarItem, view -> setAvatar())
                 .addTo(mGroupListView);
 
         selfDefineItem = mGroupListView.createItemView("自定义标签");
@@ -80,7 +101,6 @@ public class ProfileFragment extends BaseFragment {
 
 
     private void showEditNicknameDialog() {
-
         //
         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
         builder.setTitle("自定义昵称")
@@ -92,7 +112,7 @@ public class ProfileFragment extends BaseFragment {
                     if (text != null && text.length() > 0) {
 
                         dialog.dismiss();
-                        mDefaultNickname = text.toString();
+                        mNickname = text.toString();
                         setNickname();
 
                     } else {
@@ -101,7 +121,6 @@ public class ProfileFragment extends BaseFragment {
                 })
                 .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
     }
-
 
     private void showEditTagDialog() {
 
@@ -127,6 +146,34 @@ public class ProfileFragment extends BaseFragment {
 
     }
 
+    // 从服务器拉取用户信息
+    private void getProfile () {
+        //
+        BDCoreApi.userProfile(getContext(), new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                //
+                try {
+                    JSONObject infoObject = jsonObject.getJSONObject("data");
+//                    Logger.i("");
+                    uidItem.setDetailText(infoObject.getString("uid"));
+                    nicknameItem.setDetailText(infoObject.getString("nickname"));
+                    descriptionItem.setDetailText(infoObject.getString("description"));
+                    avatarItem.setDetailText(infoObject.getString("avatar"));
+//                    bdPreferenceManager.setUid(infoObject.getString("uid"));
+//                    bdPreferenceManager.setUsername(infoObject.getString("username"));
+                }  catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+
+            }
+        });
+    }
+
     private void getFingerPrint() {
         ///////
         BDCoreApi.getFingerPrint(getContext(), new BaseCallback() {
@@ -137,7 +184,6 @@ public class ProfileFragment extends BaseFragment {
                     Logger.d("get userinfo success message: " + object.get("message")
                             + " status_code:" + object.get("status_code")
                             + " data:" + object.get("data"));
-
                     //
                     String nickname = object.getJSONObject("data").getString("nickname");
                     nicknameItem.setDetailText(nickname);
@@ -152,7 +198,6 @@ public class ProfileFragment extends BaseFragment {
                             selfDefineItem.setDetailText(value);
                         }
                     }
-
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -176,13 +221,16 @@ public class ProfileFragment extends BaseFragment {
         });
     }
 
+    /**
+     * 自定义昵称
+     */
     private void setNickname() {
         // 调用接口设置昵称
-        BDCoreApi.setNickname(getContext(), mDefaultNickname, new BaseCallback() {
+        BDCoreApi.setNickname(getContext(), mNickname, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
-                //解析 object
-                nicknameItem.setDetailText(mDefaultNickname);
+                //更新界面
+                nicknameItem.setDetailText(mNickname);
             }
 
             @Override
@@ -192,9 +240,52 @@ public class ProfileFragment extends BaseFragment {
         });
     }
 
+    /**
+     * 自定义描述
+     */
+    private void setDescription() {
+        mDescription = "自定义APP用户备注信息android";
+        // 调用接口设置描述
+        BDCoreApi.setDescription(getContext(), mDescription, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+                // 更新界面
+                descriptionItem.setDetailText(mDescription);
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                BDUiUtils.showTipDialog(getContext(), "设置描述失败");
+            }
+        });
+    }
+
+    /**
+     * 自定义头像，请填写头像URL
+     */
+    private void setAvatar() {
+        mAvatar = "https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/visitor_default_avatar.png";
+        // 调用接口设置头像
+        BDCoreApi.setAvatar(getContext(), mAvatar, new BaseCallback() {
+            @Override
+            public void onSuccess(JSONObject object) {
+                //更新界面
+                avatarItem.setDetailText(mAvatar);
+            }
+
+            @Override
+            public void onError(JSONObject object) {
+                BDUiUtils.showTipDialog(getContext(), "设置头像失败");
+            }
+        });
+    }
+
+    /**
+     * 自定义标签
+     */
     private void setTag() {
 
-        BDCoreApi.setFingerPrint(getContext(), "", mTagKey, mTagValue, new BaseCallback() {
+        BDCoreApi.setFingerPrint(getContext(), "自定义标签", mTagKey, mTagValue, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
                 selfDefineItem.setDetailText(mTagValue);

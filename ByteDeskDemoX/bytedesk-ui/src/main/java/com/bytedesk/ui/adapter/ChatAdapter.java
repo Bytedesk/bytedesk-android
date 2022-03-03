@@ -109,6 +109,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             case MessageEntity.TYPE_IMAGE_SELF_ID:
                 layout = R.layout.bytedesk_message_item_image_self;
                 break;
+            case MessageEntity.TYPE_FILE_ID:
+                layout = R.layout.bytedesk_message_item_file;
+                break;
+            case MessageEntity.TYPE_FILE_SELF_ID:
+                layout = R.layout.bytedesk_message_item_file_self;
+                break;
             case MessageEntity.TYPE_VIDEO_ID:
                 layout = R.layout.bytedesk_message_item_video;
                 break;
@@ -120,6 +126,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 break;
             case MessageEntity.TYPE_VOICE_SELF_ID:
                 layout = R.layout.bytedesk_message_item_voice_self;
+                break;
+            case MessageEntity.TYPE_ROBOT_ID:
+                layout = R.layout.bytedesk_message_item_robot;
+                break;
+            case MessageEntity.TYPE_ROBOT_SELF_ID:
+                layout = R.layout.bytedesk_message_item_robot_self;
                 break;
             case MessageEntity.TYPE_QUESTIONNAIRE_ID:
                 layout = R.layout.bytedesk_message_item_questionnaire;
@@ -135,18 +147,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 break;
             case MessageEntity.TYPE_RED_PACKET_SELF_ID:
                 layout = R.layout.bytedesk_message_item_red_packet_self;
-                break;
-            case MessageEntity.TYPE_FILE_ID:
-                layout = R.layout.bytedesk_message_item_file;
-                break;
-            case MessageEntity.TYPE_FILE_SELF_ID:
-                layout = R.layout.bytedesk_message_item_file_self;
-                break;
-            case MessageEntity.TYPE_ROBOT_ID:
-                layout = R.layout.bytedesk_message_item_robot;
-                break;
-            case MessageEntity.TYPE_ROBOT_SELF_ID:
-                layout = R.layout.bytedesk_message_item_robot_self;
                 break;
             default:
                 layout = R.layout.bytedesk_message_item_text;
@@ -207,7 +207,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         private ImageView commodityImageView;
         private Button commoditySendButton;
         // 文件消息
-        private TextView fileTextView;
+        private QMUILinkTextView fileTextView;
         // 机器人
         public TextView robotTextView;
         // 阅后即焚倒计时
@@ -252,7 +252,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 initAvatar();
                 voiceTextView = itemView.findViewById(R.id.bytedesk_message_item_content_voice);
                 voiceLengthTextView = itemView.findViewById(R.id.bytedesk_message_item_voice_length);
-
                 if (messageViewType == MessageEntity.TYPE_VOICE_ID) {
                     voiceUnplayedView = itemView.findViewById(R.id.bytedesk_message_item_voice_unplayed);
                 }
@@ -372,7 +371,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 contentTextView.setOnLongClickListener(v -> {
                     Logger.d("mid:" + msgEntity.getMid());
                     EventBus.getDefault().post(new LongClickEvent(msgEntity));
-
                     return false;
                 });
             }
@@ -477,6 +475,33 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 loadAvatar(msgEntity);
                 //
                 fileTextView.setText(msgEntity.getFileUrl());
+                fileTextView.setOnLinkClickListener(new QMUILinkTextView.OnLinkClickListener() {
+
+                    @Override
+                    public void onTelLinkClick(String phoneNumber) {
+                        // TODO:
+                        Toast.makeText(mContext, "识别到电话号码是：" + phoneNumber, Toast.LENGTH_SHORT).show();
+//                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+//                        mContext.startActivity(intent);
+                    }
+                    @Override
+                    public void onMailLinkClick(String mailAddress) {
+                        // TODO:
+                        Toast.makeText(mContext, "识别到邮件地址是：" + mailAddress, Toast.LENGTH_SHORT).show();
+                    }
+                    @Override
+                    public void onWebUrlLinkClick(String url) {
+                        // TODO:
+                        Toast.makeText(mContext, "识别到网页链接是：" + url, Toast.LENGTH_SHORT).show();
+                        BDUiApi.startHtml5Chat(mContext, url, "打开网址");
+                    }
+                });
+                // 长按
+                fileTextView.setOnLongClickListener(v -> {
+                    Logger.d("mid:" + msgEntity.getMid());
+                    EventBus.getDefault().post(new LongClickEvent(msgEntity));
+                    return false;
+                });
             }
             // 机器人
             else if (messageViewType == MessageEntity.TYPE_ROBOT_ID
