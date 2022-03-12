@@ -34,7 +34,7 @@ ext {
     compileSdkVersion = 31
 
     versionCode = 270
-    versionName = '2.7.0'
+    versionName = '2.7.1'
 
     buildToolsVersion = '31'
     
@@ -55,6 +55,6 @@ ext {
     archLifecycleVersion = "2.2.0"
     archRoomVersion = '2.3.0'
 
-    bytedeskCoreVersion = "2.7.0"
-    bytedeskUIVersion = "2.7.0"
+    bytedeskCoreVersion = "2.7.1"
+    bytedeskUIVersion = "2.7.1"
 }

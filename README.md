@@ -29,8 +29,8 @@ allprojects {
 
 ```bash
 # androidx版, 参考demo：ByteDeskDemoX
-- 核心库: implementation 'com.bytedesk:libcore:2.7.0'
-- 界面库: implementation 'com.bytedesk:libui:2.7.0'
+- 核心库: implementation 'com.bytedesk:libcore:2.7.1'
+- 界面库: implementation 'com.bytedesk:libui:2.7.1'
 ```
 
 混淆
