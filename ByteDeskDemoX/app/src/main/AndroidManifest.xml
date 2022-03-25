@@ -29,6 +29,7 @@
     <!-- 收到消息后震动 -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <!--聊天内容出现电话号码，可直接拨打-->
     <uses-permission android:name="android.permission.CALL_PHONE" />

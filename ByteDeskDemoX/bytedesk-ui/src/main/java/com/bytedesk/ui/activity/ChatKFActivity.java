@@ -573,6 +573,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
         if (mIsVisitor) {
             Logger.i("getMessages 访客端");
+//            34213536, 34213713, 34213891
             //
             BDCoreApi.getMessagesWithUser(getBaseContext(), mPage, mSize, new BaseCallback() {
 

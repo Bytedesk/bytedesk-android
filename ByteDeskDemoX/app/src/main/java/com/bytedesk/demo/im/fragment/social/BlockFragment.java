@@ -266,7 +266,7 @@ public class BlockFragment extends BaseFragment implements SwipeItemClickListene
      */
     private void addBlock(String uid) {
         //
-        BDCoreApi.addBlock(getContext(), uid, "添加备注",  new BaseCallback() {
+        BDCoreApi.addBlock(getContext(), uid, "添加备注","", "",  new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {

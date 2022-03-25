@@ -1934,8 +1934,9 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         //
         Context context = this;
         String uid = mThreadEntity.getTopic().split("/")[1];
+        String uuid = mThreadEntity.getTopic().split("/")[1];
 
-        BDCoreApi.addBlock(this, uid, note, new BaseCallback() {
+        BDCoreApi.addBlock(this, uid, note, mThreadType, uuid, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
 
