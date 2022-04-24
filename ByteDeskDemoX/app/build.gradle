@@ -34,11 +34,10 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //
-//    implementation 'com.bytedesk:libcore:2.7.2'
     implementation 'com.bytedesk:libcore:' + rootProject.bytedeskCoreVersion
+//    implementation 'com.bytedesk:libui:' + rootProject.bytedeskUIVersion
     implementation project(':bytedesk-ui')
     //
-    //    implementation 'com.bytedesk:libcore:' + rootProject.bytedeskCoreVersion
     // Butterknife
     // http://jakewharton.github.io/butterknife/
     implementation "com.jakewharton:butterknife:" + rootProject.butterknifeVersion
