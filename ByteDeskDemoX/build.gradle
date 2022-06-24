@@ -55,6 +55,6 @@ ext {
     archLifecycleVersion = "2.2.0"
     archRoomVersion = '2.3.0'
 
-    bytedeskCoreVersion = "2.7.3"
-    bytedeskUIVersion = "2.7.3"
+    bytedeskCoreVersion = "2.7.4"
+    bytedeskUIVersion = "2.7.4"
 }
