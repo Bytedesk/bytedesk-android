@@ -133,7 +133,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 }
             } else if (mThreadType.equals(BDCoreConstant.THREAD_TYPE_WORKGROUP)) {
                 Logger.i("客服会话");
-
                 mUUID = getIntent().getStringExtra(BDUiConstant.EXTRA_TID);
             }
             //
@@ -670,6 +669,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setTid(thread.getString("tid"));
                 mThreadEntity.setType(thread.getString("type"));
                 mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setClient(thread.getString("client"));
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
@@ -688,6 +688,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setTid(thread.getString("tid"));
                 mThreadEntity.setType(thread.getString("type"));
                 mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setClient(thread.getString("client"));
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
@@ -706,6 +707,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setTid(thread.getString("tid"));
                 mThreadEntity.setType(thread.getString("type"));
                 mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setClient(thread.getString("client"));
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
@@ -720,6 +722,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setTid(thread.getString("tid"));
                 mThreadEntity.setType(thread.getString("type"));
                 mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setClient(thread.getString("client"));
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
@@ -795,6 +798,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setTid(thread.getString("tid"));
                 mThreadEntity.setType(thread.getString("type"));
                 mThreadEntity.setTopic(thread.getString("topic"));
+                mThreadEntity.setClient(thread.getString("client"));
                 mThreadEntity.setNickname(thread.getJSONObject("visitor").getString("nickname"));
                 mThreadEntity.setAvatar(thread.getJSONObject("visitor").getString("avatar"));
 
@@ -1425,6 +1429,11 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 userObject.put("uid", mPreferenceManager.getUid());
                 userObject.put("nickname", mPreferenceManager.getNickname());
                 userObject.put("avatar", mPreferenceManager.getAvatar());
+                // Extra
+                JSONObject extraObject = new JSONObject();
+                extraObject.put("agent", false);
+                userObject.put("extra", extraObject);
+                //
                 messageObject.put("user", userObject);
                 //
                 JSONObject textObject = new JSONObject();
@@ -1438,6 +1447,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 threadObject.put("nickname", mThreadEntity.getNickname());
                 threadObject.put("avatar", mThreadEntity.getAvatar());
                 threadObject.put("topic", mThreadEntity.getTopic());
+                threadObject.put("client", mThreadEntity.getClient());
                 threadObject.put("timestamp", timestamp);
                 threadObject.put("unreadCount", 0);
                 messageObject.put("thread", threadObject);
@@ -1750,7 +1760,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
      * @param custom
      */
     private void sendCommodityMessage(String custom) {
-
         // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
         final String localId = BDCoreUtils.uuid();
         // 插入本地消息
@@ -1762,7 +1771,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
     @Override
     public void onKeyboardHidden() {
 //        Logger.i("onKeyboardHidden");
-
     }
 
     @Override
@@ -1771,49 +1779,6 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         mRecyclerView.scrollToPosition(mChatAdapter.getItemCount() - 1);
     }
 
-    //    private void requestQuestionnaire(String questionnaireItemItemQid) {
-//
-//        BDCoreApi.requestQuestionnaire(this, mUUID, questionnaireItemItemQid, new BaseCallback() {
-//
-//            @Override
-//            public void onSuccess(JSONObject object) {
-//
-//                try {
-//
-//                    JSONObject message = object.getJSONObject("data");
-//
-//                    int status_code = object.getInt("status_code");
-//                    if (status_code == 200) {
-//
-////                      String  title = message.getString("content");
-//                        if (!message.isNull("workGroups")) {
-//
-//                            JSONArray workGroupsArray = message.getJSONArray("workGroups");
-//                            showWorkGroupDialog(workGroupsArray);
-//                        }
-//
-//                    } else {
-//
-//                        //
-//                        String toast = object.getString("message");
-//                        Toast.makeText(ChatKFActivity.this, toast, Toast.LENGTH_LONG).show();
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(JSONObject object) {
-//                try {
-//                    Toast.makeText(ChatKFActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
 
 }
 

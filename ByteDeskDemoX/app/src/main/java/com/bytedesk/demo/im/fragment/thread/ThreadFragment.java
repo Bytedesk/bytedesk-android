@@ -203,7 +203,7 @@ public class ThreadFragment extends BaseFragment implements SwipeItemClickListen
         Logger.d("thread item clicked " + position + " string: " + threadEntity.toString());
 
         BDUiApi.startThreadChatActivity(getContext(), threadEntity.getTid(),
-                threadEntity.getTopic(), threadEntity.getType(), threadEntity.getNickname(), threadEntity.getAvatar());
+                threadEntity.getTopic(), threadEntity.getClient(), threadEntity.getType(), threadEntity.getNickname(), threadEntity.getAvatar());
 
         // 清空本地未读数目
         threadEntity.setUnreadCount(0);

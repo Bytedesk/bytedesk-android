@@ -19,7 +19,9 @@ import com.bytedesk.demo.common.BaseFragment;
 import com.bytedesk.demo.common.ServerFragment;
 import com.bytedesk.demo.common.SettingFragment;
 import com.bytedesk.demo.kefu.fragment.ChatFragment;
+import com.bytedesk.demo.kefu.fragment.ProfileFragment;
 import com.bytedesk.demo.kefu.fragment.StatusFragment;
+import com.bytedesk.demo.kefu.fragment.SwitchFragment;
 import com.bytedesk.demo.kefu.fragment.ThreadFragment;
 import com.bytedesk.demo.utils.BDDemoConst;
 import com.bytedesk.ui.api.BDUiApi;
@@ -60,11 +62,8 @@ public class ApiFragment extends BaseFragment {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_api, null);
         ButterKnife.bind(this, root);
 
-        mPreferenceManager = BDPreferenceManager.getInstance(getContext());
         EventBus.getDefault().register(this);
-
         version = QMUIPackageHelper.getAppVersion(getContext());
-
         initTopBar();
         initGroupListView();
 
@@ -95,17 +94,14 @@ public class ApiFragment extends BaseFragment {
         helpCenterItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView wapChatItem = mGroupListView.createItemView("8.网页会话");
         wapChatItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-//        QMUICommonListItemView upgrateItem = mGroupListView.createItemView("9.引导新版本升级");
-//        upgrateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUICommonListItemView settingItem = mGroupListView.createItemView("9.消息设置");
         settingItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
+        QMUICommonListItemView switchItem = mGroupListView.createItemView("10.切换用户");
+        switchItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         QMUIGroupListView.newSection(getContext())
                 .setTitle("客服接口")
                 .addItemView(chatItem, view -> startFragment(new ChatFragment()))
-                .addItemView(userInfoItem, view -> {
-                    com.bytedesk.demo.kefu.fragment.ProfileFragment profileFragment = new com.bytedesk.demo.kefu.fragment.ProfileFragment();
-                    startFragment(profileFragment);
-                })
+                .addItemView(userInfoItem, view -> startFragment(new ProfileFragment()))
                 .addItemView(statusItem, view -> startFragment(new StatusFragment()))
                 .addItemView(sessionHistoryItem, view -> startFragment(new ThreadFragment()))
                 .addItemView(ticketItem, view -> BDUiApi.startTicketActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
@@ -113,275 +109,24 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(helpCenterItem, view -> BDUiApi.startSupportApiActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
                 .addItemView(wapChatItem, view -> {
                     // 注意: 登录后台->客服管理->技能组(或客服账号)->获取客服代码 获取相应URL
-                    String url = "https://www.bytedesk.com/chat?sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&aid=&hidenav=1&ph=ph";
+                    String url = "https://chat.kefux.cn/chat/h5/index.html??sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&aid=&hidenav=1&ph=ph";
                     BDUiApi.startHtml5Chat(getContext(), url, "H5在线客服");
                 })
-//                .addItemView(upgrateItem,  view -> {
-//                    // TODO: 引导新版本升级
-//                    startFragment(new AppUpgradeFragment());
-//                })
-                .addItemView(settingItem, view -> {
-                    SettingFragment settingFragment = new SettingFragment();
-                    startFragment(settingFragment);
-                })
+                .addItemView(settingItem, view -> startFragment(new SettingFragment()))
+                .addItemView(switchItem, view -> startFragment(new SwitchFragment()))
                 .addTo(mGroupListView);
 
         // 公共接口
         QMUICommonListItemView serverItem = mGroupListView.createItemView("0.自定义服务器(私有部署)");
         serverItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
         //
-//        QMUICommonListItemView registerItem = mGroupListView.createItemView("1. 点我注册");
-//        registerItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-//        loginItem = mGroupListView.createItemView("2. 点我登录");
-//        loginItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-//        QMUICommonListItemView logoutItem = mGroupListView.createItemView("3. 退出登录");
-//        logoutItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        //
         QMUIGroupListView.newSection(getContext())
                 .setTitle("公共接口")
-                .addItemView(serverItem, view -> {
-                    ServerFragment serverFragment = new ServerFragment();
-                    startFragment(serverFragment);
-                })
-//                .addItemView(registerItem, view -> showRegisterSheet())
-//                .addItemView(loginItem, view -> showLoginSheet())
-//                .addItemView(logoutItem, view -> logout())
+                .addItemView(serverItem, view -> startFragment(new ServerFragment()))
+                .addItemView(mGroupListView.createItemView("技术支持QQ-3群: 825257535"), view -> {})
                 .addTo(mGroupListView);
     }
 
-    /**
-     * 注册扩展
-     */
-    private void showRegisterSheet() {
-        //
-        new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
-                .addItem("自定义用户名")
-                .addItem("匿名用户")
-                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
-                    dialog.dismiss();
-
-                    if (tag.equals("自定义用户名")) {
-                        registerUser();
-                    } else {
-                        Toast.makeText(getContext(), "匿名用户不需要注册，直接调用匿名登录接口即可", Toast.LENGTH_LONG).show();
-                    }
-
-                })
-                .build()
-                .show();
-    }
-
-    /**
-     * 登录扩展
-     */
-    private void showLoginSheet() {
-
-        new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
-                .addItem("自定义用户名")
-                .addItem("匿名用户")
-                .setOnSheetItemClickListener((dialog, itemView, position, tag) -> {
-                    dialog.dismiss();
-                    if (tag.equals("自定义用户名")) {
-                        login();
-                    } else {
-                        anonymousLogin();
-                    }
-                })
-                .build()
-                .show();
-    }
-
-    /**
-     * 自定义用户名登录
-     *
-     * TODO: 当多个安卓客户端同时登录同一个账号的时候，会被踢掉线，此客户端会自动重连，导致不断重新登录的情况，待处理：弹出提示框
-     * TODO：弹出登录框让用户手动输入用户名/密码
-     */
-    private void login() {
-
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-        builder.setTitle("自定义用户名登录")
-                .setPlaceholder("在此输入自定义用户名")
-                .setInputType(InputType.TYPE_CLASS_TEXT)
-                .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", (dialog, index) -> {
-
-                    final CharSequence text = builder.getEditText().getText();
-                    if (text != null && text.length() > 0) {
-                        //
-                        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
-                                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                                .setTipWord(getResources().getString(R.string.bytedesk_logining))
-                                .create();
-                        loadingDialog.show();
-
-                        //
-                        String username = text.toString();
-                        String password = "123456";
-
-                        // 调用登录接口
-                        BDCoreApi.login(getContext(), username, password, BDDemoConst.DEFAULT_TEST_APPKEY, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new BaseCallback() {
-
-                            @Override
-                            public void onSuccess(JSONObject object) {
-                                loadingDialog.dismiss();
-
-                                Toast.makeText(getContext(), "登录成功", Toast.LENGTH_LONG).show();
-                            }
-
-                            @Override
-                            public void onError(JSONObject object) {
-                                Logger.e("login failed message");
-                                loadingDialog.dismiss();
-
-                                Toast.makeText(getContext(), "登录失败", Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                        dialog.dismiss();
-                    } else {
-                        Toast.makeText(getActivity(), "请填入自定义用户名", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-    }
-
-    /**
-     * 匿名登录
-     */
-    private void anonymousLogin() {
-        //
-        final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
-                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                .setTipWord(getResources().getString(R.string.bytedesk_logining))
-                .create();
-        loadingDialog.show();
-
-        // 授权登录接口
-        BDCoreApi.visitorLogin(getContext(), BDDemoConst.DEFAULT_TEST_APPKEY, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new LoginCallback() {
-
-            @Override
-            public void onSuccess(JSONObject object) {
-                loadingDialog.dismiss();
-                try {
-                    Logger.d("login success message: " + object.get("message")
-                            + " status_code:" + object.get("status_code"));
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(JSONObject object) {
-                loadingDialog.dismiss();
-                try {
-                    Logger.e("login failed message: " + object.get("message")
-                            + " status_code:" + object.get("status_code")
-                            + " data:" + object.get("data"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    /**
-     * 退出登录
-     */
-    private void logout() {
-
-        new QMUIDialog.MessageDialogBuilder(getContext())
-                .setTitle("提示")
-                .setMessage("确定要退出登录吗？")
-                .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", (dialog, index) -> {
-                    dialog.dismiss();
-
-                    ///
-                    final QMUITipDialog loadingDialog = new QMUITipDialog.Builder(getContext())
-                            .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                            .setTipWord(getResources().getString(R.string.bytedesk_logouting))
-                            .create();
-                    loadingDialog.show();
-                    //
-                    BDCoreApi.logout(getContext(), new BaseCallback() {
-                        @Override
-                        public void onSuccess(JSONObject object) {
-                            loadingDialog.dismiss();
-
-                            Toast.makeText(getContext(), "退出登录成功", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onError(JSONObject object) {
-                            loadingDialog.dismiss();
-
-                            Logger.e("退出登录失败");
-                            Toast.makeText(getContext(), "退出登录失败", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                })
-                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-
-    }
-
-    /**
-     * 自定义用户名注册
-     *
-     * TODO：弹出登录框让用户手动输入用户名/密码
-     */
-    private void registerUser() {
-
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-        builder.setTitle("自定义用户登录名")
-                .setPlaceholder("在此输入您的用户名(只能包含字母和数字)")
-                .setInputType(InputType.TYPE_CLASS_TEXT)
-                .addAction("取消", (dialog, index) -> dialog.dismiss())
-                .addAction("确定", (dialog, index) -> {
-                    final CharSequence text = builder.getEditText().getText();
-                    if (text != null && text.length() > 0) {
-
-                        //
-                        String username = text.toString();
-                        String nickname = "自定义测试账号"+username;
-                        String password = "123456";
-                        //
-                        BDCoreApi.registerUser(getContext(), username, nickname, password, BDDemoConst.DEFAULT_TEST_SUBDOMAIN, new BaseCallback() {
-
-                            @Override
-                            public void onSuccess(JSONObject object) {
-
-                                try {
-                                    //
-                                    String message = object.getString("message");
-                                    int status_code = object.getInt("status_code");
-                                    //
-                                    if (status_code == 200) {
-                                        Toast.makeText(getContext(), "注册成功", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-                                    }
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            @Override
-                            public void onError(JSONObject object) {
-                                Toast.makeText(getContext(), "注册失败", Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                        dialog.dismiss();
-                    } else {
-                        Toast.makeText(getActivity(), "请填入昵称", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
-    }
 
     /**
      * 监听 EventBus 长连接状态
@@ -401,11 +146,9 @@ public class ApiFragment extends BaseFragment {
         } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_CONNECTED)) {
 
             title = "萝卜丝" + version + "(已连接)";
-//            loginItem.setDetailText("连接已建立: " + mPreferenceManager.getUsername());
         } else if (connectionStatus.equals(BDCoreConstant.USER_STATUS_DISCONNECTED)) {
 
             title = "萝卜丝" + version + "(连接断开)";
-//            loginItem.setDetailText("当前未连接");
         }
         mTopBar.setTitle(title);
     }
@@ -445,17 +188,17 @@ public class ApiFragment extends BaseFragment {
         Logger.w("onKickoffEvent: " + content);
 
         // 弹窗提示
-        new QMUIDialog.MessageDialogBuilder(getActivity())
-                .setTitle("异地登录提示")
-                .setMessage(content)
-                .addAction("确定", (dialog, index) -> {
-                    dialog.dismiss();
-
-                    // 开发者可自行决定是否退出登录
-                    // 注意: 同一账号同时登录多个客户端不影响正常会话
-                    logout();
-
-                }).show();
+//        new QMUIDialog.MessageDialogBuilder(getActivity())
+//            .setTitle("异地登录提示")
+//            .setMessage(content)
+//            .addAction("确定", (dialog, index) -> {
+//                dialog.dismiss();
+//
+//                // 开发者可自行决定是否退出登录
+//                // 注意: 同一账号同时登录多个客户端不影响正常会话
+//                logout();
+//
+//            }).show();
     }
 
 

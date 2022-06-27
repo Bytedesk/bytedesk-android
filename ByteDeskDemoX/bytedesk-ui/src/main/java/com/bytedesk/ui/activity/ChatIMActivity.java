@@ -216,11 +216,13 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 mThreadEntity.setTid(getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TID));
                 mThreadEntity.setTopic(getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TOPIC));
                 mThreadEntity.setType(getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_TYPE));
+                mThreadEntity.setClient(getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_CLIENT));
                 mThreadEntity.setNickname(getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_NICKNAME));
                 mThreadEntity.setAvatar(getIntent().getStringExtra(BDUiConstant.EXTRA_THREAD_AVATAR));
                 //
                 mUUID = mThreadEntity.getTid();
                 mTopic = mThreadEntity.getTopic();
+                mClient = mThreadEntity.getClient();
                 mTitle = mThreadEntity.getNickname();
                 mThreadType = mThreadEntity.getType();
             } else {
@@ -1522,6 +1524,11 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 userObject.put("uid", mPreferenceManager.getUid());
                 userObject.put("nickname", mPreferenceManager.getNickname());
                 userObject.put("avatar", mPreferenceManager.getAvatar());
+                // Extra
+                JSONObject extraObject = new JSONObject();
+                extraObject.put("agent", true);
+                userObject.put("extra", extraObject);
+                //
                 messageObject.put("user", userObject);
                 //
                 JSONObject textObject = new JSONObject();
@@ -1535,6 +1542,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 threadObject.put("nickname", mThreadEntity.getNickname());
                 threadObject.put("avatar", mThreadEntity.getAvatar());
                 threadObject.put("topic", mThreadEntity.getTopic());
+                threadObject.put("client", mThreadEntity.getClient());
                 threadObject.put("timestamp", timestamp);
                 threadObject.put("unreadCount", 0);
                 messageObject.put("thread", threadObject);
@@ -1934,7 +1942,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         //
         Context context = this;
         String uid = mThreadEntity.getTopic().split("/")[1];
-        String uuid = mThreadEntity.getTopic().split("/")[1];
+        String uuid = mThreadEntity.getTopic().split("/")[0];
 
         BDCoreApi.addBlock(this, uid, note, mThreadType, uuid, new BaseCallback() {
             @Override
@@ -2017,7 +2025,6 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
     @Override
     public void onKeyboardHidden() {
         Logger.i("onKeyboardHidden");
-
     }
 
     @Override

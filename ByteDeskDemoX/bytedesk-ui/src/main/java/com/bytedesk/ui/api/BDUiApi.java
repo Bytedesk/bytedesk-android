@@ -170,10 +170,10 @@ public class BDUiApi {
 
     public static void startThreadChatActivity2(Context context, ThreadEntity threadEntity) {
         //
-        startThreadChatActivity(context, threadEntity.getTid(), threadEntity.getTopic(), threadEntity.getType(), threadEntity.getNickname(), threadEntity.getAvatar());
+        startThreadChatActivity(context, threadEntity.getTid(), threadEntity.getTopic(), threadEntity.getClient(), threadEntity.getType(), threadEntity.getNickname(), threadEntity.getAvatar());
     }
 
-    public static void startThreadChatActivity(Context context, String tid, String topic, String type, String nickname, String avatar) {
+    public static void startThreadChatActivity(Context context, String tid, String topic, String client, String type, String nickname, String avatar) {
         //
 //        BDConfig.getInstance(context).switchToIM();
         //
@@ -182,6 +182,7 @@ public class BDUiApi {
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TID, tid);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TYPE, type);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_TOPIC, topic);
+        intent.putExtra(BDUiConstant.EXTRA_THREAD_CLIENT, client);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_NICKNAME, nickname);
         intent.putExtra(BDUiConstant.EXTRA_THREAD_AVATAR, avatar);
 

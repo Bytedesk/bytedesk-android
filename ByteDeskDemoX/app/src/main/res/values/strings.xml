@@ -20,6 +20,12 @@
     <string name="bytedesk_setting">设置</string>
     <string name="bytedesk_ok">确定</string>
 
+    <string name="bytedesk_login_success">登录成功</string>
+    <string name="bytedesk_login_failed">登录失败</string>
+    <string name="bytedesk_logout_first">请先退出登录</string>
+    <string name="bytedesk_logout_success">退出登录成功</string>
+    <string name="bytedesk_logout_failed">退出登录失败</string>
+
     <string name="bytedesk_scan">扫描二维码</string>
     <string name="bytedesk_qrcode">二维码</string>
 

@@ -21,6 +21,7 @@ public class BDUiConstant {
     public static final String EXTRA_IS_THREAD = "is_thread";
     public static final String EXTRA_THREAD_TID = "thread_tid";
     public static final String EXTRA_THREAD_TOPIC = "thread_topic";
+    public static final String EXTRA_THREAD_CLIENT = "thread_client";
     public static final String EXTRA_THREAD_TYPE = "thread_type";
     public static final String EXTRA_THREAD_NICKNAME = "thread_nickname";
     public static final String EXTRA_THREAD_AVATAR = "thread_avatar";

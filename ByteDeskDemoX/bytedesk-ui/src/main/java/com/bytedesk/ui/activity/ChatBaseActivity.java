@@ -31,6 +31,7 @@ public class ChatBaseActivity extends AppCompatActivity {
     // 客服会话代表会话tid，一对一会话代表uid，群组会话代表gid
     protected String mUUID;
     protected String mTopic;
+    protected String mClient;
     public ThreadEntity mThreadEntity = new ThreadEntity();
     // 指定坐席uid
     protected String mAgentUid;
