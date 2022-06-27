@@ -33,7 +33,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    //
+    // 查看最新版本：https://search.maven.org/search?q=com.bytedesk
     implementation 'com.bytedesk:libcore:' + rootProject.bytedeskCoreVersion
 //    implementation 'com.bytedesk:libui:' + rootProject.bytedeskUIVersion
     implementation project(':bytedesk-ui')
