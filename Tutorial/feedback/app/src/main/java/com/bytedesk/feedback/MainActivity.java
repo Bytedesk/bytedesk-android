@@ -21,7 +21,7 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    // 管理后台：https://www.bytedesk.com/antv/user/login
+    // 管理后台：https://www.bytedesk.com/admin/#/antv/user/login
     // 获取管理员uid, 登录后台->客服管理->客服账号->管理员账号(唯一ID(uid))列
     public final static String adminUId = "201808221551193";
     // 获取appkey，登录后台->客服管理->渠道管理->添加应用->appkey

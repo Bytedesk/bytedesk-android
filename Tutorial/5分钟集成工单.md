@@ -4,7 +4,7 @@
 
 ## 准备工作
 
-- 到[萝卜丝官网](https://www.bytedesk.com/antv/user/login)注册管理员账号，并登录管理后台。
+- 到[萝卜丝官网](https://www.bytedesk.com/admin/#/antv/user/login)注册管理员账号，并登录管理后台。
 - 到 客服管理->渠道管理 添加网站/App
 - 到 客服管理->客服账号 有一列 ‘唯一 ID(uid)’ 会在指定客服接口中使用
 - 到 客服管理->技能组 有一列 ‘唯一 ID（wId）’ 会在技能组会话中用到

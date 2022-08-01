@@ -7,7 +7,7 @@ package com.bytedesk.demo.utils;
  */
 public class BDDemoConst {
 
-    // 管理后台：https://www.bytedesk.com/antv/user/login
+    // 管理后台：https://www.bytedesk.com/admin/#/antv/user/login
     // 获取管理员uid, 登录后台->客服管理->客服账号->管理员账号(唯一ID(uid))列
     public final static String DEFAULT_TEST_ADMIN_UID = "201808221551193";
     // TODO: 参考文档：https://github.com/pengjinning/bytedesk-android

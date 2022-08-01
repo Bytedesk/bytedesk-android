@@ -6,8 +6,8 @@
 
 ## 准备工作
 
-- [注册账号](https://www.bytedesk.com/antv/user/register)
-- [登录后台](https://www.bytedesk.com/antv/user/login)
+- [注册账号](https://www.bytedesk.com/admin/#/antv/user/register)
+- [登录后台](https://www.bytedesk.com/admin/#/antv/user/login)
 - 分配应用：登录后台->客服管理->渠道管理->添加 App
 - [下载 ApkDemo](https://bytedesk.oss-cn-shenzhen.aliyuncs.com/apk/bytedesk-android-sdk-demo.apk)
 - 技术支持 QQ 3 群: 825257535
@@ -18,8 +18,8 @@
 
 ```bash
 # 在项目根目录的build.gradle
-allprojects { 
-  repositories { 
+allprojects {
+  repositories {
     # 添加
     # 去查看最新版：https://search.maven.org/search?q=g:com.bytedesk
     mavenCentral()
