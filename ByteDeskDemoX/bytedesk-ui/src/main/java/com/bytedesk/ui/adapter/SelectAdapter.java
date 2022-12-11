@@ -77,7 +77,7 @@ public class SelectAdapter extends RecyclerView.Adapter<SelectAdapter.ViewHolder
                             : mContactEntity.getNickname() + "not checked");
                 }
             });
-            mNicknameTextView = itemView.findViewById(R.id.textview_firstitem_nickname);
+            mNicknameTextView = itemView.findViewById(R.id.textview_title);
             mContentTextView = itemView.findViewById(R.id.textview_content);
             mAvatarImageView = itemView.findViewById(R.id.imageview_avatar);
         }

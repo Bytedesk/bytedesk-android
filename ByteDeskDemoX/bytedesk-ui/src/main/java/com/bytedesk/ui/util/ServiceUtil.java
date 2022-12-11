@@ -21,31 +21,31 @@ public class ServiceUtil {
         return (WindowManager) context.getSystemService(Activity.WINDOW_SERVICE);
     }
 
-    public static ConnectivityManager getConnectivityManager(Context context) {
-        return (ConnectivityManager) context.getSystemService(Activity.CONNECTIVITY_SERVICE);
-    }
-
-    public static NotificationManager getNotificationManager(Context context) {
-        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    }
-
-    public static TelephonyManager getTelephonyManager(Context context) {
-        return (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-    }
-
-    public static AudioManager getAudioManager(Context context) {
-        return (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-    }
-
-    public static PowerManager getPowerManager(Context context) {
-        return (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-    }
-
-    public static AlarmManager getAlarmManager(Context context) {
-        return (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-    }
-
-    public static Vibrator getVibrator(Context context) {
-        return (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-    }
+//    public static ConnectivityManager getConnectivityManager(Context context) {
+//        return (ConnectivityManager) context.getSystemService(Activity.CONNECTIVITY_SERVICE);
+//    }
+//
+//    public static NotificationManager getNotificationManager(Context context) {
+//        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//    }
+//
+//    public static TelephonyManager getTelephonyManager(Context context) {
+//        return (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+//    }
+//
+//    public static AudioManager getAudioManager(Context context) {
+//        return (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+//    }
+//
+//    public static PowerManager getPowerManager(Context context) {
+//        return (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+//    }
+//
+//    public static AlarmManager getAlarmManager(Context context) {
+//        return (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//    }
+//
+//    public static Vibrator getVibrator(Context context) {
+//        return (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+//    }
 }

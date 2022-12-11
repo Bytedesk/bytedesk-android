@@ -72,7 +72,6 @@ import java.util.TimerTask;
  *
  *  TODO:
  *    1. 访客关闭会话窗口的时候通知客服
- *    2. 客服端关闭会话之后，禁止访客继续发送消息
  *
  * @author bytedesk.com
  */
@@ -465,7 +464,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         // 插入本地消息
         mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
 
-        BDCoreApi.messageAnswer(this, mRequestType, mWorkGroupWid, mAgentUid, content, new BaseCallback() {
+        BDCoreApi.messageAnswer(this, mWorkGroupWid, content, new BaseCallback() {
 
             @Override
             public void onSuccess(JSONObject object) {
@@ -1410,7 +1409,9 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
         final String localId = BDCoreUtils.uuid();
         //
-        if (!BDMqttApi.isConnected(this)) {
+//        if (!BDMqttApi.isConnected(this)) {
+            // FIXME: 长链接发消息经常显示loading发送中
+            Logger.i("sendTextMessage is disconnected");
             //
             String timestamp = BDCoreUtils.currentDate();
             String client = BDCoreConstant.CLIENT_ANDROID;
@@ -1454,6 +1455,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
             //
             String jsonContent = messageObject.toString();
             Logger.d("send message rest %s", jsonContent);
@@ -1462,11 +1464,9 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
 
                 @Override
                 public void onSuccess(JSONObject object) {
-
                     // 插入本地消息
-                    mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
+//                    mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
                 }
-
                 @Override
                 public void onError(JSONObject object) {
                     Toast.makeText(getApplicationContext(), "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
@@ -1474,17 +1474,17 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
             });
 
             return;
-        }
+//        }
         //
-        if (content.length() >= 512) {
-            Toast.makeText(this, "消息太长，请分多次发送", Toast.LENGTH_LONG).show();
-            return;
-        }
-        // 插入本地消息
-        mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
-        //
-        // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
-        BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
+//        if (content.length() >= 512) {
+//            Toast.makeText(this, "消息太长，请分多次发送", Toast.LENGTH_LONG).show();
+//            return;
+//        }
+//        // 插入本地消息
+//        mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUid, content, localId, mThreadType);
+//        //
+//        // 发送消息方式有两种：1. 异步发送消息，通过监听通知来判断是否发送成功，2. 同步发送消息，通过回调判断消息是否发送成功
+//        BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
 //
     }
 

@@ -30,31 +30,31 @@ task clean(type: Delete) {
 ext {
     // Sdk and tools
     minSdkVersion = 21
-    targetSdkVersion = 31
-    compileSdkVersion = 31
+    targetSdkVersion = 32
+    compileSdkVersion = 32
 
-    versionCode = 280
-    versionName = '2.8.0'
+    versionCode = 288
+    versionName = '2.8.8'
 
     buildToolsVersion = '31'
-    
-    appcompatVersion = '1.2.0'
+
+    appcompatVersion = '1.5.1'
     butterknifeVersion = '10.1.0'
-    recyleviewxVersion = '1.2.0'
+    recyleviewxVersion = '1.2.1'
     stethoVersion = '1.5.1'
-    
-    qmuiVersion = '2.0.0-alpha10'
-    qmuiArchVersion = '2.0.0-alpha10'
+
+    qmuiVersion = '2.1.0'
+    qmuiArchVersion = '2.1.0'
 
     easypermissionsVersion = '3.0.0'
-    eventbusVersion = '3.2.0'
-    glideVersion = '4.12.0'
+    eventbusVersion = '3.3.1'
+    glideVersion = '4.14.2'
     loggerVersion = '2.2.0'
-    gsonVersion = '2.8.6'
-    
-    archLifecycleVersion = "2.2.0"
-    archRoomVersion = '2.3.0'
+    gsonVersion = '2.10'
 
-    bytedeskCoreVersion = "2.7.5"
-    bytedeskUIVersion = "2.7.5"
+    archLifecycleVersion = "2.2.0"
+    archRoomVersion = '2.4.3'
+
+    bytedeskCoreVersion = "2.7.7"
+    bytedeskUIVersion = "2.7.7"
 }

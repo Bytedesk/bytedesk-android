@@ -225,6 +225,8 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 mClient = mThreadEntity.getClient();
                 mTitle = mThreadEntity.getNickname();
                 mThreadType = mThreadEntity.getType();
+                //
+                mPreferenceManager.setCurrentThreadTid(mThreadEntity.getTid());
             } else {
                 // 从联系人详情页面进入聊天页面
                 mUUID = getIntent().getStringExtra(BDUiConstant.EXTRA_UUID);
@@ -921,9 +923,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 
     /**
      * 从相册中选择图片
-     *
      * FIXME: 当前版本，禁止选择视频文件
-     *
      */
     private void pickImageFromAlbum() {
 
@@ -1142,14 +1142,14 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             String content = charSequence.toString();
-            Logger.i("input content: %s", content);
+//            Logger.i("input content: %s", content);
 
         }
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             String content = charSequence.toString();
-            Logger.i("input content: %s", content);
+//            Logger.i("input content: %s", content);
 
             // 切换扩展按钮和发送按钮
             if (content.length() > 0) {
@@ -1163,7 +1163,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 
         @Override
         public void afterTextChanged(Editable editable) {
-            Logger.i("afterTextChanged");
+//            Logger.i("afterTextChanged");
 
             String content = editable.toString();
             if (content != null) {
@@ -1505,7 +1505,9 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         // 自定义本地消息id，用于判断消息发送状态. 消息通知或者回调接口中会返回此id
         final String localId = BDCoreUtils.uuid();
 
-        if (!BDMqttApi.isConnected(this)) {
+//        if (!BDMqttApi.isConnected(this)) {
+            // FIXME: 长链接发消息经常显示loading发送中
+            Logger.i("disconnected, sendMessageRest");
             //
             String timestamp = BDCoreUtils.currentDate();
             String client = BDCoreConstant.CLIENT_ANDROID;
@@ -1549,17 +1551,16 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            //
+            // 插入本地消息
+            mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
+            // rest接口发送消息
             String jsonContent = messageObject.toString();
             BDCoreApi.sendMessageRest(this, jsonContent, new BaseCallback() {
-
                 @Override
                 public void onSuccess(JSONObject object) {
-
                     // 插入本地消息
-                    mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
+//                    mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
                 }
-
                 @Override
                 public void onError(JSONObject object) {
                     Toast.makeText(getApplicationContext(), "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
@@ -1567,17 +1568,19 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
             });
 
             return;
-        }
-
-        if (content.length() >= 500) {
-            Toast.makeText(this, "消息太长，请分多次发送", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        // 插入本地消息
-        mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
-        //
-        BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
+//        } else {
+//            Logger.i("sendTextMessage is connected");
+//        }
+//
+//        if (content.length() >= 500) {
+//            Toast.makeText(this, "消息太长，请分多次发送", Toast.LENGTH_LONG).show();
+//            return;
+//        }
+//
+//        // 插入本地消息
+//        mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
+//        // mqtt发送消息
+//        BDMqttApi.sendTextMessageProtobuf(this, localId, content, mThreadEntity);
     }
 
     private void sendImageMessage(String imageUrl) {

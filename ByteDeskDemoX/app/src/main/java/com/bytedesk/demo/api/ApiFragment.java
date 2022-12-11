@@ -109,7 +109,7 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(helpCenterItem, view -> BDUiApi.startSupportApiActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
                 .addItemView(wapChatItem, view -> {
                     // 注意: 登录后台->客服管理->技能组(或客服账号)->获取客服代码 获取相应URL
-                    String url = "https://chat.kefux.cn/chat/h5/index.html??sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&aid=&hidenav=1&ph=ph";
+                    String url = "https://chat.kf102.cn/chat/h5/index.html??sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&aid=&hidenav=1&ph=ph";
                     BDUiApi.startHtml5Chat(getContext(), url, "H5在线客服");
                 })
                 .addItemView(settingItem, view -> startFragment(new SettingFragment()))

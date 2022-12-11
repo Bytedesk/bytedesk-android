@@ -6,11 +6,11 @@
     android:layout_height="match_parent"
     android:background="#F3F3F3">
 
+    <!--  android:layout_marginTop="@dimen/album_dp_20" -->
     <com.bytedesk.ui.widget.InputAwareLayout
         android:id="@+id/bytedesk_activity_chat_im"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/album_dp_20">
+        android:layout_height="match_parent">
 
         <!-- 聊天记录 -->
         <LinearLayout

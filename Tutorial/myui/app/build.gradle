@@ -34,7 +34,7 @@ dependencies {
 
     // 萝卜丝第五步
     // 加载萝卜丝核心库
-    implementation 'com.bytedesk:libcore:2.7.5'
+    implementation 'com.bytedesk:libcore:2.7.7'
     // 加载萝卜丝自定义UI库
     implementation project(':bytedesk-ui')
 
