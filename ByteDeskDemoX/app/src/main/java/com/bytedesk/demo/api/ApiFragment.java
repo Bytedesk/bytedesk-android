@@ -1,13 +1,8 @@
 package com.bytedesk.demo.api;
 
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
 
-import com.bytedesk.core.api.BDCoreApi;
-import com.bytedesk.core.callback.BaseCallback;
-import com.bytedesk.core.callback.LoginCallback;
 import com.bytedesk.core.event.ConnectionEvent;
 import com.bytedesk.core.event.KickoffEvent;
 import com.bytedesk.core.event.MessageEntityEvent;
@@ -28,9 +23,6 @@ import com.bytedesk.ui.api.BDUiApi;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIPackageHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
-import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 
@@ -51,9 +43,6 @@ public class ApiFragment extends BaseFragment {
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
     @BindView(R.id.groupListView) QMUIGroupListView mGroupListView;
 
-    private BDPreferenceManager mPreferenceManager;
-    private QMUICommonListItemView loginItem;
-
     private String version;
 
     @Override
@@ -71,7 +60,6 @@ public class ApiFragment extends BaseFragment {
     }
 
     private void initTopBar() {
-
         mTopBar.setTitle("萝卜丝" + version + "(未连接)");
     }
 
@@ -109,7 +97,7 @@ public class ApiFragment extends BaseFragment {
                 .addItemView(helpCenterItem, view -> BDUiApi.startSupportApiActivity(getContext(), BDDemoConst.DEFAULT_TEST_ADMIN_UID))
                 .addItemView(wapChatItem, view -> {
                     // 注意: 登录后台->客服管理->技能组(或客服账号)->获取客服代码 获取相应URL
-                    String url = "https://chat.kf102.cn/chat/h5/index.html??sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&aid=&hidenav=1&ph=ph";
+                    String url = "https://chat.kefux.com/chat/h5/index.html??sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&aid=&hidenav=1&ph=ph";
                     BDUiApi.startHtml5Chat(getContext(), url, "H5在线客服");
                 })
                 .addItemView(settingItem, view -> startFragment(new SettingFragment()))
