@@ -69,6 +69,7 @@ import com.bytedesk.ui.util.BDPermissionUtils;
 import com.bytedesk.ui.util.BDUiConstant;
 import com.bytedesk.ui.util.BDUiUtils;
 import com.bytedesk.ui.util.EmotionMaps;
+import com.bytedesk.ui.util.EmotionMapsGroup;
 import com.bytedesk.ui.util.ExpressionUtil;
 import com.bytedesk.ui.widget.InputAwareLayout;
 import com.bytedesk.ui.widget.KeyboardAwareLinearLayout;
@@ -108,7 +109,7 @@ import java.util.List;
  *
  * @author bytedesk.com
  */
-public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickListener,
+public class ChatIMGroupActivity extends ChatBaseActivity implements ChatItemClickListener,
         View.OnClickListener,
         View.OnTouchListener,
         ViewPager.OnPageChangeListener,
@@ -177,7 +178,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
     public RelativeLayout mEmotionLayout;
     private ViewPager mEmotionViewPager;
     private EmotionViewPagerAdapter mEmotionViewPagerAdapter;
-    private EmotionMaps mEmotionMaps;
+    private EmotionMapsGroup mEmotionMaps;
 
     // 表情pager indicator
     private int mCurrentEmotionViewPagerIndex;
@@ -200,7 +201,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bytedesk_activity_chat_im);
+        setContentView(R.layout.bytedesk_activity_chat_im_group);
         //
         if (null != getIntent()) {
             //
@@ -232,20 +233,17 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 //
             }
         }
-
         //
         initTopBar();
         initView();
         initModel();
         initRecorder(savedInstanceState);
-
         // 从服务器加载thread
         if (!mIsFromThread) {
             requestThread();
         }
-
         // 从服务器端加载聊天记录，默认暂不加载
-         getMessages();
+        getMessages();
     }
 
     @Override
@@ -401,7 +399,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
             mEmotionLayout.setVisibility(View.GONE);
             mExtensionLayout.setVisibility(View.GONE);
             // TODO: 回调常用语列表
-            Intent intent = new Intent(ChatIMActivity.this, CuwActivity.class);
+            Intent intent = new Intent(ChatIMGroupActivity.this, CuwActivity.class);
             startActivityForResult(intent, BDUiConstant.SELECT_CUW);
 //            registerForActivityResult
 
@@ -417,7 +415,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 
         } else if (view.getId() == R.id.appkefu_plus_show_red_packet_btn) {
 
-            final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatIMActivity.this);
+            final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatIMGroupActivity.this);
             builder.setTitle("发送红包")
                 .setPlaceholder("在此输入金额")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -432,7 +430,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 
                         dialog.dismiss();
                     } else {
-                        Toast.makeText(ChatIMActivity.this, "请填入金额", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChatIMGroupActivity.this, "请填入金额", Toast.LENGTH_SHORT).show();
                     }
 
                 }).show();
@@ -487,13 +485,13 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 
                     m_recordedVoiceLength = (int) (m_endRecordingTimestamp - m_startRecordingTimestamp) / 1000;
                     if (m_recordedVoiceLength < 1) {
-                        Toast.makeText(ChatIMActivity.this, R.string.kfds_record_voice_too_short, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMGroupActivity.this, R.string.kfds_record_voice_too_short, Toast.LENGTH_LONG).show();
                     } else if (m_recordedVoiceLength > 60) {
-                        Toast.makeText(ChatIMActivity.this, R.string.kfds_record_voice_too_long, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMGroupActivity.this, R.string.kfds_record_voice_too_long, Toast.LENGTH_LONG).show();
                     } else {
                         //
                         if (mIsRobot) {
-                            Toast.makeText(ChatIMActivity.this, R.string.kfds_robot_cannot_send_voice, Toast.LENGTH_LONG).show();
+                            Toast.makeText(ChatIMGroupActivity.this, R.string.kfds_robot_cannot_send_voice, Toast.LENGTH_LONG).show();
                             return false;
                         }
                         //
@@ -517,14 +515,14 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 //					int checkRecordAudioPermission = checkSelfPermission(Manifest.permission.RECORD_AUDIO);
                     if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
                             checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        new AlertDialog.Builder(ChatIMActivity.this)
+                        new AlertDialog.Builder(ChatIMGroupActivity.this)
                                 .setMessage(getString(R.string.kfds_record_permission_tip))
                                 .setPositiveButton(
                                         getString(R.string.kfds_ok),
                                         new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                ActivityCompat.requestPermissions(ChatIMActivity.this,
+                                                ActivityCompat.requestPermissions(ChatIMGroupActivity.this,
                                                         new String[] { Manifest.permission.RECORD_AUDIO,
                                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE },
                                                         CHECK_RECORD_AUDIO_PERMISSION);
@@ -575,7 +573,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
                     .setOnClickListener(view -> {
                         //
-                        Intent intent = new Intent(ChatIMActivity.this, ContactProfileActivity.class);
+                        Intent intent = new Intent(ChatIMGroupActivity.this, ContactProfileActivity.class);
                         intent.putExtra(BDUiConstant.EXTRA_UID, mUUID);
                         startActivity(intent);
                     });
@@ -585,7 +583,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
             mTopBar.addRightImageButton(R.mipmap.icon_topbar_overflow, QMUIViewHelper.generateViewId())
                     .setOnClickListener(view -> {
                         //
-                        Intent intent = new Intent(ChatIMActivity.this, GroupProfileActivity.class);
+                        Intent intent = new Intent(ChatIMGroupActivity.this, GroupProfileActivity.class);
                         intent.putExtra(BDUiConstant.EXTRA_UID, mUUID);
                         startActivity(intent);
                     });
@@ -668,7 +666,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 
         // 表情
         mEmotionLayout = findViewById(R.id.bytedesk_chat_emotion);
-        mEmotionMaps = new EmotionMaps(this);
+        mEmotionMaps = new EmotionMapsGroup(this);
         mEmotionViewPagerAdapter = new EmotionViewPagerAdapter(mEmotionMaps.getGridViewArrayList());
         mEmotionViewPager = findViewById(R.id.appkefu_emotion_viewpager);
         mEmotionViewPager.setAdapter(mEmotionViewPagerAdapter);
@@ -843,7 +841,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMGroupActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -876,7 +874,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     mPullRefreshLayout.finishRefresh();
 
                     try {
-                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMGroupActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -908,7 +906,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 public void onError(JSONObject object) {
                     mPullRefreshLayout.finishRefresh();
                     try {
-                        Toast.makeText(ChatIMActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ChatIMGroupActivity.this, object.getString("message"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -937,7 +935,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                         uploadImage(albumFile.getPath(), imageName);
                     }
                 })
-                .onCancel(result -> Toast.makeText(ChatIMActivity.this, "取消发送图片", Toast.LENGTH_LONG).show())
+                .onCancel(result -> Toast.makeText(ChatIMGroupActivity.this, "取消发送图片", Toast.LENGTH_LONG).show())
                 .start();
     }
 
@@ -958,7 +956,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     String imageFileName = BDCoreUtils.getPictureTimestamp()  + "_" + mPreferenceManager.getUsername();
                     uploadImage(result, imageFileName);
                 })
-                .onCancel(result -> Toast.makeText(ChatIMActivity.this, "取消拍照", Toast.LENGTH_LONG).show())
+                .onCancel(result -> Toast.makeText(ChatIMGroupActivity.this, "取消拍照", Toast.LENGTH_LONG).show())
                 .start();
     }
 
@@ -1461,11 +1459,11 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     return;
                 }
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
-                    filePath = BDFileUtils.getPath(ChatIMActivity.this, uri);
+                    filePath = BDFileUtils.getPath(ChatIMGroupActivity.this, uri);
                     Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
                 } else {//4.4以下下系统调用方法
-                    filePath = BDFileUtils.getRealPathFromURI(ChatIMActivity.this, uri);
-                    Toast.makeText(ChatIMActivity.this, filePath, Toast.LENGTH_SHORT).show();
+                    filePath = BDFileUtils.getRealPathFromURI(ChatIMGroupActivity.this, uri);
+                    Toast.makeText(ChatIMGroupActivity.this, filePath, Toast.LENGTH_SHORT).show();
                 }
 //                Logger.i("filePath:" + filePath);
                 // 上传、发送文件
@@ -1487,7 +1485,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 } else if (type.equals("video")) {
                     sendVideoMessage(content);
                 } else {
-                    Toast.makeText(ChatIMActivity.this, "不支持的消息类型", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatIMGroupActivity.this, "不支持的消息类型", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -1503,8 +1501,8 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         final String localId = BDCoreUtils.uuid();
 
 //        if (!BDMqttApi.isConnected(this)) {
-//            // FIXME: 长链接发消息经常显示loading发送中
-//            Logger.i("disconnected, sendMessageRest");
+            // FIXME: 长链接发消息经常显示loading发送中
+            Logger.i("disconnected, sendMessageRest");
             //
             String timestamp = BDCoreUtils.currentDate();
             String client = BDCoreConstant.CLIENT_ANDROID;
@@ -1549,8 +1547,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 e.printStackTrace();
             }
             // 插入本地消息
-            String uid = mTopic.split("/")[1];
-            mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, uid, content, localId, mThreadType, BDCoreConstant.MESSAGE_STATUS_STORED);
+            mRepository.insertTextMessageLocal(mUUID, mWorkGroupWid, mUUID, content, localId, mThreadType);
             // rest接口发送消息
             String jsonContent = messageObject.toString();
             BDCoreApi.sendMessageRest(this, jsonContent, new BaseCallback() {
@@ -1564,7 +1561,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     Toast.makeText(getApplicationContext(), "网络断开，请稍后重试", Toast.LENGTH_LONG).show();
                 }
             });
-            //
+
             return;
 //        } else {
 //            Logger.i("sendTextMessage is connected");
@@ -1588,7 +1585,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         // 插入本地消息
         mRepository.insertImageMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType);
 
-        BDMqttApi.sendImageMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+        BDMqttApi.sendImageMessageProtobuf(ChatIMGroupActivity.this, localId, imageUrl, mThreadEntity);
     }
 
     private void sendFileMessage(String imageUrl) {
@@ -1598,7 +1595,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         // 插入本地消息
         mRepository.insertFileMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType, "doc", "fileName", "fileSize");
 
-        BDMqttApi.sendFileMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+        BDMqttApi.sendFileMessageProtobuf(ChatIMGroupActivity.this, localId, imageUrl, mThreadEntity);
     }
 
     private void sendVoiceMessage(String imageUrl) {
@@ -1608,7 +1605,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         // 插入本地消息
         mRepository.insertVoiceMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType, 0);
 
-        BDMqttApi.sendVoiceMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+        BDMqttApi.sendVoiceMessageProtobuf(ChatIMGroupActivity.this, localId, imageUrl, mThreadEntity);
     }
 
     private void sendVideoMessage(String imageUrl) {
@@ -1618,7 +1615,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
         // 插入本地消息
         mRepository.insertVideoMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType);
 
-        BDMqttApi.sendVideoMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+        BDMqttApi.sendVideoMessageProtobuf(ChatIMGroupActivity.this, localId, imageUrl, mThreadEntity);
     }
 
     /**
@@ -1660,7 +1657,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     // 插入本地消息
                     mRepository.insertImageMessageLocal(mUUID, mWorkGroupWid, mUUID, imageUrl, localId, mThreadType);
 
-                    BDMqttApi.sendImageMessageProtobuf(ChatIMActivity.this, localId, imageUrl, mThreadEntity);
+                    BDMqttApi.sendImageMessageProtobuf(ChatIMGroupActivity.this, localId, imageUrl, mThreadEntity);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1701,7 +1698,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     // 插入本地消息
                     mRepository.insertVoiceMessageLocal(mUUID, mWorkGroupWid, mUUID, voiceUrl, localId, mThreadType, voiceLength);
 
-                    BDMqttApi.sendVoiceMessageProtobuf(ChatIMActivity.this, localId, voiceUrl, mThreadEntity);
+                    BDMqttApi.sendVoiceMessageProtobuf(ChatIMGroupActivity.this, localId, voiceUrl, mThreadEntity);
 //                    BDMqttApi.sendVoiceMessageProtobuf(ChatIMActivity.this, localId, voiceUrl,
 //                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
@@ -1713,7 +1710,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
             @Override
             public void onError(JSONObject object) {
 
-                Toast.makeText(ChatIMActivity.this, "上传语音失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(ChatIMGroupActivity.this, "上传语音失败", Toast.LENGTH_LONG).show();
             }
 
         });
@@ -1740,7 +1737,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     // 插入本地消息
                     mRepository.insertFileMessageLocal(mUUID, mWorkGroupWid, mUUID, fileUrl, localId, mThreadType, "doc", "fileName", "fileSize");
 
-                    BDMqttApi.sendFileMessageProtobuf(ChatIMActivity.this, localId, fileUrl, mThreadEntity);
+                    BDMqttApi.sendFileMessageProtobuf(ChatIMGroupActivity.this, localId, fileUrl, mThreadEntity);
 //                    BDMqttApi.sendFileMessageProtobuf(ChatIMActivity.this, localId, fileUrl,
 //                            mUUID, mThreadEntity.getTopic(), mThreadEntity.getType(), mThreadEntity.getNickname(), mThreadEntity.getAvatar());
 
@@ -1780,7 +1777,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                     Logger.i("用户信息");
                     //
                     String uid = mThreadEntity.getTopic().split("/")[1];
-                    Intent intent = new Intent(ChatIMActivity.this, VisitorInfoActivity.class);
+                    Intent intent = new Intent(ChatIMGroupActivity.this, VisitorInfoActivity.class);
                     intent.putExtra(BDUiConstant.EXTRA_UID, uid);
                     startActivity(intent);
 
@@ -1983,7 +1980,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                 .setTitle("阅后即焚")
                 .setCheckedIndex(checkedIndex)
                 .addItems(items, (dialogInterface, which) -> {
-                    Toast.makeText(ChatIMActivity.this,  items[which] + "阅后即焚", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatIMGroupActivity.this,  items[which] + "阅后即焚", Toast.LENGTH_SHORT).show();
                     dialogInterface.dismiss();
 
                     boolean enabled = which == 0 ? true : false;
@@ -1999,7 +1996,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
 
     private void setDestroyAfterLength() {
 
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatIMActivity.this);
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(ChatIMGroupActivity.this);
         builder.setTitle("阅后即焚")
                 .setPlaceholder("输入时长(秒)")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
@@ -2018,7 +2015,7 @@ public class ChatIMActivity extends ChatBaseActivity implements ChatItemClickLis
                         }
 
                     } else {
-                        Toast.makeText(ChatIMActivity.this, "请填入时长", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChatIMGroupActivity.this, "请填入时长", Toast.LENGTH_SHORT).show();
                     }
                 }).show();
     }

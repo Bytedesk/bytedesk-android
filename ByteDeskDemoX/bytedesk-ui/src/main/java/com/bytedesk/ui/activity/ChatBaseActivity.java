@@ -1,5 +1,7 @@
 package com.bytedesk.ui.activity;
 
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bytedesk.core.api.BDCoreApi;
@@ -73,6 +75,7 @@ public class ChatBaseActivity extends AppCompatActivity {
                     case 0:
                         String content = longClickEvent.getMessageEntity().getContent();
                         Logger.d("copy:" + content);
+                        Toast.makeText(getBaseContext(), "复制成功:" + content, Toast.LENGTH_SHORT).show();
                         BDCoreUtils.copy(getBaseContext(), content);
 
                         break;

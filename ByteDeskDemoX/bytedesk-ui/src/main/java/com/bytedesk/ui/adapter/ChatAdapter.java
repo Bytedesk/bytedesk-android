@@ -352,12 +352,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                         Toast.makeText(mContext, "识别到电话号码是：" + phoneNumber, Toast.LENGTH_SHORT).show();
 //                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
 //                        mContext.startActivity(intent);
+                        // 复制内容
+                        BDUiUtils.copy(mContext, phoneNumber);
                     }
 
                     @Override
                     public void onMailLinkClick(String mailAddress) {
                         // TODO:
                         Toast.makeText(mContext, "识别到邮件地址是：" + mailAddress, Toast.LENGTH_SHORT).show();
+                        // 复制内容
+                        BDUiUtils.copy(mContext, mailAddress);
                     }
 
                     @Override
@@ -365,12 +369,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                         // TODO:
                         Toast.makeText(mContext, "识别到网页链接是：" + url, Toast.LENGTH_SHORT).show();
                         BDUiApi.startHtml5Chat(mContext, url, "打开网址");
+                        // 复制内容
+                        BDUiUtils.copy(mContext, url);
                     }
                 });
                 // 长按
                 contentTextView.setOnLongClickListener(v -> {
-                    Logger.d("mid:" + msgEntity.getMid());
+//                    Logger.d("mid:" + msgEntity.getMid());
                     EventBus.getDefault().post(new LongClickEvent(msgEntity));
+                    // 复制内容
+                    Toast.makeText(mContext, "复制成功:" + msgEntity.getContent(), Toast.LENGTH_SHORT).show();
+                    BDUiUtils.copy(mContext, msgEntity.getContent());
                     return false;
                 });
             }
@@ -604,12 +613,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                             msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_STORED) ||
                             msgEntity.getStatus().equals(BDCoreConstant.MESSAGE_STATUS_RECEIVED)) {
                         // 更新本地消息为已读
-                        msgEntity.setStatus(BDCoreConstant.MESSAGE_STATUS_READ);
-                        BDRepository.getInstance(mContext).insertMessageEntity(msgEntity);
+//                        msgEntity.setStatus(BDCoreConstant.MESSAGE_STATUS_READ);
+//                        BDRepository.getInstance(mContext).insertMessageEntity(msgEntity);
                         // 发送已读回执，通知服务器更新状态
 //                        BDMqttApi.sendReceiptReadMessage(mContext, msgEntity.getMid(), msgEntity.getThreadTid());
-                        ThreadEntity threadEntity = ((ChatBaseActivity)mContext).mThreadEntity;
-                        BDMqttApi.sendReceiptReadMessageProtobuf(mContext, threadEntity, msgEntity.getMid());
+                        // FIXME: 容易造成重复发送，暂时注释掉
+//                        ThreadEntity threadEntity = ((ChatBaseActivity)mContext).mThreadEntity;
+//                        BDMqttApi.sendReceiptReadMessageProtobuf(mContext, threadEntity, msgEntity.getMid());
                     }
                 }
             }

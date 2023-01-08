@@ -544,12 +544,12 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
      */
     private void updateCurrentThread() {
 
-        String preTid = mPreferenceManager.getCurrentTid();
+        String preTid = mPreferenceManager.getCurrentThreadTid();
         BDCoreApi.updateCurrentThread(this, preTid, mUUID, new BaseCallback() {
             @Override
             public void onSuccess(JSONObject object) {
                 // 设置当前tid
-                mPreferenceManager.setCurrentTid(mUUID);
+                mPreferenceManager.setCurrentThreadTid(mUUID);
             }
 
             @Override
@@ -957,7 +957,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                     if (result.size() > 0) {
                         AlbumFile albumFile = result.get(0);
 
-                        String imageName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp();
+                        String imageName = BDCoreUtils.getPictureTimestamp() + "_" + mPreferenceManager.getUsername();
                         uploadImage(albumFile.getPath(), imageName);
                     }
                 })
@@ -992,7 +992,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 .image()
                 .onResult(result -> {
 
-                    String imageFileName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp();
+                    String imageFileName = BDCoreUtils.getPictureTimestamp()  + "_" + mPreferenceManager.getUsername() ;
                     uploadImage(result, imageFileName);
                 })
                 .onCancel(result -> {
@@ -1029,7 +1029,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                     if (result.size() > 0) {
                         AlbumFile albumFile = result.get(0);
 
-                        String videoName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp() + ".mp4";
+                        String videoName = BDCoreUtils.getPictureTimestamp()  + "_" + mPreferenceManager.getUsername()  + ".mp4";
                         uploadVideo(albumFile.getPath(), videoName);
                     }
                 })
@@ -1051,7 +1051,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
                 .video()
                 .onResult(result -> {
 
-                    String videoFileName = mPreferenceManager.getUsername() + "_" + BDCoreUtils.getPictureTimestamp() + ".mp4";
+                    String videoFileName = BDCoreUtils.getPictureTimestamp()  + "_" + mPreferenceManager.getUsername() + ".mp4";
                     uploadVideo(result, videoFileName);
                 })
                 .onCancel(result -> {
@@ -1411,7 +1411,7 @@ public class ChatKFActivity extends ChatBaseActivity implements ChatItemClickLis
         //
 //        if (!BDMqttApi.isConnected(this)) {
             // FIXME: 长链接发消息经常显示loading发送中
-            Logger.i("sendTextMessage is disconnected");
+//            Logger.i("sendTextMessage is disconnected");
             //
             String timestamp = BDCoreUtils.currentDate();
             String client = BDCoreConstant.CLIENT_ANDROID;

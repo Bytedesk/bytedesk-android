@@ -1,5 +1,7 @@
 package com.bytedesk.ui.util;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -19,6 +21,12 @@ import java.util.TimerTask;
 
 public class BDUiUtils {
 
+
+    public static void copy(Context context, String content) {
+        ClipboardManager clipboard = (ClipboardManager)context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText(null,content);// 把数据复制到剪贴板
+        clipboard.setPrimaryClip(clipData);
+    }
 
     /**
      * 显示或隐藏系统软键盘

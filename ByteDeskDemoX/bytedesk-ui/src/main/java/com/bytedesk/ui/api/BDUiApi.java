@@ -8,6 +8,8 @@ import com.bytedesk.core.util.BDCoreConstant;
 //import com.bytedesk.core.util.MMKVUtils;
 import com.bytedesk.ui.activity.BrowserActivity;
 import com.bytedesk.ui.activity.ChatIMActivity;
+import com.bytedesk.ui.activity.ChatIMContactActivity;
+import com.bytedesk.ui.activity.ChatIMGroupActivity;
 import com.bytedesk.ui.activity.ChatKFActivity;
 import com.bytedesk.ui.activity.FeedbackActivity;
 import com.bytedesk.ui.activity.SupportApiActivity;
@@ -201,7 +203,7 @@ public class BDUiApi {
         //
 //        BDConfig.getInstance(context).switchToIM();
         //
-        Intent intent = new Intent(context, ChatIMActivity.class);
+        Intent intent = new Intent(context, ChatIMContactActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_IS_THREAD, false);
 //        intent.putExtra(BDUiConstant.EXTRA_UID, uId);
         intent.putExtra(BDUiConstant.EXTRA_UUID, uId);
@@ -236,7 +238,7 @@ public class BDUiApi {
         //
 //        BDConfig.getInstance(context).switchToIM();
         //
-        Intent intent = new Intent(context, ChatIMActivity.class);
+        Intent intent = new Intent(context, ChatIMGroupActivity.class);
         intent.putExtra(BDUiConstant.EXTRA_IS_THREAD, false);
 //        intent.putExtra(BDUiConstant.EXTRA_GID, gId);
         intent.putExtra(BDUiConstant.EXTRA_UUID, gId);
