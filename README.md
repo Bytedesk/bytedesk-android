@@ -30,8 +30,8 @@ allprojects {
 ```bash
 # 查看最新版：https://search.maven.org/search?q=com.bytedesk
 # androidx版, 参考demo：ByteDeskDemoX
-- 核心库: implementation 'com.bytedesk:libcore:2.7.7'
-- 界面库: implementation 'com.bytedesk:libui:2.7.7'
+- 核心库: implementation 'com.bytedesk:libcore:2.7.9'
+- 界面库: implementation 'com.bytedesk:libui:2.7.9'
 ```
 
 混淆
