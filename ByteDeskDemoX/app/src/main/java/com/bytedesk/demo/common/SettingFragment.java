@@ -69,7 +69,7 @@ public class SettingFragment extends BaseFragment {
         ///////
         QMUICommonListItemView vibrateItem = mGroupListView.createItemView("收到消息振动");
         vibrateItem.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_SWITCH);
-         vibrateItem.getSwitch().setChecked(preferenceManager.shouldVibrateWhenSendMessage());
+         vibrateItem.getSwitch().setChecked(preferenceManager.shouldVibrateWhenReceiveMessage());
         vibrateItem.getSwitch().setOnCheckedChangeListener((buttonView, isChecked) -> preferenceManager.setVibrateWhenReceiveMessage(isChecked));
         //
         QMUIGroupListView.newSection(getContext())
