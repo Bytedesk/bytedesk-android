@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/src/main/cpp/CMakeLists.txt",
+    "/Users/jackning/Library/Android/sdk/ndk/21.1.6352462/build/cmake/android.toolchain.cmake",
+    "/Users/jackning/Library/Android/sdk/ndk/21.1.6352462/build/cmake/platforms.cmake"
+  ],
+  "cleanCommands": [
+    "/Users/jackning/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/.cxx/cmake/debug/arm64-v8a\" clean"
+  ],
+  "buildTargetsCommand": "/Users/jackning/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/.cxx/cmake/debug/arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "native-test-Debug-arm64-v8a": {
+      "artifactName": "native-test",
+      "buildCommand": "/Users/jackning/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/.cxx/cmake/debug/arm64-v8a\" native-test",
+      "abi": "arm64-v8a",
+      "output": "/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/build/intermediates/cmake/debug/obj/arm64-v8a/libnative-test.so",
+      "runtimeFiles": []
+    },
+    "native-lib-Debug-arm64-v8a": {
+      "artifactName": "native-lib",
+      "buildCommand": "/Users/jackning/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/.cxx/cmake/debug/arm64-v8a\" native-lib",
+      "abi": "arm64-v8a",
+      "output": "/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/build/intermediates/cmake/debug/obj/arm64-v8a/libnative-lib.so",
+      "runtimeFiles": []
+    }
+  }
+}
