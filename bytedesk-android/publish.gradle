@@ -1,0 +1,148 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+// Android Jcenter迁移到Mavencentral
+// https://juejin.cn/post/6951209116521988132
+// https://www.laoyuyu.me/2021/04/19/as/upload_to_mavenCentral/
+// https://zhuanlan.zhihu.com/p/359228319
+// mavenCentral常用链接：
+// https://issues.sonatype.org/browse/OSSRH-69403
+// 注意：要一个一个发布，先执行完libcore的release，才能build/assemble libui
+// 发布：1. build/assemble, 2.publishing->publishReleasePublicationToMavencentralRepository
+// 登录：https://s01.oss.sonatype.org/#stagingRepositories，点staging repositories/close/release
+// 搜索：https://search.maven.org/search?q=g:com.bytedesk
+// 搜索新版：https://central.sonatype.dev/search?q=com.bytedesk
+// https://repo1.maven.org/maven2/com/bytedesk/
+
+task androidSourcesJar(type: Jar) {
+//    classifier = 'sources'
+    from android.sourceSets.main.java.source
+    exclude "**/R.class"
+    exclude "**/BuildConfig.class"
+}
+
+ext {
+    PUBLISH_GROUP_ID = 'com.bytedesk'
+    PUBLISH_VERSION = '2.8.0'
+}
+
+//ext["signing.keyId"] = '0AFD015B'
+ext["signing.keyId"] = '29ECD171'
+ext["signing.password"] = 'wUxSk7prRLQM%gW'
+ext["signing.secretKeyRingFile"] = '../secret.gpg'
+ext["ossrhUsername"] = '270580156'
+ext["ossrhPassword"] = 'wUxSk7prRLQM%gW'
+
+//gpg: /Users/ningjinpeng/.gnupg/trustdb.gpg：建立了信任度数据库
+//gpg: 目录‘/Users/ningjinpeng/.gnupg/openpgp-revocs.d’已创建
+//gpg: 吊销证书已被存储为‘/Users/ningjinpeng/.gnupg/openpgp-revocs.d/DBE5140238D4B69F51FEFC318E5A1CA929ECD171.rev’
+//公钥和私钥已经生成并被签名。
+//
+//pub   ed25519 2022-03-03 [SC] [有效至：2024-03-02]
+//DBE5140238D4B69F51FEFC318E5A1CA929ECD171
+//uid                      jackning <270580156@qq.com>
+//sub   cv25519 2022-03-03 [E] [有效至：2024-03-02]
+
+// gpg userid: jackning, email: 270580156@qq.com，passphrase: wUxSk7prRLQM%gW
+// gpg: key D7C2404E0AFD015B marked as ultimately trusted
+// gpg: revocation certificate stored as '/Users/ningjinpeng/.gnupg/openpgp-revocs.d/DCDFE0116CB7A74E4B990F58D7C2404E0AFD015B.rev'
+// public and secret key created and signed.
+// pub   rsa4096 2021-05-26 [SC]
+//       DCDFE0116CB7A74E4B990F58D7C2404E0AFD015B
+// uid   jackning (mavenCentral) <270580156@qq.com>
+// sub   rsa4096 2021-05-26 [E]
+
+//File secretPropsFile = project.rootProject.file('local.properties')
+//if (secretPropsFile.exists()) {
+//    println "Found secret props file, loading props"
+//    Properties p = new Properties()
+//    p.load(new FileInputStream(secretPropsFile))
+//    p.each { name, value ->
+//        ext[name] = value
+//    }
+//} else {
+//    println "No props file, loading env vars"
+//}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            // The coordinates of the library, being set from variables that
+            // we'll set up in a moment
+            groupId PUBLISH_GROUP_ID
+            artifactId PUBLISH_ARTIFACT_ID
+            version PUBLISH_VERSION
+
+            // Two artifacts, the `aar` and the sources
+            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            artifact androidSourcesJar
+
+            // Self-explanatory metadata for the most part
+            pom {
+                name = PUBLISH_ARTIFACT_ID
+                description = 'bytedesk'
+                // If your project has a dedicated site, use its URL here
+                url = 'https://github.com/Bytedesk/bytedesk-android'
+                licenses {
+                    license {
+                        //协议类型，一般默认Apache License2.0的话不用改：
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                // 开发者信息
+                developers {
+                    developer {
+                        id = '270580156'
+                        name = '270580156'
+                        email = '270580156@qq.com'
+                    }
+                }
+                // Version control info, if you're using GitHub, follow the format as seen here
+                scm {
+                    //修改成你的Git地址：
+                    connection = 'scm:git:github.com/Bytedesk/bytedesk-android.git'
+                    developerConnection = 'scm:git:ssh://github.com/Bytedesk/bytedesk-android.git'
+                    //分支地址：
+                    url = 'https://github.com/Bytedesk/bytedesk-android/tree/master'
+                }
+                // A slightly hacky fix so that your POM will include any transitive dependencies
+                // that your library builds upon
+                withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+
+                    project.configurations.implementation.allDependencies.each {
+                        if (it.name != 'unspecified') {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        // The repository to publish to, Sonatype/MavenCentral
+        maven {
+            // This is an arbitrary name, you may also use "mavencentral" or
+            // any other name that's descriptive for you
+            name = "mavencentral"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            // You only need this if you want to publish snapshots, otherwise just set the URL
+            // to the release repo directly
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            // The username and password we've fetched earlier
+            credentials {
+                username '270580156'
+                password 'wUxSk7prRLQM%gW'
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications
+}

@@ -1,0 +1,96 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+//      阿里云云效仓库：https://maven.aliyun.com/mvn/guide
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/repository/google/'}
+        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        // https://search.maven.org/search?q=com.bytedesk
+        // https://central.sonatype.dev/search?q=com.bytedesk
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.5.1'
+        //Gradle Android Maven plugin
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        //Gradle Bintray Plugin
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        // protobuf step 1
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.9.0'
+//        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.21'
+    }
+}
+
+//allprojects {
+//    repositories {
+//        // 此句maven是为因为项目中使用了jitpack上的开源项目PhotoView
+//        maven { url 'https://jitpack.io' }
+//    }
+//}
+
+//task clean(type: Delete) {
+//    delete rootProject.buildDir
+//}
+
+ext {
+    // Sdk and tools
+    minSdkVersion = 21
+    targetSdkVersion = 34
+    compileSdkVersion = 34
+
+    versionCode = 300
+    versionName = '3.0.0'
+
+    buildToolsVersion = '33.0.2'
+//    supportLibVersion = '28.0.0'
+
+//    appcompatVersion = '1.5.1'
+//    recyleviewxVersion = '1.3.2'
+//    stethoVersion = '1.5.1'
+
+//    qmuiVersion = '2.1.0'
+//    qmuiArchVersion = '2.1.0'
+//
+//    easypermissionsVersion = '3.0.0'
+//    eventbusVersion = '3.3.1'
+//    glideVersion = '4.16.0'
+//    loggerVersion = '2.2.0'
+//    gsonVersion = '2.10'
+//
+//    archLifecycleVersion = "2.2.0"
+//    archRoomVersion = '2.4.3'
+
+//    mqttClientVersion = '1.2.5'
+//    materialVersion = '1.7.0' //'1.3.0' //'1.1.0'
+//    constraintlayoutVersion = '2.1.4' //'2.0.4'
+//    annotationVersion = '1.1.0'
+//    retrofit2Version = '2.9.0'
+//    okhttp3Version = '4.10.0' //'4.9.1' //'4.8.1'
+//    conscryptVersion = '2.5.2' //'2.5.0'
+//    rxandroidVersion = '2.1.1'
+//    wcdbVersion = '1.1-19'
+//    mmkvVersion = '1.2.11'
+//    tinypinyinVersion = '2.0.3'
+//    protobufJavaVersion = '3.21.10' //'3.18.1'
+//    recyclerviewSwipeVersion = '1.2.3'
+//    scwang90Refresh = '2.1.0'
+    // https://search.maven.org/search?q=bytedesk
+    // 注意修改 publish.gradle 中版本号 PUBLISH_VERSION
+    // 2023/01/07, 2.7.9, maven
+    bytedeskCoreVersion = '3.0.0'
+    bytedeskUIVersion = '3.0.0'
+    bytedeskMqttVersion = '3.0.0'
+    bytedeskMarsVersion = '3.0.0'
+    bytedeskPushVersion = '3.0.0'
+    bytedeskWebRTCUIVersion = '3.0.0'
+    bytedeskWebRTCCoreVersion = '3.0.0'
+}
+
+// proto使用说明
+//
+// 在app/main目录下创建proto文件夹，用于存放.proto文件
+// Build - > Clean Project
+// Build - > Rebulid Project
+// 构建完了之后可以在工程的 app/build/generated/source/proto/debug/java/中找到Proto文件

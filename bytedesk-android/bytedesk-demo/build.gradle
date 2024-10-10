@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+
+android {
+
+    defaultConfig {
+        applicationId "com.bytedesk.demo"
+
+        compileSdk 34
+        minSdkVersion 21
+
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    namespace 'com.bytedesk.demo'
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    // import bytedesk library
+    implementation project(':bytedesk-android')
+
+    // https://github.com/orhanobut/logger
+    implementation 'com.orhanobut:logger:2.2.0'
+    //
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    // https://mvnrepository.com/artifact/androidx.annotation/annotation
+    implementation "androidx.annotation:annotation:1.6.0"
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+}

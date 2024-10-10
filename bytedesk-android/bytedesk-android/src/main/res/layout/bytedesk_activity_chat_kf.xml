@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/wx_config_color_10_white">
+
+<!-- android:layout_marginTop="@dimen/album_dp_20"-->
+    <com.bytedesk.im.ui.widget.InputAwareLayout
+        android:id="@+id/bytedesk_activity_chat_kf"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 聊天记录 -->
+        <!--  android:layout_marginTop="20dp"-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:fillViewport="true"
+            android:fitsSystemWindows="true">
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/bytedesk_chat_pulltorefresh"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/bytedesk_chat_fragment_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bytedesk_activity_chat_background_default"
+                    android:paddingLeft="@dimen/bytedesk_activity_horizontal_margin"
+                    android:paddingRight="@dimen/bytedesk_activity_horizontal_margin"
+                    android:scrollbars="vertical"
+                    android:scrollbarStyle="outsideOverlay"/>
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <include android:id="@+id/bytedesk_chat_kf_input" layout="@layout/bytedesk_activity_chat_kf_input" />
+
+        </LinearLayout>
+
+    </com.bytedesk.im.ui.widget.InputAwareLayout>
+
+    <!--<com.liyi.viewer.widget.ScaleImageView-->
+        <!--android:id="@+id/bytedesk_image_preivew"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="#000000"-->
+        <!--android:visibility="gone" />-->
+
+<!--    <Toolbar-->
+<!--        android:id="@+id/bytedesk_chat_topbarlayout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:fitsSystemWindows="true"/>-->
+    
+</FrameLayout>

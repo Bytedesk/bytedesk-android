@@ -1,4 +1,0 @@
-/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/.cxx/cmake/debug/x86/CMakeFiles/rebuild_cache.dir
-/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/.cxx/cmake/debug/x86/CMakeFiles/edit_cache.dir
-/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/.cxx/cmake/debug/x86/CMakeFiles/native-test.dir
-/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/.cxx/cmake/debug/x86/CMakeFiles/native-lib.dir

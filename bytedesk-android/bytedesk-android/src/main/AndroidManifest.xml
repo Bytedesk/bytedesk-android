@@ -1,0 +1,26 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--聊天内容出现电话号码，可直接拨打-->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+<!--    <application>-->
+<!--        <service-->
+<!--            android:name="com.tencent.mars.sample.wrapper.service.MarsServiceNative"-->
+<!--            android:process=":marsservice">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.bytedesk.mars.service.MarsServiceNative"/>-->
+<!--            </intent-filter>-->
+<!--        </service>-->
+
+<!--        <receiver-->
+<!--            android:name="com.tencent.mars.BaseEvent$ConnectionReceiver"-->
+<!--            android:process=":marsservice" />-->
+<!--    </application>-->
+
+</manifest>
