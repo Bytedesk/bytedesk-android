@@ -1,5 +1,0 @@
-# ninja log v5
-0	394	1634024730	CMakeFiles/native-test.dir/native-test.cpp.o	c043dee566fd5bc
-0	395	1634024730	CMakeFiles/native-lib.dir/native-lib.cpp.o	db621f4590b3a4f
-394	482	1634024730	/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/build/intermediates/cmake/debug/obj/arm64-v8a/libnative-test.so	5169cc605d9190db
-395	482	1634024730	/Users/jackning/Desktop/github/bytedeskprivate/bytedeskandroidx/libcore/build/intermediates/cmake/debug/obj/arm64-v8a/libnative-lib.so	11f0d0f7c0f536e9

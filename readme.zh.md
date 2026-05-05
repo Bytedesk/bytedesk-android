@@ -1,93 +1,52 @@
-<!--
- * @Author: jackning 270580156@qq.com
- * @Date: 2024-10-09 11:50:31
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-21 16:08:09
- * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
- *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
- *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
--->
-# 微语 Android SDK
+# Visitor Android
 
-- [官网](https://www.weiyuai.cn/)
-- [萝卜丝->请切换此分支](https://gitee.com/270580156/bytedesk-android/tree/luobosi/)
+Visitor Android 是 Bytedesk 访客端的原生 Android 实现，基于 Jetpack Compose，整体交互与 Visitor UniApp 的三个 tab 保持一致。
 
-## 语言
+## 功能说明
 
-- [English](./README.md)
-- [中文](./README.zh.md)
+- 基于 Jetpack Compose Material 3 的原生访客演示应用。
+- 首页支持普通会话、商品会话、订单会话入口。
+- 消息页从线上接口拉取访客历史会话。
+- 我的页面支持切换预置演示用户。
+- 聊天内容通过 Android WebView 加载。
 
-## 部分功能
+## 默认线上地址
 
-- 微语官方技术支持
-- 100%全部开源，支持自定义界面
-- 支持人工客服
-- 支持机器人
-- 支持文字、图片、语音、表情
-- 支持消息预知：对方正在输入
-- 支持消息状态：送达、已读
-- 支持消息撤回
-- 对接第三方账号系统/多用户切换
+- Chat 页面：https://cdn.weiyuai.cn
+- API 地址：https://api.weiyuai.cn
 
-## Demo 下载
+## 关键文件
 
-- [Gitee Demo](https://gitee.com/270580156/bytedesk-android)
-- [Github Demo](https://github.com/Bytedesk/bytedesk-android)
+- app/src/main/java/com/bytedesk/visitorandroid/MainActivity.kt：应用入口、tab 布局、接口加载、聊天 WebView
+- app/src/main/AndroidManifest.xml：网络权限与 Web 访问配置
 
-## 集成
+## 环境要求
+
+- 已安装 Android Studio 和 Android SDK
+- JDK 11
+- 命令行构建时配置 ANDROID_HOME 与 ANDROID_SDK_ROOT
+
+## 使用步骤
+
+1. 用 Android Studio 打开 frontend/apps/visitorAndroid。
+2. 等待 Gradle 同步完成。
+3. 运行到模拟器或真机。
+
+命令行校验可使用：
 
 ```bash
-# 在项目中引入bytedesk-android模块，参考bytedesk-demo
-implementation project(':bytedesk-android')
+cd frontend/apps/visitorAndroid
+ANDROID_HOME=/path/to/android/sdk ANDROID_SDK_ROOT=/path/to/android/sdk ./gradlew :app:compileDebugKotlin
 ```
 
-混淆
+## 体验流程
 
-```bash
-# 参考bytedesk-demo proguard-rules.pro
-```
+1. 进入首页，点击场景卡片直接进入客服会话。
+2. 进入消息页，从线上接口拉取历史会话。
+3. 点击某条会话继续沟通。
+4. 进入我的页切换当前演示用户。
 
-## 截图
+## 说明
 
-|                      image1                      |                       image2                       |                        image3                        |
-| :----------------------------------------------: | :------------------------------------------------: | :--------------------------------------------------: |
-| <img src="./images/home.jpeg?raw=true" width="250"> | <img src="./images/robot.jpeg?raw=true" width="250">  |  <img src="./images/notice.jpeg?raw=true" width="250">  |
-| <img src="./images/chat.png?raw=true" width="250">  | <img src="./images/status.jpeg?raw=true" width="250"> | <img src="./images/userinfo.jpeg?raw=true" width="250"> |
-
-## 对话SDK
-
-| Project     | Description           | Forks          | Stars             |
-|-------------|-----------------------|----------------|-------------------|
-| [iOS-swift](https://github.com/bytedesk/bytedesk-swift) | iOS swift  | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-swift) | ![GitHub Repo stars](https://img.shields.io/github/stars/Bytedesk/bytedesk-swift)                 |
-| [Android](https://github.com/bytedesk/bytedesk-android) | Android | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-android) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-android)  |
-| [Flutter](https://github.com/bytedesk/bytedesk-flutter) | Flutter | ![GitHub forks](https://img.shields.io/github/bytedesk/bytedesk-flutter)| ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-flutter) |
-| [React](https://github.com/bytedesk/bytedesk-react) | React | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-react) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-react) |
-| [UniApp](https://github.com/bytedesk/bytedesk-uniapp) | Uniapp | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-uniapp) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-uniapp) |
-| [Web/Vue](https://github.com/bytedesk/bytedesk-web) | Web/Vue | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-web) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-web) |
-
-## 客户端
-
-- [Windows](https://www.weiyuai.cn/download.html)
-- [Mac](https://www.weiyuai.cn/download.html)
-- [Linux](https://www.weiyuai.cn/download.html)
-- [Android](https://www.weiyuai.cn/download.html)
-- [IOS](https://www.weiyuai.cn/download.html)
-
-## 技术栈
-
-<!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server 基于金融级云原生架构-->
-- [springboot-3.x for 后端](https://github.com/Bytedesk/bytedesk)
-- [python for ai](https://github.com/Bytedesk/bytedesk-ai)
-- [react for web前端](https://github.com/Bytedesk/bytedesk-react)
-- [flutter for 移动客户端(ios&android)](https://github.com/Bytedesk/bytedesk-mobile)
-- [electron for 桌面客户端(windows&mac&linux)](https://github.com/Bytedesk/bytedesk-desktop)
-
-## 联系
-
-- [Email](mailto:270580156@qq.com)
-- [微信](./images/wechat.png)
+- 当前默认使用线上地址。
+- AndroidManifest.xml 中已配置网络权限和 cleartext 支持。
