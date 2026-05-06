@@ -70,6 +70,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.bytedesk.visitorandroid.ui.theme.VisitorAndroidTheme
@@ -105,6 +106,7 @@ private data class ThreadSummary(
     val updatedAt: String,
     val unreadCount: Int,
     val avatar: String,
+    val isPlatformThread: Boolean,
 ) {
     val typeLabel: String
         get() = when (type) {
@@ -133,6 +135,7 @@ private data class ThreadSummary(
                 updatedAt = formatTime(thread.optString("updatedAt", thread.optString("createdAt"))),
                 unreadCount = thread.optInt("visitorUnreadCount", thread.optInt("unreadCount", 0)),
                 avatar = resolveThreadAvatar(thread),
+                isPlatformThread = thread.optString("orgUid") == DEFAULT_CHAT_PROFILE.org,
             )
         }
     }
@@ -624,7 +627,29 @@ private fun MessagesTab(
                                         Text(thread.title, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
                                         Text(thread.updatedAt, style = MaterialTheme.typography.bodySmall, color = Color(0xFF79867E))
                                     }
-                                    Text(thread.preview, style = MaterialTheme.typography.bodyMedium, color = Color(0xFF56655B))
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        if (thread.isPlatformThread) {
+                                            Surface(
+                                                color = Color(0x1F2C5D9F),
+                                                shape = RoundedCornerShape(999.dp),
+                                            ) {
+                                                Text(
+                                                    text = "平台",
+                                                    color = Color(0xFF2C5D9F),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                                )
+                                            }
+                                        }
+                                        Text(
+                                            thread.preview,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = Color(0xFF56655B),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                    }
                                     Row {
                                         Spacer(modifier = Modifier.weight(1f))
                                         if (thread.unreadCount > 0) {
